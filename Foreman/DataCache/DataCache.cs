@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -17,6 +18,7 @@ namespace Foreman
 
 		public IEnumerable<Group> AvailableGroups { get { return groups.Values.Where(g => g.Available); } }
 		public IEnumerable<Subgroup> AvailableSubgroups { get { return subgroups.Values.Where(g => g.Available); } }
+		public IEnumerable<Quality> AvailableQualities { get { return qualities.Values.Where(g => g.Available); } }
 		public IEnumerable<Item> AvailableItems { get { return items.Values.Where(g => g.Available); } }
 		public IEnumerable<Recipe> AvailableRecipes { get { return recipes.Values.Where(g => g.Available); } }
 
@@ -27,6 +29,7 @@ namespace Foreman
 		public IReadOnlyDictionary<string, Technology> Technologies { get { return technologies; } }
 		public IReadOnlyDictionary<string, Group> Groups { get { return groups; } }
 		public IReadOnlyDictionary<string, Subgroup> Subgroups { get { return subgroups; } }
+		public IReadOnlyDictionary<string, Quality> Qualities { get { return qualities; } }
 		public IReadOnlyDictionary<string, Item> Items { get { return items; } }
 		public IReadOnlyDictionary<string, Recipe> Recipes { get { return recipes; } }
 		public IReadOnlyDictionary<string, Assembler> Assemblers { get { return assemblers; } }
@@ -47,6 +50,9 @@ namespace Foreman
 		public IReadOnlyDictionary<string, Beacon> MissingBeacons { get { return missingBeacons; } }
 		public IReadOnlyDictionary<RecipeShort, Recipe> MissingRecipes { get { return missingRecipes; } }
 
+		public Quality DefaultQuality { get; private set; }
+		private Quality ErrorQuality;
+
 		public static Bitmap UnknownIcon { get { return IconCache.GetUnknownIcon(); } }
 		private static Bitmap noBeaconIcon;
 		public static Bitmap NoBeaconIcon { get { if (noBeaconIcon == null) noBeaconIcon = IconCache.GetIcon(Path.Combine("Graphics", "NoBeacon.png"), 64); return noBeaconIcon; } }
@@ -56,6 +62,7 @@ namespace Foreman
 		private Dictionary<string, Technology> technologies;
 		private Dictionary<string, Group> groups;
 		private Dictionary<string, Subgroup> subgroups;
+		private Dictionary<string, Quality> qualities;
 		private Dictionary<string, Item> items;
 		private Dictionary<string, Recipe> recipes;
 		private Dictionary<string, Assembler> assemblers;
@@ -108,6 +115,7 @@ namespace Foreman
 			technologies = new Dictionary<string, Technology>();
 			groups = new Dictionary<string, Group>();
 			subgroups = new Dictionary<string, Subgroup>();
+			qualities = new Dictionary<string, Quality>();
 			items = new Dictionary<string, Item>();
 			recipes = new Dictionary<string, Recipe>();
 			assemblers = new Dictionary<string, Assembler>();
@@ -158,6 +166,8 @@ namespace Foreman
 			rocketLaunchSubgroup.myGroup = extraFormanGroup;
 			extraFormanGroup.subgroups.Add(rocketLaunchSubgroup);
 
+			ErrorQuality = new QualityPrototype(this, "§§error_quality", "ERROR", "-");
+
 			IconColorPair heatIcon = new IconColorPair(IconCache.GetIcon(Path.Combine("Graphics", "HeatIcon.png"), 64), Color.DarkRed);
 			IconColorPair burnerGeneratorIcon = new IconColorPair(IconCache.GetIcon(Path.Combine("Graphics", "BurnerGeneratorIcon.png"), 64), Color.DarkRed);
 			IconColorPair playerAssemblerIcon = new IconColorPair(IconCache.GetIcon(Path.Combine("Graphics", "PlayerAssembler.png"), 64), Color.Gray);
@@ -177,15 +187,11 @@ namespace Foreman
 			BurnerRecipe.Time = 1;
 
 			playerAssember = new AssemblerPrototype(this, "§§a:player-assembler", "Player", EntityType.Assembler, EnergySource.Void);
-			playerAssember.EnergyConsumption = 0;
-			playerAssember.EnergyDrain = 0;
-			playerAssember.EnergyProduction = 0;
+			playerAssember.energyDrain = 0;
 			playerAssember.SetIconAndColor(playerAssemblerIcon);
 			
 			rocketAssembler = new AssemblerPrototype(this, "§§a:rocket-assembler", "Rocket", EntityType.Rocket, EnergySource.Void);
-			rocketAssembler.EnergyConsumption = 0;
-			rocketAssembler.EnergyDrain = 0;
-			rocketAssembler.EnergyProduction = 0;
+			rocketAssembler.energyDrain = 0;
 			rocketAssembler.SetIconAndColor(rocketAssemblerIcon);
 
 			ElectricityIcon = IconCache.GetIcon(Path.Combine("Graphics", "ElectricityIcon.png"), 64);
@@ -199,12 +205,18 @@ namespace Foreman
 		public async Task LoadAllData(Preset preset, IProgress<KeyValuePair<int, string>> progress, bool loadIcons = true)
 		{
 			Clear();
+			//return;
 
 			Dictionary<string, List<RecipePrototype>> craftingCategories = new Dictionary<string, List<RecipePrototype>>();
 			Dictionary<string, List<RecipePrototype>> resourceCategories = new Dictionary<string, List<RecipePrototype>>();
+			resourceCategories.Add("<<foreman_resource_category_water_tile>>", new List<RecipePrototype>()); //the water resources
 			Dictionary<string, List<ItemPrototype>> fuelCategories = new Dictionary<string, List<ItemPrototype>>();
 			fuelCategories.Add("§§fc:liquids", new List<ItemPrototype>()); //the liquid fuels category
 			Dictionary<Item, string> burnResults = new Dictionary<Item, string>();
+			Dictionary<Item, string> plantResults = new Dictionary<Item, string>();
+			Dictionary<Item, string> spoilResults = new Dictionary<Item, string>();
+			Dictionary<Quality, string> nextQualities = new Dictionary<Quality, string>();
+			List<Recipe> miningWithFluidRecipes = new List<Recipe>();
 
 			PresetName = preset.Name;
 			JObject jsonData = PresetProcessor.PrepPreset(preset);
@@ -220,34 +232,54 @@ namespace Foreman
 				//process each section (order is rather important here)
 				foreach (var objJToken in jsonData["mods"].ToList())
 					ProcessMod(objJToken);
+
 				foreach (var objJToken in jsonData["subgroups"].ToList())
 					ProcessSubgroup(objJToken);
+
 				foreach (var objJToken in jsonData["groups"].ToList())
 					ProcessGroup(objJToken, iconCache);
+
+				foreach (var objToken in jsonData["qualities"].ToList())
+					ProcessQuality(objToken, iconCache, nextQualities);
+				foreach (QualityPrototype quality in qualities.Values.Cast<QualityPrototype>())
+					ProcessQualityLink(quality, nextQualities);
+				ProcessDefaultQuality();
+
 				foreach (var objJToken in jsonData["fluids"].ToList())
 					ProcessFluid(objJToken, iconCache, fuelCategories);
+
 				foreach (var objJToken in jsonData["items"].ToList())
-					ProcessItem(objJToken, iconCache, fuelCategories, burnResults); //items after fluids to take care of duplicates (if name exists in fluid and in item set, then only the fluid is counted)
-				foreach (ItemPrototype item in items.Values)
-					ProcessBurnItem(item, fuelCategories, burnResults); //link up any items with burn remains
-				foreach (var objJToken in jsonData["recipes"].ToList())
-					ProcessRecipe(objJToken, iconCache, craftingCategories);
+					ProcessItem(objJToken, iconCache, fuelCategories, burnResults, plantResults, spoilResults); //items after fluids to take care of duplicates (if name exists in fluid and in item set, then only the fluid is counted)
+				foreach (ItemPrototype item in items.Values.Cast<ItemPrototype>())
+					ProcessBurnItem(item, burnResults); //link up any items with burn remains
+                foreach (ItemPrototype item in items.Values.Cast<ItemPrototype>())
+                    ProcessPlantItem(item, plantResults); //link up any items with plant results
+                foreach (ItemPrototype item in items.Values.Cast<ItemPrototype>())
+                    ProcessSpoilItem(item, spoilResults); //link up any items with spoil remains
 
 				foreach (var objJToken in jsonData["modules"].ToList())
 					ProcessModule(objJToken, iconCache);
+
+                foreach (var objJToken in jsonData["recipes"].ToList())
+					ProcessRecipe(objJToken, iconCache, craftingCategories);
+
 				foreach (var objJToken in jsonData["resources"].ToList())
-					ProcessResource(objJToken, resourceCategories);
+					ProcessResource(objJToken, resourceCategories, miningWithFluidRecipes);
+				foreach (var objToken in jsonData["water_resources"].ToList())
+					ProcessResource(objToken, resourceCategories, miningWithFluidRecipes);
+
 				foreach (var objJToken in jsonData["technologies"].ToList())
-					ProcessTechnology(objJToken, iconCache);
+					ProcessTechnology(objJToken, iconCache, miningWithFluidRecipes);
 				foreach (var objJToken in jsonData["technologies"].ToList())
 					ProcessTechnologyP2(objJToken); //required to properly link technology prerequisites
-				foreach (var objJToken in jsonData["entities"].ToList())
-					ProcessEntity(objJToken, iconCache, craftingCategories, resourceCategories, fuelCategories);
 
-				//process launch products
-				foreach (var objJToken in jsonData["items"].Where(t => t["launch_products"] != null).ToList())
+				foreach (var objJToken in jsonData["entities"].ToList())
+					ProcessEntity(objJToken, iconCache, craftingCategories, resourceCategories, fuelCategories, miningWithFluidRecipes);
+
+				//process launch products (empty now - depreciated)
+				foreach (var objJToken in jsonData["items"].Where(t => t["rocket_launch_products"] != null).ToList())
 					ProcessRocketLaunch(objJToken);
-				foreach (var objJToken in jsonData["fluids"].Where(t => t["launch_products"] != null).ToList())
+				foreach (var objJToken in jsonData["fluids"].Where(t => t["rocket_launch_products"] != null).ToList())
 					ProcessRocketLaunch(objJToken);
 
 				//process character
@@ -261,11 +293,14 @@ namespace Foreman
 				resourceCategories.Clear();
 				fuelCategories.Clear();
 				burnResults.Clear();
+				plantResults.Clear();
+				spoilResults.Clear();
+
 
 				//sort
-				foreach (GroupPrototype g in groups.Values)
+				foreach (GroupPrototype g in groups.Values.Cast<GroupPrototype>())
 					g.SortSubgroups();
-				foreach (SubgroupPrototype sg in subgroups.Values)
+				foreach (SubgroupPrototype sg in subgroups.Values.Cast<SubgroupPrototype>())
 					sg.SortIRs();
 
 				//The data read by the dataCache (json preset) includes everything. We need to now process it such that any items/recipes that cant be used dont appear.
@@ -274,7 +309,7 @@ namespace Foreman
 
 				//delete any recipe that has no assembler. This is the only type of deletion that we will do, as we MUST enforce the 'at least 1 assembler' per recipe. The only recipes with no assemblers linked are those added to 'missing' category, and those are handled separately.
 				//note that even hand crafting has been handled: there is a player assembler that has been added. So the only recipes removed here are those that literally can not be crafted.
-				foreach (RecipePrototype recipe in recipes.Values.Where(r => r.Assemblers.Count == 0).ToList())
+				foreach (RecipePrototype recipe in recipes.Values.Where(r => r.Assemblers.Count == 0).ToList().Cast<RecipePrototype>())
 				{
 					foreach (ItemPrototype ingredient in recipe.ingredientList)
 						ingredient.consumptionRecipes.Remove(recipe);
@@ -314,6 +349,8 @@ namespace Foreman
 
 		public void Clear()
 		{
+			DefaultQuality = ErrorQuality;
+
 			includedMods.Clear();
 			technologies.Clear();
 			groups.Clear();
@@ -345,8 +382,6 @@ namespace Foreman
 			recipes.Add(HeatRecipe.Name, HeatRecipe);
 			recipes.Add(BurnerRecipe.Name, BurnerRecipe);
 			technologies.Add(StartingTech.Name, startingTech);
-
-
 		}
 
 		//------------------------------------------------------Import processing
@@ -498,6 +533,52 @@ namespace Foreman
 			groups.Add(group.Name, group);
 		}
 
+		private void ProcessQuality(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<Quality, string> nextQualities)
+		{
+			QualityPrototype quality = new QualityPrototype(
+				this,
+				(string)objJToken["name"],
+				(string)objJToken["localised_name"],
+				(string)objJToken["order"]);
+
+			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
+				quality.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
+
+			quality.Enabled = false; //we will set the enabled qualities from default later
+			quality.Available = false;
+
+			quality.Level = (int)objJToken["level"];
+			quality.BeaconPowerMultiplier = (double)objJToken["beacon_power_multiplier"];
+			quality.MiningDrillResourceDrainMultiplier = (double)objJToken["mining_drill_resource_drain_multiplier"];
+			quality.NextProbability = (double)objJToken["next_probability"];
+
+			if (objJToken["next"] != null)
+				nextQualities.Add(quality, (string)objJToken["next"]);
+
+			qualities.Add(quality.Name, quality);
+		}
+
+		private void ProcessQualityLink(QualityPrototype quality, Dictionary<Quality, string> nextQualities)
+		{
+
+			if (nextQualities.ContainsKey(quality) && qualities.ContainsKey(nextQualities[quality]))
+			{
+				quality.NextQuality = qualities[nextQualities[quality]];
+				((QualityPrototype)qualities[nextQualities[quality]]).PrevQuality = quality;
+			}
+		}
+
+		private void ProcessDefaultQuality()
+		{
+			DefaultQuality = qualities.ContainsKey("normal") ? qualities["normal"] : ErrorQuality;
+			Quality cQuality = DefaultQuality;
+			while(cQuality != null)
+			{
+				((QualityPrototype)cQuality).Available = true;
+				cQuality =cQuality.NextQuality;
+			}
+		}
+
 		private void ProcessFluid(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<ItemPrototype>> fuelCategories)
 		{
 			FluidPrototype item = new FluidPrototype(
@@ -512,18 +593,20 @@ namespace Foreman
 
 			item.DefaultTemperature = (double)objJToken["default_temperature"];
 			item.SpecificHeatCapacity = (double)objJToken["heat_capacity"];
+			item.GasTemperature = (double)objJToken["gas_temperature"];
+            item.MaxTemperature = (double)objJToken["max_temperature"];
 
-			if (objJToken["fuel_value"] != null && (double)objJToken["fuel_value"] > 0)
+            if (objJToken["fuel_value"] != null && (double)objJToken["fuel_value"] > 0)
 			{
 				item.FuelValue = (double)objJToken["fuel_value"];
-				item.PollutionMultiplier = (double)objJToken["pollution_multiplier"];
+				item.PollutionMultiplier = (double)objJToken["emissions_multiplier"];
 				fuelCategories["§§fc:liquids"].Add(item);
 			}
 
 			items.Add(item.Name, item);
 		}
 
-		private void ProcessItem(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<ItemPrototype>> fuelCategories, Dictionary<Item, string> burnResults)
+		private void ProcessItem(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<ItemPrototype>> fuelCategories, Dictionary<Item, string> burnResults, Dictionary<Item, string> plantResults, Dictionary<Item, string> spoilResults)
 		{
 			if (items.ContainsKey((string)objJToken["name"])) //special handling for fluids which appear in both items & fluid lists (ex: fluid-unknown)
 				return;
@@ -538,12 +621,14 @@ namespace Foreman
 			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
 				item.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
 
-			item.StackSize = (int)objJToken["stack"];
+			item.StackSize = (int)objJToken["stack_size"];
+			item.Weight = (double)objJToken["weight"];
+			item.IngredientToWeightCoefficient = (double)objJToken["ingredient_to_weight_coefficient"];
 
 			if (objJToken["fuel_category"] != null && (double)objJToken["fuel_value"] > 0) //factorio eliminates any 0fuel value fuel from the list (checked)
 			{
 				item.FuelValue = (double)objJToken["fuel_value"];
-				item.PollutionMultiplier = (double)objJToken["pollution_multiplier"];
+				item.PollutionMultiplier = (double)objJToken["fuel_emissions_multiplier"];
 
 				if (!fuelCategories.ContainsKey((string)objJToken["fuel_category"]))
 					fuelCategories.Add((string)objJToken["fuel_category"], new List<ItemPrototype>());
@@ -551,17 +636,61 @@ namespace Foreman
 			}
 			if (objJToken["burnt_result"] != null)
 				burnResults.Add(item, (string)objJToken["burnt_result"]);
+            if (objJToken["plant_result"] != null)
+                plantResults.Add(item, (string)objJToken["plant_result"]);
+            if (objJToken["spoil_result"] != null)
+                spoilResults.Add(item, (string)objJToken["spoil_result"]);
 
-			items.Add(item.Name, item);
+            items.Add(item.Name, item);
 		}
 
-		private void ProcessBurnItem(ItemPrototype item, Dictionary<string, List<ItemPrototype>> fuelCategories, Dictionary<Item, string> burnResults)
+		private void ProcessBurnItem(ItemPrototype item, Dictionary<Item, string> burnResults)
 		{
 			if (burnResults.ContainsKey(item))
 			{
 				item.BurnResult = items[burnResults[item]];
 				((ItemPrototype)items[burnResults[item]]).FuelOrigin = item;
 			}
+		}
+        private void ProcessPlantItem(ItemPrototype item, Dictionary<Item, string> plantResults)
+        {
+            if (plantResults.ContainsKey(item))
+            {
+                item.PlantResult = items[plantResults[item]];
+                ((ItemPrototype)items[plantResults[item]]).PlantOrigin = item;
+            }
+        }
+        private void ProcessSpoilItem(ItemPrototype item, Dictionary<Item, string> spoilResults)
+        {
+            if (spoilResults.ContainsKey(item))
+            {
+                item.SpoilResult = items[spoilResults[item]];
+                ((ItemPrototype)items[spoilResults[item]]).SpoilOrigin = item;
+            }
+        }
+
+		private void ProcessModule(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
+		{
+			ModulePrototype module = new ModulePrototype(
+				this,
+				(string)objJToken["name"],
+				(string)objJToken["localised_name"]);
+
+			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
+				module.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
+			else if (iconCache.ContainsKey((string)objJToken["icon_alt_name"]))
+				module.SetIconAndColor(iconCache[(string)objJToken["icon_alt_name"]]);
+
+			module.SpeedBonus = (double)objJToken["module_effects"]["speed"];
+			module.ProductivityBonus = (double)objJToken["module_effects"]["productivity"];
+			module.ConsumptionBonus = (double)objJToken["module_effects"]["consumption"];
+			module.PollutionBonus = (double)objJToken["module_effects"]["pollution"];
+			module.QualityBonus = (double)objJToken["module_effects"]["quality"];
+
+			module.Tier = (int)objJToken["tier"];
+			module.Category = (string)objJToken["category"];
+
+			modules.Add(module.Name, module);
 		}
 
 		private void ProcessRecipe(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<RecipePrototype>> craftingCategories)
@@ -621,57 +750,42 @@ namespace Foreman
 				}
 			}
 
-			recipes.Add(recipe.Name, recipe);
-		}
-
-		private void ProcessModule(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
-		{
-			ModulePrototype module = new ModulePrototype(
-				this,
-				(string)objJToken["name"],
-				(string)objJToken["localised_name"]);
-
-			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
-				module.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
-			else if (iconCache.ContainsKey((string)objJToken["icon_alt_name"]))
-				module.SetIconAndColor(iconCache[(string)objJToken["icon_alt_name"]]);
-
-			module.SpeedBonus = (double)objJToken["module_effects_speed"];
-			module.ProductivityBonus = (double)objJToken["module_effects_productivity"];
-			module.ConsumptionBonus = (double)objJToken["module_effects_consumption"];
-			module.PollutionBonus = (double)objJToken["module_effects_pollution"];
-			module.Tier = (int)objJToken["tier"];
-
-			foreach (var recipe in objJToken["limitations"])
+			foreach(ModulePrototype module in modules.Values.Cast<ModulePrototype>())
 			{
-				if (recipes.ContainsKey((string)recipe)) //only add if the recipe is in the list of recipes (if it isnt, means it was deleted either in data phase of LUA or during foreman export cleanup)
+				bool validModule =	((bool)objJToken["allowed_effects"]["consumption"] || module.ConsumptionBonus >= 0) &&
+									((bool)objJToken["allowed_effects"]["speed"] || module.SpeedBonus <= 0) &&
+									((bool)objJToken["allowed_effects"]["productivity"] || module.ProductivityBonus <= 0) &&
+									((bool)objJToken["allowed_effects"]["pollution"] || module.PollutionBonus >= 0) &&
+									((bool)objJToken["allowed_effects"]["quality"] || module.QualityBonus <= 0);
+
+				if (objJToken["allowed_module_categories"] != null)
 				{
-					((RecipePrototype)recipes[(string)recipe]).modules.Add(module);
-					module.recipes.Add((RecipePrototype)recipes[(string)recipe]);
+					foreach (var moduleCategoryJToken in objJToken["allowed_module_categories"])
+					{
+						validModule &= (module.Category == (string)moduleCategoryJToken);
+					}
 				}
-			}
 
-			if (objJToken["limitations"].Count() == 0) //means all recipes work
-			{
-				foreach (RecipePrototype recipe in recipes.Values)
+				if (validModule)
 				{
 					recipe.modules.Add(module);
 					module.recipes.Add(recipe);
 				}
 			}
 
-			modules.Add(module.Name, module);
+			recipes.Add(recipe.Name, recipe);
 		}
 
-		private void ProcessResource(JToken objJToken, Dictionary<string, List<RecipePrototype>> resourceCategories)
+		private string GetExtractionRecipeName(string itemName) { return "§§r:e:" + itemName; }
+
+		private void ProcessResource(JToken objJToken, Dictionary<string, List<RecipePrototype>> resourceCategories, List<Recipe> miningWithFluidRecipes)
 		{
 			if (objJToken["products"].Count() == 0)
 				return;
 
-			string extractionRecipeName = "§§r:e:" + (string)objJToken["name"];
 			RecipePrototype recipe = new RecipePrototype(
 				this,
-				extractionRecipeName,
+				GetExtractionRecipeName((string)objJToken["name"]),
 				(string)objJToken["localised_name"] + " Extraction",
 				(string)objJToken["products"][0]["type"] == "fluid" ? extractionSubgroupFluids : extractionSubgroupItems,
 				(string)objJToken["name"]);
@@ -698,9 +812,10 @@ namespace Foreman
 				ItemPrototype reqLiquid = (ItemPrototype)items[(string)objJToken["required_fluid"]];
 				recipe.InternalOneWayAddIngredient(reqLiquid, (double)objJToken["fluid_amount"]);
 				reqLiquid.consumptionRecipes.Add(recipe);
+				miningWithFluidRecipes.Add(recipe);
 			}
 
-			foreach (ModulePrototype module in modules.Values) //we will let the assembler sort out which module can be used with this recipe
+			foreach (ModulePrototype module in modules.Values.Cast<ModulePrototype>()) //we will let the assembler sort out which module can be used with this recipe
 			{
 				module.recipes.Add(recipe);
 				recipe.modules.Add(module);
@@ -714,13 +829,14 @@ namespace Foreman
 			resourceCategories[category].Add(recipe);
 
 			//resource recipe will be processed when adding to miners (each miner that can use this recipe will have its recipe's techs added to unlock tech of the resource recipe)
+			//this is for any non-fluid based resource! (fluid based item mining is locked behind research and processed in research function)
 			//recipe.myUnlockTechnologies.Add(startingTech);
 			//startingTech.unlockedRecipes.Add(recipe);
 
 			recipes.Add(recipe.Name, recipe);
 		}
 
-		private void ProcessTechnology(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
+		private void ProcessTechnology(JToken objJToken, Dictionary<string, IconColorPair> iconCache, List<Recipe> miningWithFluidRecipes)
 		{
 			TechnologyPrototype technology = new TechnologyPrototype(
 				this,
@@ -739,6 +855,18 @@ namespace Foreman
 					((RecipePrototype)recipes[(string)recipe]).myUnlockTechnologies.Add(technology);
 					technology.unlockedRecipes.Add((RecipePrototype)recipes[(string)recipe]);
 				}
+			}
+
+			foreach (var altModifier in objJToken["alt_modifiers"])
+			{
+				if((string)altModifier == "mining-with-fluid")
+				{
+					foreach(RecipePrototype recipe in miningWithFluidRecipes.Cast<RecipePrototype>())
+					{
+						recipe.myUnlockTechnologies.Add(technology);
+						technology.unlockedRecipes.Add(recipe);
+					}
+				}	
 			}
 
 			foreach (var ingredientJToken in objJToken["research_unit_ingredients"].ToList())
@@ -780,7 +908,7 @@ namespace Foreman
 			assemblers.Add(playerAssember.Name, playerAssember);
 		}
 
-		private void ProcessEntity(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<RecipePrototype>> craftingCategories, Dictionary<string, List<RecipePrototype>> resourceCategories, Dictionary<string, List<ItemPrototype>> fuelCategories)
+		private void ProcessEntity(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<RecipePrototype>> craftingCategories, Dictionary<string, List<RecipePrototype>> resourceCategories, Dictionary<string, List<ItemPrototype>> fuelCategories, List<Recipe> miningWithFluidRecipes)
 		{
 			string type = (string)objJToken["type"];
 			if (type == "character") //character is processed later
@@ -806,18 +934,22 @@ namespace Foreman
 
 
 			if (etype == EntityType.Beacon)
+			{
 				entity = new BeaconPrototype(this,
 					(string)objJToken["name"],
 					(string)objJToken["localised_name"],
 					esource,
 					false);
+			}
 			else
+			{
 				entity = new AssemblerPrototype(this,
 					(string)objJToken["name"],
 					(string)objJToken["localised_name"],
 					etype,
 					esource,
-					false); ;
+					false);
+			}
 
 			//icons
 			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
@@ -826,34 +958,64 @@ namespace Foreman
 				entity.SetIconAndColor(iconCache[(string)objJToken["icon_alt_name"]]);
 
 			//associated items
-			if (objJToken["associated_items"] != null)
-				foreach (string item in objJToken["associated_items"].Select(i => (string)i))
+			if (objJToken["items_to_place_this"] != null)
+				foreach (string item in objJToken["items_to_place_this"].Select(i => (string)i))
 					if (items.ContainsKey(item))
 						entity.associatedItems.Add((ItemPrototype)items[item]);
 
 			//base parameters
-			entity.Speed = objJToken["speed"] == null ? 0.5f : (double)objJToken["speed"];
+			if (objJToken["q_speed"] != null)
+			{
+				foreach (JToken speedToken in objJToken["q_speed"])
+					entity.speed.Add(qualities[(string)speedToken["quality"]], (double)speedToken["value"]);
+			}
+			else if (objJToken["speed"] != null)
+			{
+				foreach (Quality quality in qualities.Values)
+					entity.speed.Add(quality, (double)objJToken["speed"]);
+			}
+
 			entity.ModuleSlots = objJToken["module_inventory_size"] == null ? 0 : (int)objJToken["module_inventory_size"];
 
 			//modules
-			List<string> allowedEffectsList = objJToken["allowed_effects"].Select(token => (string)token).ToList();
-			bool[] allowedEffects = new bool[] {
-				allowedEffectsList.Contains("consumption"),
-				allowedEffectsList.Contains("speed"),
-				allowedEffectsList.Contains("productivity"),
-				allowedEffectsList.Contains("pollution") };
-
-			foreach (ModulePrototype module in modules.Values.Where(module =>
-				 (allowedEffects[0] || module.ConsumptionBonus == 0) &&
-				 (allowedEffects[1] || module.SpeedBonus == 0) &&
-				 (allowedEffects[2] || module.ProductivityBonus == 0) &&
-				 (allowedEffects[3] || module.PollutionBonus == 0)))
+			if (entity.EntityType == EntityType.Assembler || entity.EntityType == EntityType.Miner || entity.EntityType == EntityType.Rocket || entity.EntityType == EntityType.Beacon)
 			{
-				entity.modules.Add(module);
-				if (entity is AssemblerPrototype aEntity)
-					module.assemblers.Add(aEntity);
-				else if (entity is BeaconPrototype bEntity)
-					module.beacons.Add(bEntity);
+				if (entity is AssemblerPrototype)
+				{
+					((AssemblerPrototype)entity).BaseConsumptionBonus = (double)objJToken["base_module_effects"]["consumption"];
+					((AssemblerPrototype)entity).BaseSpeedBonus = (double)objJToken["base_module_effects"]["speed"];
+					((AssemblerPrototype)entity).BaseProductivityBonus = (double)objJToken["base_module_effects"]["productivity"];
+					((AssemblerPrototype)entity).BasePollutionBonus = (double)objJToken["base_module_effects"]["pollution"];
+					((AssemblerPrototype)entity).BaseQualityBonus = (double)objJToken["base_module_effects"]["quality"];
+					((AssemblerPrototype)entity).AllowModules = (bool)objJToken["uses_module_effects"];
+					((AssemblerPrototype)entity).AllowBeacons = (bool)objJToken["uses_beacon_effects"];
+				}
+
+				foreach (ModulePrototype module in modules.Values.Cast<ModulePrototype>())
+				{
+					bool validModule = ((bool)objJToken["allowed_effects"]["consumption"] || module.ConsumptionBonus >= 0) &&
+										((bool)objJToken["allowed_effects"]["speed"] || module.SpeedBonus <= 0) &&
+										((bool)objJToken["allowed_effects"]["productivity"] || module.ProductivityBonus <= 0) &&
+										((bool)objJToken["allowed_effects"]["pollution"] || module.PollutionBonus >= 0) &&
+										((bool)objJToken["allowed_effects"]["quality"] || module.QualityBonus <= 0);
+
+					if (objJToken["allowed_module_categories"] != null)
+					{
+						foreach (var moduleCategoryJToken in objJToken["allowed_module_categories"].ToList())
+						{
+							validModule &= (module.Category == (string)moduleCategoryJToken);
+						}
+					}
+
+					if (validModule)
+					{
+						entity.modules.Add(module);
+						if (entity is AssemblerPrototype aEntity)
+							module.assemblers.Add(aEntity);
+						else if (entity is BeaconPrototype bEntity)
+							module.beacons.Add(bEntity);
+					}
+				}
 			}
 
 			//energy types
@@ -863,13 +1025,13 @@ namespace Foreman
 			if (etype == EntityType.Beacon)
 			{
 				BeaconPrototype bEntity = (BeaconPrototype)entity;
-				bEntity.BeaconEffectivity = objJToken["distribution_effectivity"] == null ? 0.5f : (double)objJToken["distribution_effectivity"];
-				beacons.Add(bEntity.Name, bEntity);
+
+				if (BeaconAdditionalProcessing(objJToken, bEntity))
+					beacons.Add(bEntity.Name, bEntity);
 			}
 			else
 			{
 				AssemblerPrototype aEntity = (AssemblerPrototype)entity;
-				aEntity.BaseProductivityBonus = objJToken["base_productivity"] == null ? 0f : (double)objJToken["base_productivity"];
 
 				bool success = false;
 				switch (etype)
@@ -887,10 +1049,10 @@ namespace Foreman
 						success = GeneratorAdditionalProcessing(objJToken, aEntity);
 						break;
 					case EntityType.Miner:
-						success = MinerAdditionalProcessing(objJToken, aEntity, resourceCategories);
+						success = MinerAdditionalProcessing(objJToken, aEntity, resourceCategories, miningWithFluidRecipes);
 						break;
 					case EntityType.OffshorePump:
-						success = OffshorePumpAdditionalProcessing(objJToken, aEntity);
+						success = OffshorePumpAdditionalProcessing(objJToken, aEntity, resourceCategories["<<foreman_resource_category_water_tile>>"]);
 						break;
 					case EntityType.Reactor:
 						success = ReactorAdditionalProcessing(objJToken, aEntity);
@@ -904,14 +1066,28 @@ namespace Foreman
 		private void EntityEnergyFurtherProcessing(JToken objJToken, EntityObjectBasePrototype entity, Dictionary<string, List<ItemPrototype>> fuelCategories)
 		{
 			entity.ConsumptionEffectivity = (double)objJToken["fuel_effectivity"];
-			entity.Pollution = (double)objJToken["pollution"]; //calculated as per energy, so no tick to second conversion necessary
-			entity.EnergyProduction = (double)objJToken["energy_production"] * 60f; //in seconds
 
+			//pollution
+			if(objJToken is JObject objJObject)
+			{
+				Dictionary<string, double> pollutions = objJObject["pollution"].ToObject<Dictionary<string, double>>();
+				foreach (KeyValuePair<string, double> pollution in pollutions)
+					entity.pollution.Add(pollution.Key, pollution.Value);
+			}
+
+			//energy production
+			foreach (JToken speedToken in objJToken["q_energy_production"])
+				entity.energyProduction.Add(qualities[(string)speedToken["quality"]], (double)speedToken["value"] * 60.0f); //60 = convert ticks to seconds
+
+			//energy consumption
+			entity.energyDrain = objJToken["drain"] != null ? (double)objJToken["drain"] * 60f : 0; //seconds
+			foreach (JToken speedToken in objJToken["q_max_energy_usage"])
+				entity.energyConsumption.Add(qualities[(string)speedToken["quality"]], (double)speedToken["value"] * 60.0f); //60 = convert ticks to seconds
+
+			//fuel processing
 			switch (entity.EnergySource)
 			{
 				case EnergySource.Burner:
-					entity.EnergyDrain = 0;
-					entity.EnergyConsumption = (double)objJToken["max_energy_usage"] * 60f; //in seconds
 					foreach (var categoryJToken in objJToken["fuel_categories"])
 					{
 						if (fuelCategories.ContainsKey((string)categoryJToken))
@@ -926,9 +1102,6 @@ namespace Foreman
 					break;
 
 				case EnergySource.FluidBurner:
-					entity.EnergyDrain = 0;
-					entity.EnergyConsumption = (double)objJToken["max_energy_usage"] * 60f; //in seconds
-					
 					entity.IsTemperatureFluidBurner = !(bool)objJToken["burns_fluid"];
 					entity.FluidFuelTemperatureRange = new fRange(objJToken["minimum_fuel_temperature"] == null ? double.NegativeInfinity : (double)objJToken["minimum_fuel_temperature"], objJToken["maximum_fuel_temperature"] == null ? double.PositiveInfinity : (double)objJToken["maximum_fuel_temperature"]);
 					string fuelFilter = objJToken["fuel_filter"] == null ? null : (string)objJToken["fuel_filter"];
@@ -955,7 +1128,7 @@ namespace Foreman
 					}
 					else //ok, this is a bit of a FK U, but this basically means this entity can burn any fluid, and burns it as a temperature range. This is how the old steam generators worked (where you could feed in hot sulfuric acid and it would just burn through it no problem). If you want to use it, fine. Here you go.
 					{
-						foreach(FluidPrototype fluid in items.Values.Where(i => i is Fluid))
+						foreach(FluidPrototype fluid in items.Values.Where(i => i is Fluid).Cast<FluidPrototype>())
 						{
 							entity.fuels.Add(fluid);
 							fluid.fuelsEntities.Add(entity);
@@ -964,23 +1137,46 @@ namespace Foreman
 					break;
 
 				case EnergySource.Heat:
-					entity.EnergyDrain = 0;
-					entity.EnergyConsumption = (double)objJToken["max_energy_usage"] * 60f; //in seconds
 					entity.fuels.Add(HeatItem);
 					HeatItem.fuelsEntities.Add(entity);
 					break;
 
 				case EnergySource.Electric:
-					entity.EnergyDrain = (double)objJToken["drain"] * 60f; //seconds
-					entity.EnergyConsumption = (double)objJToken["max_energy_usage"] * 60f; //seconds
 					break;
 
 				case EnergySource.Void:
 				default:
-					entity.EnergyConsumption = 0;
-					entity.EnergyDrain = 0;
 					break;
 			}
+		}
+
+		private bool BeaconAdditionalProcessing(JToken objJToken, BeaconPrototype bEntity)
+		{
+			bEntity.DistributionEffectivity = objJToken["distribution_effectivity"] == null ? 0.5f : (double)objJToken["distribution_effectivity"];
+			bEntity.DistributionEffectivityQualityBoost = objJToken["distribution_effectivity_bonus_per_quality_level"] == null ? 0f : (double)objJToken["distribution_effectivity_bonus_per_quality_level"];
+
+			if (objJToken["profile"] != null)
+			{
+				int quantity = 1;
+				double lastProfile = 0.5f;
+				foreach(var profileJToken in objJToken["profile"])
+				{
+					lastProfile = (double)profileJToken;
+					bEntity.profile[quantity] = lastProfile;
+
+					quantity++;
+					if (quantity >= bEntity.profile.Length)
+						break;
+				}
+				while(quantity < bEntity.profile.Length)
+				{
+					bEntity.profile[quantity] = lastProfile;
+					quantity++;
+				}
+				bEntity.profile[0] = bEntity.profile[1]; //helps with calculating partial beacon values (ex: 0.5 beacons)
+			}
+
+			return true;
 		}
 
 		private bool AssemblerAdditionalProcessing(JToken objJToken, AssemblerPrototype aEntity, Dictionary<string, List<RecipePrototype>> craftingCategories) //recipe user
@@ -1002,7 +1198,7 @@ namespace Foreman
 			return true;
 		}
 
-		private bool MinerAdditionalProcessing(JToken objJToken, AssemblerPrototype aEntity, Dictionary<string, List<RecipePrototype>> resourceCategories) //resource provider
+		private bool MinerAdditionalProcessing(JToken objJToken, AssemblerPrototype aEntity, Dictionary<string, List<RecipePrototype>> resourceCategories, List<Recipe> miningWithFluidRecipes) //resource provider
 		{
 			foreach (var categoryJToken in objJToken["resource_categories"])
 			{
@@ -1012,7 +1208,9 @@ namespace Foreman
 					{
 						if (TestRecipeEntityPipeFit(recipe, objJToken))
 						{
-							ProcessEntityRecipeTechlink(aEntity, recipe);
+							if(!miningWithFluidRecipes.Contains(recipe))
+								ProcessEntityRecipeTechlink(aEntity, recipe);
+
 							recipe.assemblers.Add(aEntity);
 							aEntity.recipes.Add(recipe);
 						}
@@ -1022,47 +1220,51 @@ namespace Foreman
 			return true;
 		}
 
-		private bool OffshorePumpAdditionalProcessing(JToken objJToken, AssemblerPrototype aEntity) //fluid provider (vanilla -> water, mods can add extra)
+		private bool OffshorePumpAdditionalProcessing(JToken objJToken, AssemblerPrototype aEntity, List<RecipePrototype> waterPumpRecipes)
 		{
-			if (objJToken["fluid_product"] == null)
-				return false;
+			//check if the pump has a specified 'output' fluid preset. if yes then only that recipe is added to it; if not then all water tile resource recipes are added
+			List<string> outPipeFilters = objJToken["out_pipe_filters"].Select(o => (string)o).ToList();
 
-			string fluidName = (string)objJToken["fluid_product"];
-			ItemPrototype fluid = (ItemPrototype)items[fluidName];
-
-			//now to add an extra recipe that will be used to 'mine' this fluid
-			RecipePrototype recipe;
-			string extractionRecipeName = "§§r:e:" + fluid.Name;
-			if (!recipes.ContainsKey(extractionRecipeName))
+			if (outPipeFilters.Count != 0)
 			{
-				recipe = new RecipePrototype(
-					this,
-					extractionRecipeName,
-					fluid.FriendlyName + " Extraction",
-					extractionSubgroupFluidsOP,
-					fluid.Name);
-
-				recipe.SetIconAndColor(new IconColorPair(fluid.Icon, fluid.AverageColor));
-				recipe.Time = 1;
-
-				recipe.InternalOneWayAddProduct(fluid, 60, 60);
-				fluid.productionRecipes.Add(recipe);
-
-
-				foreach (ModulePrototype module in modules.Values) //we will let the assembler sort out which module can be used with this recipe
+				if (recipes.TryGetValue(GetExtractionRecipeName(outPipeFilters[0]), out Recipe extractionRecipe))
 				{
-					module.recipes.Add(recipe);
-					recipe.modules.Add(module);
+					ProcessEntityRecipeTechlink(aEntity, (RecipePrototype)extractionRecipe);
+					((RecipePrototype)extractionRecipe).assemblers.Add(aEntity);
+					aEntity.recipes.Add((RecipePrototype)extractionRecipe);
 				}
+				else
+				{
+					//add new recipe
+					if (!items.TryGetValue(outPipeFilters[0], out Item extractionFluid))
+						return false;
 
-				recipes.Add(recipe.Name, recipe);
+					RecipePrototype recipe = new RecipePrototype(
+						this,
+						GetExtractionRecipeName(outPipeFilters[0]),
+						extractionFluid.FriendlyName + " Extraction",
+						extractionSubgroupFluids,
+						extractionFluid.Name);
+
+					recipe.Time = 1;
+
+					recipe.InternalOneWayAddProduct((ItemPrototype)extractionFluid, 60, 60);
+					((ItemPrototype)extractionFluid).productionRecipes.Add(recipe);
+
+					recipe.SetIconAndColor(new IconColorPair(recipe.productList[0].Icon, recipe.productList[0].AverageColor));
+
+					recipes.Add(recipe.Name, recipe);
+				}
 			}
 			else
-				recipe = (RecipePrototype)recipes[extractionRecipeName];
-
-			ProcessEntityRecipeTechlink(aEntity, recipe);
-			recipe.assemblers.Add(aEntity);
-			aEntity.recipes.Add(recipe);
+			{
+				foreach (RecipePrototype recipe in waterPumpRecipes)
+				{
+					ProcessEntityRecipeTechlink(aEntity, recipe);
+					recipe.assemblers.Add(aEntity);
+					aEntity.recipes.Add(recipe);
+				}
+			}
 
 			return true;
 		}
@@ -1072,7 +1274,7 @@ namespace Foreman
 			if (objJToken["fluid_ingredient"] == null || objJToken["fluid_product"] == null)
 				return false;
 			FluidPrototype ingredient = (FluidPrototype)items[(string)objJToken["fluid_ingredient"]];
-			ItemPrototype product = (ItemPrototype)items[(string)objJToken["fluid_product"]];
+			FluidPrototype product = (FluidPrototype)items[(string)objJToken["fluid_product"]];
 
 			//boiler is a ingredient to product conversion with product coming out at the  target_temperature *C at a rate based on energy efficiency & energy use to bring the INGREDIENT to the given temperature (basically ingredient goes from default temp to target temp, then shifts to product). we will add an extra recipe for this
 			double temp = (double)objJToken["target_temperature"];
@@ -1083,9 +1285,14 @@ namespace Foreman
 			//then the values calculated here will be wrong.
 			//Still, for now I will leave it as is.
 			if (ingredient.SpecificHeatCapacity == 0)
-				aEntity.Speed = 0;
-			else
-				aEntity.Speed = (double)(aEntity.EnergyConsumption / ((temp - ingredient.DefaultTemperature) * ingredient.SpecificHeatCapacity * 60)); //by placing this here we can keep the recipe as a 1 sec -> 60 production, simplifying recipe comparing for presets.
+			{
+				foreach (Quality quality in qualities.Values)
+					aEntity.speed.Add(quality, 0);
+			} else
+			{
+                foreach (Quality quality in qualities.Values)
+                    aEntity.speed.Add(quality, (double)(aEntity.GetEnergyConsumption(quality) / ((temp - ingredient.DefaultTemperature) * ingredient.SpecificHeatCapacity * 60))); //by placing this here we can keep the recipe as a 1 sec -> 60 production, simplifying recipe comparing for presets.
+			}
 
 			RecipePrototype recipe;
 			string boilRecipeName = string.Format("§§r:b:{0}:{1}:{2}", ingredient.Name, product.Name, temp.ToString());
@@ -1104,11 +1311,13 @@ namespace Foreman
 
 				recipe.InternalOneWayAddIngredient(ingredient, 60);
 				ingredient.consumptionRecipes.Add(recipe);
-				recipe.InternalOneWayAddProduct(product, 60, 60, temp);
+
+				double productQuantity = 60 * ingredient.SpecificHeatCapacity / product.SpecificHeatCapacity;
+				recipe.InternalOneWayAddProduct(product, productQuantity, productQuantity, temp);
 				product.productionRecipes.Add(recipe);
 
 
-				foreach (ModulePrototype module in modules.Values) //we will let the assembler sort out which module can be used with this recipe
+				foreach (ModulePrototype module in modules.Values.Cast<ModulePrototype>()) //we will let the assembler sort out which module can be used with this recipe
 				{
 					module.recipes.Add(recipe);
 					recipe.modules.Add(module);
@@ -1132,7 +1341,12 @@ namespace Foreman
 				return false;
 			FluidPrototype ingredient = (FluidPrototype)items[(string)objJToken["fluid_ingredient"]];
 
-			aEntity.Speed = (double)objJToken["fluid_usage_per_tick"];
+			double baseSpeed = (double)objJToken["fluid_usage_per_tick"];
+			double baseEnergyProduction = (double)objJToken["max_power_output"] * 60f; //in seconds
+
+			foreach (Quality quality in qualities.Values)
+				aEntity.speed.Add(quality, baseSpeed * aEntity.GetEnergyProduction(quality) / baseEnergyProduction);
+
 			aEntity.OperationTemperature = (double)objJToken["full_power_temperature"];
 			double minTemp = (double)(objJToken["minimum_temperature"] ?? double.NaN);
 			double maxTemp = (double)(objJToken["maximum_temperature"] ?? double.NaN);
@@ -1160,7 +1374,7 @@ namespace Foreman
 
 				ingredient.consumptionRecipes.Add(recipe);
 
-				foreach (ModulePrototype module in modules.Values) //we will let the assembler sort out which module can be used with this recipe
+				foreach (ModulePrototype module in modules.Values.Cast<ModulePrototype>()) //we will let the assembler sort out which module can be used with this recipe
 				{
 					module.recipes.Add(recipe);
 					recipe.modules.Add(module);
@@ -1184,7 +1398,8 @@ namespace Foreman
 			BurnerRecipe.assemblers.Add(aEntity);
 			ProcessEntityRecipeTechlink(aEntity, BurnerRecipe);
 
-			aEntity.Speed = 1f; //doesnt matter -> the recipe is empty.
+			foreach (Quality quality in qualities.Values)
+				aEntity.speed.Add(quality, 1f); //doesnt matter - recipe is empty
 
 			return true;
 		}
@@ -1196,7 +1411,8 @@ namespace Foreman
 			HeatRecipe.assemblers.Add(aEntity);
 			ProcessEntityRecipeTechlink(aEntity, HeatRecipe);
 
-			aEntity.Speed = (aEntity.EnergyConsumption) / HeatItem.FuelValue; //the speed of producing 1MJ of energy as heat for this reactor
+			foreach (Quality quality in qualities.Values)
+				aEntity.speed.Add(quality, (aEntity.GetEnergyConsumption(quality)) / HeatItem.FuelValue); //the speed of producing 1MJ of energy as heat for this reactor based on quality
 
 			return true;
 		}
@@ -1214,7 +1430,7 @@ namespace Foreman
 				{
 					foreach (Recipe placeItemRecipe in placeItem.ProductionRecipes)
 					{
-						foreach (TechnologyPrototype tech in placeItemRecipe.MyUnlockTechnologies)
+						foreach (TechnologyPrototype tech in placeItemRecipe.MyUnlockTechnologies.Cast<TechnologyPrototype>())
 						{
 							recipe.myUnlockTechnologies.Add(tech);
 							tech.unlockedRecipes.Add(recipe);
@@ -1235,7 +1451,7 @@ namespace Foreman
 
 			int inCount = 0; //unfiltered
 			int outCount = 0; //unfiltered
-			foreach(Fluid inFluid in recipe.ingredientList.Where(i => i is Fluid))
+			foreach(ItemPrototype inFluid in recipe.ingredientList.Where(i => i is Fluid))
 			{
 				if (inPipeFilters.Contains(inFluid.Name))
 				{
@@ -1250,7 +1466,7 @@ namespace Foreman
 				else
 					inCount++;
 			}
-			foreach (Fluid outFluid in recipe.productList.Where(i => i is Fluid))
+			foreach (ItemPrototype outFluid in recipe.productList.Where(i => i is Fluid))
 			{
 				if (outPipeFilters.Contains(outFluid.Name))
 				{
@@ -1299,7 +1515,7 @@ namespace Foreman
 			int inputSize = launchItem.StackSize;
 			Dictionary<ItemPrototype, double> products = new Dictionary<ItemPrototype, double>();
 			Dictionary<ItemPrototype, double> productTemp = new Dictionary<ItemPrototype, double>();
-			foreach (var productJToken in objJToken["launch_products"].ToList())
+			foreach (var productJToken in objJToken["rocket_launch_products"].ToList())
 			{
 				ItemPrototype product = (ItemPrototype)items[(string)productJToken["name"]];
 				double amount = (double)productJToken["amount"];
@@ -1402,11 +1618,11 @@ namespace Foreman
 			}
 
 			//step 1: update tech unlock status & science packs (add a 0 cost pack to the tech if it has no such requirement but its prerequisites do), set tech tier
-			foreach (TechnologyPrototype tech in technologies.Values)
+			foreach (TechnologyPrototype tech in technologies.Values.Cast<TechnologyPrototype>())
 			{
 				TechRequiredSciPacks(tech);
 				GetTechnologyTier(tech);
-				foreach (ItemPrototype sciPack in techRequirements[tech])
+				foreach (ItemPrototype sciPack in techRequirements[tech].Cast<ItemPrototype>())
 					tech.InternalOneWayAddSciPack(sciPack, 0);
 			}
 
@@ -1416,14 +1632,14 @@ namespace Foreman
 
 
 			//step 2.5: update the technology science packs to account for the science pack prerequisites
-			foreach (TechnologyPrototype tech in technologies.Values)
+			foreach (TechnologyPrototype tech in technologies.Values.Cast<TechnologyPrototype>())
 				foreach (Item sciPack in tech.SciPackList.ToList())
-					foreach (ItemPrototype reqSciPack in sciencePackPrerequisites[sciPack])
+					foreach (ItemPrototype reqSciPack in sciencePackPrerequisites[sciPack].Cast<ItemPrototype>())
 						tech.InternalOneWayAddSciPack(reqSciPack, 0);
 
 			//step 3: calculate science pack tier (minimum tier of technology that unlocks the recipe for the given science pack). also make the sciencePacks list.
 			Dictionary<Item, int> sciencePackTiers = new Dictionary<Item, int>();
-			foreach (ItemPrototype sciPack in sciPacks)
+			foreach (ItemPrototype sciPack in sciPacks.Cast<ItemPrototype>())
 			{
 				int minTier = int.MaxValue;
 				foreach (Recipe recipe in sciPack.productionRecipes)
@@ -1437,11 +1653,11 @@ namespace Foreman
 
 			//step 4: update all science pack lists (main sciencePacks list, plus SciPackList of every technology). Sorting is done by A: if science pack B has science pack A as a prerequisite (in sciPackRequiredPacks), then B goes after A. If neither has the other as a prerequisite, then compare by sciencePack tiers
 			sciencePacks.Sort((s1, s2) => sciencePackTiers[s1].CompareTo(sciencePackTiers[s2]) + (sciencePackPrerequisites[s1].Contains(s2) ? 1000 : sciencePackPrerequisites[s2].Contains(s1) ? -1000 : 0));
-			foreach (TechnologyPrototype tech in technologies.Values)
+			foreach (TechnologyPrototype tech in technologies.Values.Cast<TechnologyPrototype>())
 				tech.sciPackList.Sort((s1, s2) => sciencePackTiers[s1].CompareTo(sciencePackTiers[s2]) + (sciencePackPrerequisites[s1].Contains(s2) ? 1000 : sciencePackPrerequisites[s2].Contains(s1) ? -1000 : 0));
 
 			//step 5: create science pack lists for each recipe (list of distinct min-pack sets -> ex: if recipe can be aquired through 4 techs with [ A+B, A+B, A+C, A+B+C ] science pack requirements, we will only include A+B and A+C
-			foreach (RecipePrototype recipe in recipes.Values)
+			foreach (RecipePrototype recipe in recipes.Values.Cast<RecipePrototype>())
 			{
 				List<List<Item>> sciPackLists = new List<List<Item>>();
 				foreach (TechnologyPrototype tech in recipe.myUnlockTechnologies)

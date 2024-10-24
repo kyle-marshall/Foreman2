@@ -414,7 +414,7 @@ namespace Foreman
 
 			BeaconEnergyLabel.Text = nodeData.SelectedBeacon == null ? "0J" : GraphicsStuff.DoubleToEnergy(nodeData.GetBeaconEnergyConsumption(), "W");
 			BeaconModuleCountLabel.Text = nodeData.SelectedBeacon == null ? "0" : nodeData.SelectedBeacon.ModuleSlots.ToString();
-			BeaconEfficiencyLabel.Text = nodeData.SelectedBeacon == null ? "0%" : nodeData.SelectedBeacon.BeaconEffectivity.ToString("P0");
+			BeaconEfficiencyLabel.Text = nodeData.SelectedBeacon == null ? "0%" : nodeData.SelectedBeacon.GetBeaconEffectivity(nodeData.SelectedBeacon.Owner.DefaultQuality, nodeData.BeaconCount).ToString("P0"); //QUALITY UPDATE REQUIRED
 			TotalBeaconsLabel.Text = nodeData.GetTotalBeacons().ToString();
 			TotalBeaconEnergyLabel.Text = nodeData.SelectedBeacon == null ? "0J" : GraphicsStuff.DoubleToEnergy(nodeData.GetTotalBeaconElectricalConsumption(), "W");
 		}

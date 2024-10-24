@@ -99,7 +99,7 @@ namespace Foreman
 					string foundFile = files.FirstOrDefault(f => Regex.IsMatch(Path.GetFileName(f).ToLower(), string.Format("{0}_{1}.zip", mod.Key, versionMatch)));
 					if (foundFile == null)
 					{
-						if (mod.Key.ToLower() != "core" && mod.Key.ToLower() != "base" && mod.Key.ToLower() != "foremanexport")
+						if (mod.Key.ToLower() != "core" && mod.Key.ToLower() != "base" && mod.Key.ToLower() != "elevated-rails" && mod.Key.ToLower() != "quality" && mod.Key.ToLower() != "space-age")
 							return false;
 						continue;
 					}
@@ -126,6 +126,10 @@ namespace Foreman
 			}
 			folderLinks.Add("__core__", Path.Combine(dataPath, "core"));
 			folderLinks.Add("__base__", Path.Combine(dataPath, "base"));
+			folderLinks.Add("__elevated-rails__", Path.Combine(dataPath, "elevated-rails"));
+			folderLinks.Add("__quality__", Path.Combine(dataPath, "quality"));
+			folderLinks.Add("__space-age__", Path.Combine(dataPath, "space-age"));
+
 			return true;
 		}
 

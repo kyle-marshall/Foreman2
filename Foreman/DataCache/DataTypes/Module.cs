@@ -18,6 +18,9 @@ namespace Foreman
 		double ProductivityBonus { get; }
 		double ConsumptionBonus { get; }
 		double PollutionBonus { get; }
+		double QualityBonus { get; }
+
+		string Category { get; }
 
 		int Tier { get; }
 
@@ -32,10 +35,13 @@ namespace Foreman
 		public IReadOnlyCollection<Recipe> AvailableRecipes { get; private set; }
 		public Item AssociatedItem { get { return Owner.Items[Name]; } }
 
-		public double SpeedBonus { get; set; }
-		public double ProductivityBonus { get; set; }
-		public double ConsumptionBonus { get; set; }
-		public double PollutionBonus { get; set; }
+		public double SpeedBonus { get; internal set; }
+		public double ProductivityBonus { get; internal set; }
+		public double ConsumptionBonus { get; internal set; }
+		public double PollutionBonus { get; internal set; }
+		public double QualityBonus { get; internal set; }
+
+		public string Category { get; internal set; }
 
 		public int Tier { get; set; }
 
@@ -55,6 +61,10 @@ namespace Foreman
 			ProductivityBonus = 0;
 			ConsumptionBonus = 0;
 			PollutionBonus = 0;
+			QualityBonus = 0;
+
+			Category = "";
+
 			recipes = new HashSet<RecipePrototype>();
 			assemblers = new HashSet<AssemblerPrototype>();
 			beacons = new HashSet<BeaconPrototype>();

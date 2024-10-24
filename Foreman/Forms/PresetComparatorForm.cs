@@ -326,7 +326,7 @@ namespace Foreman
 						Assembler lAssembler = (Assembler)l.Tag;
 						Assembler rAssembler = (Assembler)r.Tag;
 
-						similarInternals = (lAssembler.Speed == rAssembler.Speed && lAssembler.ModuleSlots == rAssembler.ModuleSlots);
+						similarInternals = true; // (lAssembler.Speed == rAssembler.Speed && lAssembler.ModuleSlots == rAssembler.ModuleSlots);  //QUALITY UPDATE REQUIRED
 						break;
 					case 6: //beacons
 						Beacon lBeacon = (Beacon)l.Tag;
@@ -495,14 +495,14 @@ namespace Foreman
 				else if (lLVI.Tag is Assembler assembler) //assembler, miner, or power
 				{
 					string left = assembler.FriendlyName + "\n" +
-						string.Format("   Speed:         {0}x\n", assembler.Speed) +
+						string.Format("   Speed:         {0}x\n", assembler.GetSpeed(assembler.Owner.DefaultQuality)) +  //QUALITY UPDATE REQUIRED
 						string.Format("   Module Slots:  {0}", assembler.ModuleSlots);
 					string right = "";
 					if (compareTypeTT)
 					{
 						Assembler rassembler = rLVI.Tag as Assembler;
 						right = rassembler.FriendlyName + "\n" +
-						string.Format("   Speed:         {0}x\n", rassembler.Speed) +
+						string.Format("   Speed:         {0}x\n", rassembler.GetSpeed(assembler.Owner.DefaultQuality)) +  //QUALITY UPDATE REQUIRED
 						string.Format("   Module Slots:  {0}", rassembler.ModuleSlots);
 					}
 

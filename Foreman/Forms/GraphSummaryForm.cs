@@ -199,7 +199,7 @@ namespace Foreman
 				lvItem.Name = beacon.Name; //key
 				lvItem.BackColor = beacon.Available ? AvailableObjectColor : UnavailableObjectColor;
 				lvItem.SubItems.Add(beacon.FriendlyName);
-				double beaconPowerConsumption = beaconCounters[beacon] * (beacon.EnergyConsumption + beacon.EnergyDrain);
+				double beaconPowerConsumption = beaconCounters[beacon] * (beacon.GetEnergyConsumption(beacon.Owner.DefaultQuality) + beacon.GetEnergyDrain());  //QUALITY UPDATE REQUIRED
 				lvItem.SubItems.Add(new ListViewItem.ListViewSubItem() { Text = beaconCounters[beacon] == 0 ? "-" : GraphicsStuff.DoubleToEnergy(beaconPowerConsumption, "W"), Tag = beaconPowerConsumption });
 				lviList.Add(lvItem);
 			}

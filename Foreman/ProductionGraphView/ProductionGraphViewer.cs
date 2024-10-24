@@ -1199,7 +1199,7 @@ namespace Foreman
 				DCache = form.GetDataCache();
 				if (result == DialogResult.Abort)
 				{
-					MessageBox.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt. Switching to the default preset (Factorio 1.1 Vanilla)");
+					MessageBox.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") is corrupt. Switching to the default preset (Factorio 2.0 Vanilla)");
 					Properties.Settings.Default.CurrentPresetName = MainForm.DefaultPreset;
 					using (DataLoadForm form2 = new DataLoadForm(new Preset(MainForm.DefaultPreset, false, true)))
 					{

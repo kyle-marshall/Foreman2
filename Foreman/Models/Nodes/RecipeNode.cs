@@ -75,8 +75,8 @@ namespace Foreman
 		public List<Module> BeaconModules { get; private set; }
 
 		public double DesiredAssemblerCount { get; set; }
-		public double ActualAssemblerCount { get { return ActualRatePerSec * BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier()); } }
-		public override double DesiredRatePerSec { get { return DesiredAssemblerCount * SelectedAssembler.Speed * GetSpeedMultiplier() / (BaseRecipe.Time); } set { Trace.Fail("Desired rate set on a recipe node!"); } }
+		public double ActualAssemblerCount { get { return ActualRatePerSec * BaseRecipe.Time / (SelectedAssembler.GetSpeed(SelectedAssembler.Owner.DefaultQuality) * GetSpeedMultiplier()); } }  //QUALITY UPDATE REQUIRED
+		public override double DesiredRatePerSec { get { return DesiredAssemblerCount * SelectedAssembler.GetSpeed(SelectedAssembler.Owner.DefaultQuality) * GetSpeedMultiplier() / (BaseRecipe.Time); } set { Trace.Fail("Desired rate set on a recipe node!"); } }  //QUALITY UPDATE REQUIRED
 
 		public double ExtraProductivityBonus { get; set; }
 
@@ -236,7 +236,7 @@ namespace Foreman
 			foreach (Module module in AssemblerModules)
 				multiplier += module.SpeedBonus;
 			foreach (Module beaconModule in BeaconModules)
-				multiplier += beaconModule.SpeedBonus * SelectedBeacon.BeaconEffectivity * BeaconCount;
+				multiplier += beaconModule.SpeedBonus * SelectedBeacon.GetBeaconEffectivity(SelectedBeacon.Owner.DefaultQuality, BeaconCount) * BeaconCount;
 			return Math.Max(0.2f, multiplier);
 		}
 
@@ -246,7 +246,7 @@ namespace Foreman
 			foreach (Module module in AssemblerModules)
 				multiplier += module.ProductivityBonus;
 			foreach (Module beaconModule in BeaconModules)
-				multiplier += beaconModule.ProductivityBonus * SelectedBeacon.BeaconEffectivity * BeaconCount;
+				multiplier += beaconModule.ProductivityBonus * SelectedBeacon.GetBeaconEffectivity(SelectedBeacon.Owner.DefaultQuality, BeaconCount) * BeaconCount;
 			return Math.Max(0, multiplier);
 		}
 
@@ -256,7 +256,7 @@ namespace Foreman
 			foreach (Module module in AssemblerModules)
 				multiplier += module.ConsumptionBonus;
 			foreach (Module beaconModule in BeaconModules)
-				multiplier += beaconModule.ConsumptionBonus * SelectedBeacon.BeaconEffectivity * BeaconCount;
+				multiplier += beaconModule.ConsumptionBonus * SelectedBeacon.GetBeaconEffectivity(SelectedBeacon.Owner.DefaultQuality, BeaconCount) * BeaconCount;
 			return Math.Max(0.2f, multiplier);
 		}
 
@@ -266,7 +266,7 @@ namespace Foreman
 			foreach (Module module in AssemblerModules)
 				multiplier += module.PollutionBonus;
 			foreach (Module beaconModule in BeaconModules)
-				multiplier += beaconModule.PollutionBonus * SelectedBeacon.BeaconEffectivity * BeaconCount;
+				multiplier += beaconModule.PollutionBonus * SelectedBeacon.GetBeaconEffectivity(SelectedBeacon.Owner.DefaultQuality, BeaconCount) * BeaconCount;
 			return Math.Max(0.2f, multiplier);
 		}
 
@@ -314,12 +314,12 @@ namespace Foreman
 				temperature = LinkChecker.GetTemperatureRange(Fuel as Fluid, ReadOnlyNode, LinkType.Output, false).Min;
 
 			//burner rate = recipe time (modified by speed bonus & assembler) * fuel consumption rate of assembler (modified by fuel, temperature, and consumption modifier)
-			return (BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier())) * SelectedAssembler.GetBaseFuelConsumptionRate(Fuel, temperature) * GetConsumptionMultiplier();
+			return (BaseRecipe.Time / (SelectedAssembler.GetSpeed(SelectedAssembler.Owner.DefaultQuality) * GetSpeedMultiplier())) * SelectedAssembler.GetBaseFuelConsumptionRate(Fuel, SelectedAssembler.Owner.DefaultQuality, temperature) * GetConsumptionMultiplier();
 		}
 
 		internal double factoryRate()
 		{
-			return BaseRecipe.Time / (SelectedAssembler.Speed * GetSpeedMultiplier());
+			return BaseRecipe.Time / (SelectedAssembler.GetSpeed(SelectedAssembler.Owner.DefaultQuality) * GetSpeedMultiplier());
 		}
 
 		internal double GetMinOutputRatio()
@@ -554,38 +554,38 @@ namespace Foreman
 		public double GetGeneratorElectricalProduction() //Watts
 		{
 			if (SelectedAssembler.EntityType == EntityType.Generator)
-				return MyNode.SelectedAssembler.EnergyProduction * GetGeneratorEffectivity();
-			return MyNode.SelectedAssembler.EnergyProduction; //no consumption multiplier => generators cant have modules / beacon effects
+				return SelectedAssembler.GetEnergyProduction(SelectedAssembler.Owner.DefaultQuality) * GetGeneratorEffectivity();
+			return SelectedAssembler.GetEnergyProduction(SelectedAssembler.Owner.DefaultQuality); //no consumption multiplier => generators cant have modules / beacon effects
 		}
 
 
 		public double GetAssemblerSpeed()
 		{
-			return MyNode.SelectedAssembler.Speed * MyNode.GetSpeedMultiplier();
+			return SelectedAssembler.GetSpeed(SelectedAssembler.Owner.DefaultQuality) * MyNode.GetSpeedMultiplier();
 		}
 
 		public double GetAssemblerEnergyConsumption() //Watts
 		{
-			return MyNode.SelectedAssembler.EnergyDrain + (MyNode.SelectedAssembler.EnergyConsumption * MyNode.GetConsumptionMultiplier());
+			return SelectedAssembler.GetEnergyDrain() + (SelectedAssembler.GetEnergyConsumption(SelectedAssembler.Owner.DefaultQuality) * MyNode.GetConsumptionMultiplier());
 		}
 
 		public double GetAssemblerPollutionProduction() //pollution/sec
 		{
-			return MyNode.SelectedAssembler.Pollution * MyNode.GetPollutionMultiplier() * GetAssemblerEnergyConsumption(); //pollution is counted in per energy
+			return 0;// SelectedAssembler.Pollution * MyNode.GetPollutionMultiplier() * GetAssemblerEnergyConsumption(); //pollution is counted in per energy //POLLUTION UPDATER REQUIRED
 		}
 
 		public double GetBeaconEnergyConsumption() //Watts
 		{
-			if (MyNode.SelectedBeacon == null || MyNode.SelectedBeacon.EnergySource != EnergySource.Electric)
+			if (SelectedBeacon == null || SelectedBeacon.EnergySource != EnergySource.Electric)
 				return 0;
-			return MyNode.SelectedBeacon.EnergyConsumption + MyNode.SelectedBeacon.EnergyDrain;
+			return SelectedBeacon.GetEnergyProduction(SelectedBeacon.Owner.DefaultQuality) + SelectedBeacon.GetEnergyDrain();
 		}
 
 		public double GetBeaconPollutionProduction() //pollution/sec
 		{
-			if (MyNode.SelectedBeacon == null)
+			if (SelectedBeacon == null)
 				return 0;
-			return MyNode.SelectedBeacon.Pollution * GetBeaconEnergyConsumption();
+			return 0; // SelectedBeacon.Pollution * GetBeaconEnergyConsumption(); //POLLUTION UPDATE REQUIRED
 		}
 
 		//----------------------------------------------------------------------- Get functions (totals)
@@ -610,7 +610,7 @@ namespace Foreman
 			double partialAssembler = MyNode.ActualAssemblerCount % 1;
 			double entireAssemblers = MyNode.ActualAssemblerCount - partialAssembler;
 
-			return (((entireAssemblers + (partialAssembler < 0.05 ? 0 : 1)) * MyNode.SelectedAssembler.EnergyDrain) + (MyNode.ActualAssemblerCount * MyNode.SelectedAssembler.EnergyConsumption * MyNode.GetConsumptionMultiplier())); //if there is more than 5% of an extra assembler, assume there is +1 assembler working x% of the time (full drain, x% uptime)
+			return (((entireAssemblers + (partialAssembler < 0.05 ? 0 : 1)) * SelectedAssembler.GetEnergyDrain()) + (ActualAssemblerCount * SelectedAssembler.GetEnergyConsumption(SelectedAssembler.Owner.DefaultQuality) * GetConsumptionMultiplier())); //if there is more than 5% of an extra assembler, assume there is +1 assembler working x% of the time (full drain, x% uptime)
 		}
 
 		public double GetTotalGeneratorElectricalProduction() // J/sec (W) ; this is also when the temperature range of incoming fuel is taken into account

@@ -17,11 +17,22 @@ namespace Foreman
 
 		int StackSize { get; }
 
+		double Weight { get; }
+		double IngredientToWeightCoefficient { get; }
 		double FuelValue { get; }
 		double PollutionMultiplier { get; }
+
 		Item BurnResult { get; }
+		Item PlantResult { get; }
+		Item SpoilResult { get; }
+
 		Item FuelOrigin { get; }
+		Item PlantOrigin { get; }
+		Item SpoilOrigin { get; }
+
 		IReadOnlyCollection<EntityObjectBase> FuelsEntities { get; }
+
+		//spoil ticks are ignored - its assumed that if there is a plant/spoil result then the ticks are at least low enough to make it viable on a world basis
 	}
 
 	public class ItemPrototype : DataObjectBasePrototype, Item
@@ -36,10 +47,19 @@ namespace Foreman
 
 		public int StackSize { get; set; }
 
+		public double Weight { get; set; }
+		public double IngredientToWeightCoefficient { get; set; }
 		public double FuelValue { get; internal set; }
 		public double PollutionMultiplier { get; internal set; }
+
 		public Item BurnResult { get; internal set; }
+		public Item PlantResult { get; internal set; }
+		public Item SpoilResult { get; internal set; }
+
 		public Item FuelOrigin { get; internal set; }
+		public Item PlantOrigin { get; internal set; }
+		public Item SpoilOrigin { get; internal set; }
+
 		public IReadOnlyCollection<EntityObjectBase> FuelsEntities { get { return fuelsEntities; } }
 
 		internal SubgroupPrototype mySubgroup;
@@ -61,6 +81,8 @@ namespace Foreman
 			consumptionTechnologies = new HashSet<TechnologyPrototype>();
 			fuelsEntities = new HashSet<EntityObjectBasePrototype>();
 
+			Weight = 0.01f;
+			IngredientToWeightCoefficient = 1f;
 			FuelValue = 1f; //useful for preventing overlow issues when using missing items / non-fuel items (loading with wrong mods / importing from alt mod group can cause this)
 			PollutionMultiplier = 1f;
 			IsMissing = isMissing;

@@ -7,18 +7,21 @@ using Newtonsoft.Json.Linq;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Runtime.CompilerServices;
 
 namespace Foreman
 {
 	public partial class MainForm : Form
 	{
-		internal const string DefaultPreset = "Factorio 1.1 Vanilla";
+		internal const string DefaultPreset = "Factorio 2.0 Vanilla";
+		internal string DefaultAppName;
 		private string savefilePath = null;
 
 		public MainForm()
 		{
 			InitializeComponent();
 			this.DoubleBuffered = true;
+			DefaultAppName = this.Text;
 			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 		}
 
@@ -149,7 +152,7 @@ namespace Foreman
 				GraphViewer.Graph.SerializeNodeIdSet = null; //we want to save everything.
 				serialiser.Serialize(writer, GraphViewer);
 				savefilePath = path;
-				this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
+				this.Text = string.Format(DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
 				return true;
 			}
 			catch (Exception exception)
@@ -207,7 +210,7 @@ namespace Foreman
 
 			Properties.Settings.Default.Save();
 			GraphViewer.Invalidate();
-			this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
+			this.Text = string.Format(DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
 		}
 
 		private void NewGraph()
@@ -233,7 +236,7 @@ namespace Foreman
 			}
 
 			Properties.Settings.Default.Save();
-			this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
+			this.Text = string.Format(DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
 		}
 
 		private void ImportGraph()
@@ -310,12 +313,12 @@ namespace Foreman
 
 			if (!existingPresetFiles.Contains(Properties.Settings.Default.CurrentPresetName))
 			{
-				MessageBox.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") has been removed. Switching to the default preset (Factorio 1.1 Vanilla)");
+				MessageBox.Show("The current preset (" + Properties.Settings.Default.CurrentPresetName + ") has been removed. Switching to the default preset (Factorio 2.0 Vanilla)");
 				Properties.Settings.Default.CurrentPresetName = DefaultPreset;
 			}
 			if (!existingPresetFiles.Contains(DefaultPreset))
 			{
-				MessageBox.Show("The default preset (Factorio 1.1 Vanilla) has been removed. Please re-install / re-download Foreman");
+				MessageBox.Show("The default preset (Factorio 2.0 Vanilla) has been removed. Please re-install / re-download Foreman");
 				Application.Exit();
 				return null;
 			}
@@ -390,7 +393,7 @@ namespace Foreman
 
 						List<Preset> validPresets = GetValidPresetsList();
 						await GraphViewer.LoadFromJson(JObject.Parse(JsonConvert.SerializeObject(GraphViewer)), true, false);
-						this.Text = string.Format("Foreman 2.0 ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
+						this.Text = string.Format(DefaultAppName + " ({0}) - {1}", Properties.Settings.Default.CurrentPresetName, savefilePath ?? "Untitled");
 					}
 					else //not loading a new preset -> update the enabled statuses
 					{

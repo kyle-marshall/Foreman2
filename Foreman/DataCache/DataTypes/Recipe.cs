@@ -15,6 +15,14 @@ namespace Foreman
 		long RecipeID { get; }
 		bool IsMissing { get; }
 
+        bool AllowConsumptionBonus { get; }
+        bool AllowSpeedBonus { get; }
+        bool AllowProductivityBonus { get; }
+        bool AllowPollutionBonus { get; }
+        bool AllowQualityBonus { get; }
+
+        double MaxProductivityBonus { get; }
+
 		IReadOnlyDictionary<Item, double> ProductSet { get; }
 		IReadOnlyDictionary<Item, double> ProductPSet { get; } //extra productivity amounts [ actual amount = productSet + (productPSet * productivity bonus) ]
 		IReadOnlyList<Item> ProductList { get; }
@@ -34,6 +42,8 @@ namespace Foreman
 		string GetProductFriendlyName(Item item);
 		bool TestIngredientConnection(Recipe provider, Item ingredient);
 
+		//trash items (spoiled items from spoiling of items already inside assembler) are ignored
+		//planet conditions are ignored
 	}
 
 	public class RecipePrototype : DataObjectBasePrototype, Recipe
@@ -75,10 +85,20 @@ namespace Foreman
 
 		public bool IsMissing { get; private set; }
 
+        public bool AllowConsumptionBonus { get; internal set; }
+        public bool AllowSpeedBonus { get; internal set; }
+        public bool AllowProductivityBonus { get; internal set; }
+        public bool AllowPollutionBonus { get; internal set; }
+        public bool AllowQualityBonus { get; internal set; }
+
+		public double MaxProductivityBonus { get; internal set; }
+
 		private static long lastRecipeID = 0;
 		public long RecipeID { get; private set; }
 
-		public RecipePrototype(DataCache dCache, string name, string friendlyName, SubgroupPrototype subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
+        internal bool HideFromPlayerCrafting { get; set; }
+
+        public RecipePrototype(DataCache dCache, string name, string friendlyName, SubgroupPrototype subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
 		{
 			RecipeID = lastRecipeID++;
 
@@ -88,6 +108,13 @@ namespace Foreman
 			Time = 0.5f;
 			this.Enabled = true;
 			this.IsMissing = isMissing;
+			this.HideFromPlayerCrafting = false;
+			this.AllowConsumptionBonus = true;
+			this.AllowSpeedBonus = true;
+			this.AllowProductivityBonus = true;
+			this.AllowPollutionBonus = true;
+			this.AllowQualityBonus = true;
+			this.MaxProductivityBonus = 1000;
 
 			ingredientSet = new Dictionary<Item, double>();
 			ingredientList = new List<ItemPrototype>();
