@@ -111,23 +111,9 @@ namespace Foreman
 			//graphics.DrawRectangle(devPen, textbox);
 			string text = "x";
 			if (DisplayedNode.SelectedAssembler.IsMissing)
-			{
 				text += "---";
-			}
 			else
-			{
-				double assemblerCount = DisplayedNode.ActualAssemblerCount;
-				if (assemblerCount >= 10000)
-					text += assemblerCount.ToString("0.##e0");
-				else if (Properties.Settings.Default.RoundAssemblerCount)
-					text += Math.Ceiling(assemblerCount).ToString("0");
-				else if (assemblerCount >= 0.1)
-					text += assemblerCount.ToString("0.#");
-				else if (assemblerCount != 0)
-					text += "<0.1";
-				else
-					text += "0";
-			}
+				text += BuildingQuantityToText(DisplayedNode.ActualAssemblerCount);
 
 			GraphicsStuff.DrawText(graphics, textBrush, textFormat, text, counterBaseFont, textbox, true);
 		}

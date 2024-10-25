@@ -5,6 +5,20 @@ using System.Linq;
 
 namespace Foreman
 {
+	public readonly struct QualityItem
+	{
+		public Item Item { get; }
+		public Quality Quality { get; }
+
+		public QualityItem(Item item, Quality quality)
+		{
+			Item = item;
+			Quality = quality;
+		}
+
+		public override string ToString() => $"{Item} ({Quality})";
+    }
+
 	public interface Item : DataObjectBase
 	{
 		Subgroup MySubgroup { get; }
@@ -27,10 +41,12 @@ namespace Foreman
 		Item SpoilResult { get; }
 
 		Item FuelOrigin { get; }
-		Item PlantOrigin { get; }
-		Item SpoilOrigin { get; }
+        IReadOnlyCollection<Item> PlantOrigins { get; }
+        IReadOnlyCollection<Item> SpoilOrigins { get; }
 
-		IReadOnlyCollection<EntityObjectBase> FuelsEntities { get; }
+        double GetItemSpoilageTime(Quality quality); //seconds
+
+        IReadOnlyCollection<EntityObjectBase> FuelsEntities { get; }
 
 		//spoil ticks are ignored - its assumed that if there is a plant/spoil result then the ticks are at least low enough to make it viable on a world basis
 	}
@@ -57,10 +73,12 @@ namespace Foreman
 		public Item SpoilResult { get; internal set; }
 
 		public Item FuelOrigin { get; internal set; }
-		public Item PlantOrigin { get; internal set; }
-		public Item SpoilOrigin { get; internal set; }
+        public IReadOnlyCollection<Item> PlantOrigins { get { return plantOrigins; } }
+        public IReadOnlyCollection<Item> SpoilOrigins { get { return spoilOrigins; } }
 
 		public IReadOnlyCollection<EntityObjectBase> FuelsEntities { get { return fuelsEntities; } }
+
+		public double GetItemSpoilageTime(Quality quality) { return spoilageTimes.ContainsKey(quality) ? spoilageTimes[quality] : 1; }
 
 		internal SubgroupPrototype mySubgroup;
 
@@ -68,6 +86,10 @@ namespace Foreman
 		internal HashSet<RecipePrototype> consumptionRecipes { get; private set; }
 		internal HashSet<TechnologyPrototype> consumptionTechnologies { get; private set; }
 		internal HashSet<EntityObjectBasePrototype> fuelsEntities { get; private set; }
+		internal HashSet<ItemPrototype> plantOrigins { get; private set; }
+		internal HashSet<ItemPrototype> spoilOrigins { get; private set; }
+
+		internal Dictionary<Quality, double> spoilageTimes { get; private set; }
 
 		public ItemPrototype(DataCache dCache, string name, string friendlyName, SubgroupPrototype subgroup, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
 		{
@@ -80,6 +102,9 @@ namespace Foreman
 			consumptionRecipes = new HashSet<RecipePrototype>();
 			consumptionTechnologies = new HashSet<TechnologyPrototype>();
 			fuelsEntities = new HashSet<EntityObjectBasePrototype>();
+			plantOrigins = new HashSet<ItemPrototype>();
+			spoilOrigins = new HashSet<ItemPrototype>();
+			spoilageTimes = new Dictionary<Quality, double>();
 
 			Weight = 0.01f;
 			IngredientToWeightCoefficient = 1f;

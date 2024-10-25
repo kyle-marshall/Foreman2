@@ -46,7 +46,8 @@ namespace Foreman
 
 		protected static readonly Brush TextBrush = Brushes.Black;
 		protected static readonly Font BaseFont = new Font(FontFamily.GenericSansSerif, 10f);
-		protected static readonly Font TitleFont = new Font(FontFamily.GenericSansSerif, 9.2f, FontStyle.Bold);
+        protected static readonly Font CounterBaseFont = new Font(FontFamily.GenericSansSerif, 14f);
+        protected static readonly Font TitleFont = new Font(FontFamily.GenericSansSerif, 9.2f, FontStyle.Bold);
 
 		protected static StringFormat TitleFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
 		protected static StringFormat TextFormat = new StringFormat() { LineAlignment = StringAlignment.Near, Alignment = StringAlignment.Center };
@@ -57,6 +58,7 @@ namespace Foreman
 		protected const int TabPadding = 7; //makes each tab be evenly spaced for grid
 		protected const int WidthD = 24; //(6*4) -> width will be divisible by this
 		protected const int PassthroughNodeWidth = WidthD * 3;
+		protected const int SpoilNodeWidth = WidthD * 6;
 		protected const int MinWidth = WidthD * 6;
 		protected const int BorderSpacing = 1; //the drawn node will be smaller by this in all directions (graph looks nicer if adjacent nodes have a slight gap between them)
 

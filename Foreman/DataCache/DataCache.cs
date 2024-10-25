@@ -56,6 +56,7 @@ namespace Foreman
 		public static Bitmap UnknownIcon { get { return IconCache.GetUnknownIcon(); } }
 		private static Bitmap noBeaconIcon;
 		public static Bitmap NoBeaconIcon { get { if (noBeaconIcon == null) noBeaconIcon = IconCache.GetIcon(Path.Combine("Graphics", "NoBeacon.png"), 64); return noBeaconIcon; } }
+		public static Bitmap SpoilabeIcon { get { return IconCache.GetSpoilageIcon(); } }
 
 
 		private Dictionary<string, string> includedMods; //name : version
@@ -638,8 +639,12 @@ namespace Foreman
 				burnResults.Add(item, (string)objJToken["burnt_result"]);
             if (objJToken["plant_result"] != null)
                 plantResults.Add(item, (string)objJToken["plant_result"]);
-            if (objJToken["spoil_result"] != null)
-                spoilResults.Add(item, (string)objJToken["spoil_result"]);
+			if (objJToken["spoil_result"] != null)
+			{
+				spoilResults.Add(item, (string)objJToken["spoil_result"]);
+                foreach (JToken spoilToken in objJToken["q_spoil_ticks"])
+                    item.spoilageTimes.Add(qualities[(string)spoilToken["quality"]], (double)spoilToken["value"] / 60);
+            }
 
             items.Add(item.Name, item);
 		}
@@ -654,10 +659,11 @@ namespace Foreman
 		}
         private void ProcessPlantItem(ItemPrototype item, Dictionary<Item, string> plantResults)
         {
+			return;
             if (plantResults.ContainsKey(item))
             {
                 item.PlantResult = items[plantResults[item]];
-                ((ItemPrototype)items[plantResults[item]]).PlantOrigin = item;
+                ((ItemPrototype)items[plantResults[item]]).plantOrigins.Add(item);
             }
         }
         private void ProcessSpoilItem(ItemPrototype item, Dictionary<Item, string> spoilResults)
@@ -665,7 +671,7 @@ namespace Foreman
             if (spoilResults.ContainsKey(item))
             {
                 item.SpoilResult = items[spoilResults[item]];
-                ((ItemPrototype)items[spoilResults[item]]).SpoilOrigin = item;
+                ((ItemPrototype)items[spoilResults[item]]).spoilOrigins.Add(item);
             }
         }
 
@@ -1736,14 +1742,18 @@ namespace Foreman
 					clean = false;
 				}
 
-				//4.2: mark any useless items as unavailable (nothing/unavailable recipes produce it, it isnt consumed by anything / only consumed by incineration / only consumed by unavailable recipes)
-				//this will also update assembler availability status for those whose items become unavailable automatically.
-				//note: while this gets rid of those annoying 'burn/incinerate' auto-generated recipes, if the modder decided to have a 'recycle' auto-generated recipe (item->raw ore or something), we will be forced to accept those items as 'available'
-				foreach (ItemPrototype item in items.Values.Where(i => i.Available && !i.ProductionRecipes.Any(r => r.Available)))
+                //4.2: mark any useless items as unavailable (nothing/unavailable recipes produce it, it isnt consumed by anything / only consumed by incineration / only consumed by unavailable recipes, only produced by itself)
+                //this will also update assembler availability status for those whose items become unavailable automatically.
+                //note: while this gets rid of those annoying 'burn/incinerate' auto-generated recipes, if the modder decided to have a 'recycle' auto-generated recipe (item->raw ore or something), we will be forced to accept those items as 'available'
+                //good example from vanilla: most of the 'garbage' items such as 'item-unknown' and 'electric-energy-interface' are removed as their only recipes are 'recycle to themselves', but 'heat interface' isnt removed as its only recipe is a 'recycle into several parts' (so nothing we can do about it)
+                foreach (ItemPrototype item in items.Values.Where(i => i.Available && !i.ProductionRecipes.Any(r => r.Available && r.ProductList.Count > 1 && r.ProductList[0] != i)).Cast<ItemPrototype>())
 				{
 					bool useful = false;
 					foreach (RecipePrototype r in item.consumptionRecipes.Where(r => r.Available))
-						useful |= (r.ingredientList.Count > 1 || r.productList.Count != 0); //recipe with multiple items coming in or some ingredients coming out -> not an incineration type
+					{
+
+						useful |= (r.ingredientList.Count > 1 || r.productList.Count > 1 || (r.productList.Count == 1 && r.productList[0] != item)); //recipe with multiple items coming in or some ingredients coming out (that arent itself) -> not an incineration type
+					}
 					if (!useful && !item.Name.StartsWith("§§"))
 					{
 						item.Available = false;

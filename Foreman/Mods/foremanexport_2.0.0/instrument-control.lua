@@ -167,30 +167,12 @@ local function ExportRecipes()
 
 			amount = (product.amount == nil) and ((product.amount_max + product.amount_min)/2) or product.amount
 			amount = amount * product.probability
+			amount_ignored_by_productivity = (product.ignored_by_productivity == nil) and 0 or product.ignored_by_productivity
+			if amount_ignored_by_productivity > amount then amount_ignored_by_productivity = amount end
+			amount_added_by_extra_fraction = (product.extra_count_fraction == nil) and 0 or product.extra_count_fraction
 
-			tproduct['amount'] = amount
-			tproduct['p_amount'] = amount
-
-			if (product.catalyst_amount ~= nil) then
-
-				if product.amount ~= nil then
-					tproduct['p_amount'] = product.amount - math.max(0, math.min(product.amount, product.catalyst_amount))
-				elseif product.catalyst_amount <= product.amount_min then
-					tproduct['p_amount'] = ((product.amount_max + product.amount_min)/2) - math.max(0, product.catalyst_amount)
-				else
-					catalyst_amount = math.min(product.amount_max, product.catalyst_amount)
-					tproduct['p_amount'] = ((product.amount_max - catalyst_amount) * (product.amount_max + 1 - catalyst_amount) / 2) / (product.amount_max + 1 - product.amount_min)
-				end
-
-				tproduct['p_amount'] = tproduct['p_amount'] * product.probability
-
-			elseif product.amount ~= nil and product.probability == 1 then
-				for _, ingredient in pairs(recipe.ingredients) do
-					if ingredient.name == product.name then
-						tproduct['p_amount'] = math.max(0, product.amount - ingredient.amount)
-					end
-				end
-			end
+			tproduct['amount'] = amount + amount_added_by_extra_fraction
+			tproduct['p_amount'] = amount - amount_ignored_by_productivity + amount_added_by_extra_fraction
 
 			if product.type == 'fluid' and product.temperature ~= nil then
 				tproduct['temperature'] = ProcessTemperature(product.temperature)
@@ -259,6 +241,7 @@ local function ExportItems()
 
 		if item.spoil_result ~= nil then
 			titem['spoil_result'] = item.spoil_result.name
+			titem['q_spoil_ticks'] = ProcessQualityValue(item.get_spoil_ticks)
 		end
 
 		if item.plant_result ~= nil then
@@ -283,8 +266,6 @@ local function ExportItems()
 				table.insert(titem['rocket_launch_products'], tproduct)
 			end
 		end
-
-		titem['q_spoil_ticks'] = ProcessQualityValue(item.get_spoil_ticks)
 
 		titem['lid'] = '$'..localindex
 		ExportLocalisedString(item.localised_name, localindex)
@@ -580,8 +561,13 @@ local function ExportResources()
 				tproduct['type'] = product.type
 
 				amount = (product.amount == nil) and ((product.amount_max + product.amount_min)/2) or product.amount
-				amount = amount * ( (product.probability == nil) and 1 or product.probability)
-				tproduct['amount'] = amount
+				amount = amount * product.probability
+				amount_ignored_by_productivity = (product.ignored_by_productivity == nil) and 0 or product.ignored_by_productivity
+				if amount_ignored_by_productivity > amount then amount_ignored_by_productivity = amount end
+				amount_added_by_extra_fraction = (product.extra_count_fraction == nil) and 0 or product.extra_count_fraction
+
+				tproduct['amount'] = amount + amount_added_by_extra_fraction
+				tproduct['p_amount'] = amount - amount_ignored_by_productivity + amount_added_by_extra_fraction
 
 				if product.type == 'fluid' and product.temperate ~= nil then
 					tproduct['temperature'] = ProcessTemperature(product.temperature)

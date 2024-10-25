@@ -48,8 +48,8 @@
             this.ModsLocationComboBox = new System.Windows.Forms.ComboBox();
             this.OKButton = new System.Windows.Forms.Button();
             this.CancelImportButtonB = new System.Windows.Forms.Button();
-            this.ImportProgressBar = new Foreman.CustomProgressBar();
             this.CancelImportButton = new System.Windows.Forms.Button();
+            this.ImportProgressBar = new Foreman.CustomProgressBar();
             this.FactorioLocationGroup.SuspendLayout();
             this.FactorioLocationTable.SuspendLayout();
             this.FactorioSettingsGroup.SuspendLayout();
@@ -80,6 +80,7 @@
             this.FactorioLocationComboBox.Name = "FactorioLocationComboBox";
             this.FactorioLocationComboBox.Size = new System.Drawing.Size(376, 21);
             this.FactorioLocationComboBox.TabIndex = 3;
+            this.FactorioLocationComboBox.Text = "D:\\software\\Factorios\\Factorio_2.0.7_SA";
             // 
             // FactorioLocationGroup
             // 
@@ -228,6 +229,7 @@
             this.PresetNameTable.SetRowSpan(this.PresetNameTextBox, 2);
             this.PresetNameTextBox.Size = new System.Drawing.Size(269, 20);
             this.PresetNameTextBox.TabIndex = 0;
+            this.PresetNameTextBox.Text = "Factorio 2.0 Space Age";
             this.PresetNameTextBox.TextChanged += new System.EventHandler(this.PresetNameTextBox_TextChanged);
             // 
             // label3
@@ -349,17 +351,6 @@
             this.CancelImportButtonB.Visible = false;
             this.CancelImportButtonB.Click += new System.EventHandler(this.CancelButton_Click);
             // 
-            // ImportProgressBar
-            // 
-            this.ImportProgressBar.CustomText = null;
-            this.ImportProgressBar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ImportProgressBar.Location = new System.Drawing.Point(4, 225);
-            this.ImportProgressBar.Margin = new System.Windows.Forms.Padding(4);
-            this.ImportProgressBar.Name = "ImportProgressBar";
-            this.ImportProgressBar.Size = new System.Drawing.Size(394, 21);
-            this.ImportProgressBar.TabIndex = 5;
-            this.ImportProgressBar.Visible = false;
-            // 
             // CancelImportButton
             // 
             this.CancelImportButton.AutoSize = true;
@@ -373,6 +364,17 @@
             this.CancelImportButton.Text = "Cancel";
             this.CancelImportButton.UseVisualStyleBackColor = true;
             this.CancelImportButton.Click += new System.EventHandler(this.CancelButton_Click);
+            // 
+            // ImportProgressBar
+            // 
+            this.ImportProgressBar.CustomText = null;
+            this.ImportProgressBar.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ImportProgressBar.Location = new System.Drawing.Point(4, 225);
+            this.ImportProgressBar.Margin = new System.Windows.Forms.Padding(4);
+            this.ImportProgressBar.Name = "ImportProgressBar";
+            this.ImportProgressBar.Size = new System.Drawing.Size(394, 21);
+            this.ImportProgressBar.TabIndex = 5;
+            this.ImportProgressBar.Visible = false;
             // 
             // PresetImportForm
             // 

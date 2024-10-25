@@ -15937,16 +15937,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Wooden chest"
     },
     {
@@ -15957,16 +15947,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Iron chest"
     },
     {
@@ -15977,16 +15957,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Steel chest"
     },
     {
@@ -15997,16 +15967,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Storage tank"
     },
     {
@@ -16017,16 +15977,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Transport belt"
     },
     {
@@ -16037,16 +15987,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Fast transport belt"
     },
     {
@@ -16057,16 +15997,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Express transport belt"
     },
     {
@@ -16077,16 +16007,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Underground belt"
     },
     {
@@ -16097,16 +16017,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Fast underground belt"
     },
     {
@@ -16117,16 +16027,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Express underground belt"
     },
     {
@@ -16137,16 +16037,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Splitter"
     },
     {
@@ -16157,16 +16047,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Fast splitter"
     },
     {
@@ -16177,16 +16057,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Express splitter"
     },
     {
@@ -16197,16 +16067,6 @@
       "stack_size": 50,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Loader"
     },
     {
@@ -16217,16 +16077,6 @@
       "stack_size": 50,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Fast loader"
     },
     {
@@ -16237,16 +16087,6 @@
       "stack_size": 50,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Express loader"
     },
     {
@@ -16257,16 +16097,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Burner inserter"
     },
     {
@@ -16277,16 +16107,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Inserter"
     },
     {
@@ -16297,16 +16117,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Long-handed inserter"
     },
     {
@@ -16317,16 +16127,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Fast inserter"
     },
     {
@@ -16337,16 +16137,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Bulk inserter"
     },
     {
@@ -16357,16 +16147,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Small electric pole"
     },
     {
@@ -16377,16 +16157,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Medium electric pole"
     },
     {
@@ -16397,16 +16167,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Big electric pole"
     },
     {
@@ -16417,16 +16177,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Substation"
     },
     {
@@ -16437,16 +16187,6 @@
       "stack_size": 100,
       "weight": 5000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Pipe"
     },
     {
@@ -16457,16 +16197,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Pipe to ground"
     },
     {
@@ -16477,16 +16207,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Pump"
     },
     {
@@ -16497,16 +16217,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Rail"
     },
     {
@@ -16517,16 +16227,6 @@
       "stack_size": 10,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Train stop"
     },
     {
@@ -16537,16 +16237,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Rail signal"
     },
     {
@@ -16557,16 +16247,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Rail chain signal"
     },
     {
@@ -16577,16 +16257,6 @@
       "stack_size": 5,
       "weight": 200000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Locomotive"
     },
     {
@@ -16597,16 +16267,6 @@
       "stack_size": 5,
       "weight": 200000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Cargo wagon"
     },
     {
@@ -16617,16 +16277,6 @@
       "stack_size": 5,
       "weight": 200000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Fluid wagon"
     },
     {
@@ -16637,16 +16287,6 @@
       "stack_size": 5,
       "weight": 200000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Artillery wagon"
     },
     {
@@ -16657,16 +16297,6 @@
       "stack_size": 1,
       "weight": 1000000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Car"
     },
     {
@@ -16677,16 +16307,6 @@
       "stack_size": 1,
       "weight": 1000000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Tank"
     },
     {
@@ -16697,16 +16317,6 @@
       "stack_size": 1,
       "weight": 1000000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Spidertron"
     },
     {
@@ -16717,16 +16327,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Logistic robot"
     },
     {
@@ -16737,16 +16337,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Construction robot"
     },
     {
@@ -16757,16 +16347,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Active provider chest"
     },
     {
@@ -16777,16 +16357,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Passive provider chest"
     },
     {
@@ -16797,16 +16367,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Storage chest"
     },
     {
@@ -16817,16 +16377,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Buffer chest"
     },
     {
@@ -16837,16 +16387,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Requester chest"
     },
     {
@@ -16857,16 +16397,6 @@
       "stack_size": 10,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Roboport"
     },
     {
@@ -16877,16 +16407,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Lamp"
     },
     {
@@ -16897,16 +16417,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Arithmetic combinator"
     },
     {
@@ -16917,16 +16427,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Decider combinator"
     },
     {
@@ -16937,16 +16437,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Selector combinator"
     },
     {
@@ -16957,16 +16447,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Constant combinator"
     },
     {
@@ -16977,16 +16457,6 @@
       "stack_size": 10,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Power switch"
     },
     {
@@ -16997,16 +16467,6 @@
       "stack_size": 10,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Programmable speaker"
     },
     {
@@ -17017,16 +16477,6 @@
       "stack_size": 10,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Display panel"
     },
     {
@@ -17037,16 +16487,6 @@
       "stack_size": 100,
       "weight": 2000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Stone brick"
     },
     {
@@ -17057,16 +16497,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Concrete"
     },
     {
@@ -17077,16 +16507,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Hazard concrete"
     },
     {
@@ -17097,16 +16517,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Refined concrete"
     },
     {
@@ -17117,16 +16527,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Refined hazard concrete"
     },
     {
@@ -17137,16 +16537,6 @@
       "stack_size": 100,
       "weight": 50000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Landfill"
     },
     {
@@ -17157,16 +16547,6 @@
       "stack_size": 20,
       "weight": 50000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Cliff explosives"
     },
     {
@@ -17177,16 +16557,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Repair pack"
     },
     {
@@ -17197,16 +16567,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Blueprint"
     },
     {
@@ -17217,16 +16577,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Deconstruction planner"
     },
     {
@@ -17237,16 +16587,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Upgrade planner"
     },
     {
@@ -17257,16 +16597,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Blueprint book"
     },
     {
@@ -17277,16 +16607,6 @@
       "stack_size": 1,
       "weight": 0,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Copy paste tool"
     },
     {
@@ -17297,16 +16617,6 @@
       "stack_size": 1,
       "weight": 0,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Cut paste tool"
     },
     {
@@ -17317,16 +16627,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Boiler"
     },
     {
@@ -17337,16 +16637,6 @@
       "stack_size": 10,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Steam engine"
     },
     {
@@ -17357,16 +16647,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Solar panel"
     },
     {
@@ -17377,16 +16657,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Accumulator"
     },
     {
@@ -17397,16 +16667,6 @@
       "stack_size": 10,
       "weight": 1000000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Nuclear reactor"
     },
     {
@@ -17417,16 +16677,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Heat pipe"
     },
     {
@@ -17437,16 +16687,6 @@
       "stack_size": 50,
       "weight": 40000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Heat exchanger"
     },
     {
@@ -17457,16 +16697,6 @@
       "stack_size": 10,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Steam turbine"
     },
     {
@@ -17477,16 +16707,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Burner mining drill"
     },
     {
@@ -17497,16 +16717,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Electric mining drill"
     },
     {
@@ -17517,16 +16727,6 @@
       "stack_size": 20,
       "weight": 50000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Offshore pump"
     },
     {
@@ -17537,16 +16737,6 @@
       "stack_size": 20,
       "weight": 50000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Pumpjack"
     },
     {
@@ -17557,16 +16747,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Stone furnace"
     },
     {
@@ -17577,16 +16757,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Steel furnace"
     },
     {
@@ -17597,16 +16767,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Electric furnace"
     },
     {
@@ -17617,16 +16777,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Assembling machine 1"
     },
     {
@@ -17637,16 +16787,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Assembling machine 2"
     },
     {
@@ -17657,16 +16797,6 @@
       "stack_size": 50,
       "weight": 40000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Assembling machine 3"
     },
     {
@@ -17677,16 +16807,6 @@
       "stack_size": 10,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Oil refinery"
     },
     {
@@ -17697,16 +16817,6 @@
       "stack_size": 10,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Chemical plant"
     },
     {
@@ -17717,16 +16827,6 @@
       "stack_size": 50,
       "weight": 662500,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Centrifuge"
     },
     {
@@ -17737,16 +16837,6 @@
       "stack_size": 10,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Lab"
     },
     {
@@ -17757,16 +16847,6 @@
       "stack_size": 20,
       "weight": 50000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Beacon"
     },
     {
@@ -17777,16 +16857,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Speed module"
     },
     {
@@ -17797,16 +16867,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Speed module 2"
     },
     {
@@ -17817,16 +16877,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Speed module 3"
     },
     {
@@ -17837,16 +16887,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Efficiency module"
     },
     {
@@ -17857,16 +16897,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Efficiency module 2"
     },
     {
@@ -17877,16 +16907,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Efficiency module 3"
     },
     {
@@ -17897,16 +16917,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Productivity module"
     },
     {
@@ -17917,16 +16927,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Productivity module 2"
     },
     {
@@ -17937,16 +16937,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Productivity module 3"
     },
     {
@@ -17957,16 +16947,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Empty module slot"
     },
     {
@@ -17977,16 +16957,6 @@
       "stack_size": 1,
       "weight": 10000000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Rocket silo"
     },
     {
@@ -17997,16 +16967,6 @@
       "stack_size": 1,
       "weight": 1000000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Cargo landing pad"
     },
     {
@@ -18024,16 +16984,6 @@
           "amount": 1000
         }
       ],
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Satellite"
     },
     {
@@ -18047,16 +16997,6 @@
       "fuel_category": "chemical",
       "fuel_value": 2000000,
       "fuel_emissions_multiplier": 1,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Wood"
     },
     {
@@ -18070,16 +17010,6 @@
       "fuel_category": "chemical",
       "fuel_value": 4000000,
       "fuel_emissions_multiplier": 1,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Coal"
     },
     {
@@ -18090,16 +17020,6 @@
       "stack_size": 50,
       "weight": 2000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Stone"
     },
     {
@@ -18110,16 +17030,6 @@
       "stack_size": 50,
       "weight": 2000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Iron ore"
     },
     {
@@ -18130,16 +17040,6 @@
       "stack_size": 50,
       "weight": 2000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Copper ore"
     },
     {
@@ -18150,16 +17050,6 @@
       "stack_size": 50,
       "weight": 5000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Uranium ore"
     },
     {
@@ -18170,16 +17060,6 @@
       "stack_size": 100,
       "weight": 3333.3333282470703,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Raw fish"
     },
     {
@@ -18190,16 +17070,6 @@
       "stack_size": 100,
       "weight": 1000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Iron plate"
     },
     {
@@ -18210,16 +17080,6 @@
       "stack_size": 100,
       "weight": 1000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Copper plate"
     },
     {
@@ -18230,16 +17090,6 @@
       "stack_size": 100,
       "weight": 2500,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Steel plate"
     },
     {
@@ -18253,16 +17103,6 @@
       "fuel_category": "chemical",
       "fuel_value": 12000000,
       "fuel_emissions_multiplier": 1,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Solid fuel"
     },
     {
@@ -18273,16 +17113,6 @@
       "stack_size": 100,
       "weight": 500,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Plastic bar"
     },
     {
@@ -18293,16 +17123,6 @@
       "stack_size": 50,
       "weight": 1000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Sulfur"
     },
     {
@@ -18313,16 +17133,6 @@
       "stack_size": 200,
       "weight": 2500,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Battery"
     },
     {
@@ -18333,16 +17143,6 @@
       "stack_size": 50,
       "weight": 2000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Explosives"
     },
     {
@@ -18353,16 +17153,6 @@
       "stack_size": 10,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Water barrel"
     },
     {
@@ -18373,16 +17163,6 @@
       "stack_size": 10,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Crude oil barrel"
     },
     {
@@ -18393,16 +17173,6 @@
       "stack_size": 10,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Petroleum gas barrel"
     },
     {
@@ -18413,16 +17183,6 @@
       "stack_size": 10,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Light oil barrel"
     },
     {
@@ -18433,16 +17193,6 @@
       "stack_size": 10,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Heavy oil barrel"
     },
     {
@@ -18453,16 +17203,6 @@
       "stack_size": 10,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Lubricant barrel"
     },
     {
@@ -18473,16 +17213,6 @@
       "stack_size": 10,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Sulfuric acid barrel"
     },
     {
@@ -18493,16 +17223,6 @@
       "stack_size": 100,
       "weight": 1000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Iron gear wheel"
     },
     {
@@ -18513,16 +17233,6 @@
       "stack_size": 100,
       "weight": 500,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Iron stick"
     },
     {
@@ -18533,16 +17243,6 @@
       "stack_size": 200,
       "weight": 250,
       "ingredient_to_weight_coefficient": 0.25,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Copper cable"
     },
     {
@@ -18553,16 +17253,6 @@
       "stack_size": 10,
       "weight": 5000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Barrel"
     },
     {
@@ -18573,16 +17263,6 @@
       "stack_size": 200,
       "weight": 500,
       "ingredient_to_weight_coefficient": 0.28,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Electronic circuit"
     },
     {
@@ -18593,16 +17273,6 @@
       "stack_size": 200,
       "weight": 1000,
       "ingredient_to_weight_coefficient": 0.28,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Advanced circuit"
     },
     {
@@ -18613,16 +17283,6 @@
       "stack_size": 100,
       "weight": 3333.3333282470703,
       "ingredient_to_weight_coefficient": 0.25,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Processing unit"
     },
     {
@@ -18633,16 +17293,6 @@
       "stack_size": 50,
       "weight": 2500,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Engine unit"
     },
     {
@@ -18653,16 +17303,6 @@
       "stack_size": 50,
       "weight": 2500,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Electric engine unit"
     },
     {
@@ -18673,16 +17313,6 @@
       "stack_size": 50,
       "weight": 6666.6666564941406,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Flying robot frame"
     },
     {
@@ -18693,16 +17323,6 @@
       "stack_size": 50,
       "weight": 5000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Low density structure"
     },
     {
@@ -18716,16 +17336,6 @@
       "fuel_category": "chemical",
       "fuel_value": 100000000,
       "fuel_emissions_multiplier": 1,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Rocket fuel"
     },
     {
@@ -18736,16 +17346,6 @@
       "stack_size": 5,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Rocket part"
     },
     {
@@ -18756,16 +17356,6 @@
       "stack_size": 100,
       "weight": 50000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Uranium-235"
     },
     {
@@ -18776,16 +17366,6 @@
       "stack_size": 100,
       "weight": 50000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Uranium-238"
     },
     {
@@ -18800,16 +17380,6 @@
       "fuel_value": 8000000000,
       "fuel_emissions_multiplier": 1,
       "burnt_result": "depleted-uranium-fuel-cell",
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Uranium fuel cell"
     },
     {
@@ -18820,16 +17390,6 @@
       "stack_size": 50,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Depleted uranium fuel cell"
     },
     {
@@ -18843,16 +17403,6 @@
       "fuel_category": "chemical",
       "fuel_value": 1210000000,
       "fuel_emissions_multiplier": 1,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Nuclear fuel"
     },
     {
@@ -18863,16 +17413,6 @@
       "stack_size": 200,
       "weight": 1000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Automation science pack"
     },
     {
@@ -18883,16 +17423,6 @@
       "stack_size": 200,
       "weight": 1000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Logistic science pack"
     },
     {
@@ -18903,16 +17433,6 @@
       "stack_size": 200,
       "weight": 1000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Military science pack"
     },
     {
@@ -18923,16 +17443,6 @@
       "stack_size": 200,
       "weight": 1000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Chemical science pack"
     },
     {
@@ -18943,16 +17453,6 @@
       "stack_size": 200,
       "weight": 1000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Production science pack"
     },
     {
@@ -18963,16 +17463,6 @@
       "stack_size": 200,
       "weight": 1000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Utility science pack"
     },
     {
@@ -18983,16 +17473,6 @@
       "stack_size": 2000,
       "weight": 1000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Space science pack"
     },
     {
@@ -19003,16 +17483,6 @@
       "stack_size": 100000,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Coin"
     },
     {
@@ -19023,16 +17493,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Science"
     },
     {
@@ -19043,16 +17503,6 @@
       "stack_size": 5,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Pistol"
     },
     {
@@ -19063,16 +17513,6 @@
       "stack_size": 5,
       "weight": 200000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Submachine gun"
     },
     {
@@ -19083,16 +17523,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Vehicle machine gun"
     },
     {
@@ -19103,16 +17533,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Vehicle machine gun"
     },
     {
@@ -19123,16 +17543,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Vehicle flamethrower"
     },
     {
@@ -19143,16 +17553,6 @@
       "stack_size": 5,
       "weight": 200000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Shotgun"
     },
     {
@@ -19163,16 +17563,6 @@
       "stack_size": 5,
       "weight": 200000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Combat shotgun"
     },
     {
@@ -19183,16 +17573,6 @@
       "stack_size": 5,
       "weight": 200000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Rocket launcher"
     },
     {
@@ -19203,16 +17583,6 @@
       "stack_size": 5,
       "weight": 200000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Flamethrower"
     },
     {
@@ -19223,16 +17593,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Artillery cannon"
     },
     {
@@ -19243,16 +17603,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Spidertron rocket launcher"
     },
     {
@@ -19263,16 +17613,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Spidertron rocket launcher"
     },
     {
@@ -19283,16 +17623,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Spidertron rocket launcher"
     },
     {
@@ -19303,16 +17633,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Spidertron rocket launcher"
     },
     {
@@ -19323,16 +17643,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Tank cannon"
     },
     {
@@ -19343,16 +17653,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Firearm magazine"
     },
     {
@@ -19363,16 +17663,6 @@
       "stack_size": 100,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Piercing rounds magazine"
     },
     {
@@ -19383,16 +17673,6 @@
       "stack_size": 100,
       "weight": 40000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Uranium rounds magazine"
     },
     {
@@ -19403,16 +17683,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Shotgun shells"
     },
     {
@@ -19423,16 +17693,6 @@
       "stack_size": 100,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Piercing shotgun shells"
     },
     {
@@ -19443,16 +17703,6 @@
       "stack_size": 100,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Cannon shell"
     },
     {
@@ -19463,16 +17713,6 @@
       "stack_size": 100,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Explosive cannon shell"
     },
     {
@@ -19483,16 +17723,6 @@
       "stack_size": 100,
       "weight": 40000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Uranium cannon shell"
     },
     {
@@ -19503,16 +17733,6 @@
       "stack_size": 100,
       "weight": 40000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Explosive uranium cannon shell"
     },
     {
@@ -19523,16 +17743,6 @@
       "stack_size": 1,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Artillery shell"
     },
     {
@@ -19543,16 +17753,6 @@
       "stack_size": 100,
       "weight": 40000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Rocket"
     },
     {
@@ -19563,16 +17763,6 @@
       "stack_size": 100,
       "weight": 40000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Explosive rocket"
     },
     {
@@ -19583,16 +17773,6 @@
       "stack_size": 10,
       "weight": 1500000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Atomic bomb"
     },
     {
@@ -19603,16 +17783,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Flamethrower ammo"
     },
     {
@@ -19623,16 +17793,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Grenade"
     },
     {
@@ -19643,16 +17803,6 @@
       "stack_size": 100,
       "weight": 40000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Cluster grenade"
     },
     {
@@ -19663,16 +17813,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Poison capsule"
     },
     {
@@ -19683,16 +17823,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Slowdown capsule"
     },
     {
@@ -19703,16 +17833,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Defender capsule"
     },
     {
@@ -19723,16 +17843,6 @@
       "stack_size": 100,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Distractor capsule"
     },
     {
@@ -19743,16 +17853,6 @@
       "stack_size": 100,
       "weight": 40000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Destroyer capsule"
     },
     {
@@ -19763,16 +17863,6 @@
       "stack_size": 1,
       "weight": 1000000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Light armor"
     },
     {
@@ -19783,16 +17873,6 @@
       "stack_size": 1,
       "weight": 1000000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Heavy armor"
     },
     {
@@ -19803,16 +17883,6 @@
       "stack_size": 1,
       "weight": 1000000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Modular armor"
     },
     {
@@ -19823,16 +17893,6 @@
       "stack_size": 1,
       "weight": 1000000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Power armor"
     },
     {
@@ -19843,16 +17903,6 @@
       "stack_size": 1,
       "weight": 1000000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Power armor MK2"
     },
     {
@@ -19863,16 +17913,6 @@
       "stack_size": 20,
       "weight": 50000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Portable solar panel"
     },
     {
@@ -19883,16 +17923,6 @@
       "stack_size": 20,
       "weight": 250000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Portable fission reactor"
     },
     {
@@ -19903,16 +17933,6 @@
       "stack_size": 20,
       "weight": 50000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Personal battery"
     },
     {
@@ -19923,16 +17943,6 @@
       "stack_size": 20,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Personal battery MK2"
     },
     {
@@ -19943,16 +17953,6 @@
       "stack_size": 20,
       "weight": 50000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Belt immunity equipment"
     },
     {
@@ -19963,16 +17963,6 @@
       "stack_size": 20,
       "weight": 79166,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Exoskeleton"
     },
     {
@@ -19983,16 +17973,6 @@
       "stack_size": 20,
       "weight": 106250,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Personal roboport"
     },
     {
@@ -20003,16 +17983,6 @@
       "stack_size": 20,
       "weight": 482291,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Personal roboport MK2"
     },
     {
@@ -20023,16 +17993,6 @@
       "stack_size": 20,
       "weight": 50000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Nightvision"
     },
     {
@@ -20043,16 +18003,6 @@
       "stack_size": 20,
       "weight": 50000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Energy shield"
     },
     {
@@ -20063,16 +18013,6 @@
       "stack_size": 20,
       "weight": 100000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Energy shield MK2"
     },
     {
@@ -20083,16 +18023,6 @@
       "stack_size": 20,
       "weight": 200000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Personal laser defense"
     },
     {
@@ -20103,16 +18033,6 @@
       "stack_size": 20,
       "weight": 233333,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Discharge defense"
     },
     {
@@ -20123,16 +18043,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Wall"
     },
     {
@@ -20143,16 +18053,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Gate"
     },
     {
@@ -20163,16 +18063,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Radar"
     },
     {
@@ -20183,16 +18073,6 @@
       "stack_size": 100,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Land mine"
     },
     {
@@ -20203,16 +18083,6 @@
       "stack_size": 50,
       "weight": 20000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Gun turret"
     },
     {
@@ -20223,16 +18093,6 @@
       "stack_size": 50,
       "weight": 40000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Laser turret"
     },
     {
@@ -20243,16 +18103,6 @@
       "stack_size": 50,
       "weight": 50000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Flamethrower turret"
     },
     {
@@ -20263,16 +18113,6 @@
       "stack_size": 10,
       "weight": 200000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Artillery turret"
     },
     {
@@ -20283,16 +18123,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Parameter 0"
     },
     {
@@ -20303,16 +18133,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Parameter 1"
     },
     {
@@ -20323,16 +18143,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Parameter 2"
     },
     {
@@ -20343,16 +18153,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Parameter 3"
     },
     {
@@ -20363,16 +18163,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Parameter 4"
     },
     {
@@ -20383,16 +18173,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Parameter 5"
     },
     {
@@ -20403,16 +18183,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Parameter 6"
     },
     {
@@ -20423,16 +18193,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Parameter 7"
     },
     {
@@ -20443,16 +18203,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Parameter 8"
     },
     {
@@ -20463,16 +18213,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Parameter 9"
     },
     {
@@ -20483,16 +18223,6 @@
       "stack_size": 1,
       "weight": 0,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Copper wire"
     },
     {
@@ -20503,16 +18233,6 @@
       "stack_size": 1,
       "weight": 0,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Green wire"
     },
     {
@@ -20523,16 +18243,6 @@
       "stack_size": 1,
       "weight": 0,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Red wire"
     },
     {
@@ -20543,16 +18253,6 @@
       "stack_size": 1,
       "weight": 0,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Spidertron remote"
     },
     {
@@ -20563,16 +18263,6 @@
       "stack_size": 1,
       "weight": 0,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Discharge defense remote"
     },
     {
@@ -20583,16 +18273,6 @@
       "stack_size": 1,
       "weight": 0,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Artillery targeting remote"
     },
     {
@@ -20603,16 +18283,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Unknown item"
     },
     {
@@ -20623,16 +18293,6 @@
       "stack_size": 50,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Electric energy interface"
     },
     {
@@ -20643,16 +18303,6 @@
       "stack_size": 10,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Linked chest"
     },
     {
@@ -20663,16 +18313,6 @@
       "stack_size": 20,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Heat interface"
     },
     {
@@ -20683,16 +18323,6 @@
       "stack_size": 50,
       "weight": 10000,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Lane splitter"
     },
     {
@@ -20703,16 +18333,6 @@
       "stack_size": 10,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Linked belt"
     },
     {
@@ -20723,16 +18343,6 @@
       "stack_size": 10,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Infinity chest"
     },
     {
@@ -20743,16 +18353,6 @@
       "stack_size": 10,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Infinity pipe"
     },
     {
@@ -20763,16 +18363,6 @@
       "stack_size": 1,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Selection tool"
     },
     {
@@ -20783,16 +18373,6 @@
       "stack_size": 50,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Simple entity with force"
     },
     {
@@ -20803,16 +18383,6 @@
       "stack_size": 50,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Simple entity with owner"
     },
     {
@@ -20823,16 +18393,6 @@
       "stack_size": 10,
       "weight": 100,
       "ingredient_to_weight_coefficient": 0.5,
-      "q_spoil_ticks": [
-        {
-          "quality": "normal",
-          "value": 0
-        },
-        {
-          "quality": "quality-unknown",
-          "value": 0
-        }
-      ],
       "localised_name": "Burner generator"
     }
   ],
@@ -22702,7 +20262,8 @@
         {
           "name": "coal",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Coal"
@@ -22715,7 +20276,8 @@
         {
           "name": "copper-ore",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Copper ore"
@@ -22728,7 +20290,8 @@
         {
           "name": "iron-ore",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Iron ore"
@@ -22741,7 +20304,8 @@
         {
           "name": "stone",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Stone"
@@ -22756,7 +20320,8 @@
         {
           "name": "uranium-ore",
           "type": "item",
-          "amount": 1
+          "amount": 1,
+          "p_amount": 1
         }
       ],
       "localised_name": "Uranium ore"
@@ -22769,7 +20334,8 @@
         {
           "name": "crude-oil",
           "type": "fluid",
-          "amount": 10
+          "amount": 10,
+          "p_amount": 10
         }
       ],
       "localised_name": "Crude oil"

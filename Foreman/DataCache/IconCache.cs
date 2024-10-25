@@ -40,6 +40,14 @@ namespace Foreman
 				unknownIcon = GetIcon(Path.Combine("Graphics", "UnknownIcon.png"), 32);
 			return unknownIcon;
 		}
+		private static Bitmap spoilageIcon;
+		public static Bitmap GetSpoilageIcon()
+		{
+			if (spoilageIcon == null)
+				spoilageIcon = GetIcon(Path.Combine("Graphics", "SpoilAssembler.png"), 96);
+			return spoilageIcon;
+
+		}
 		public static Bitmap GetIcon(string path, int size)
 		{
 			try

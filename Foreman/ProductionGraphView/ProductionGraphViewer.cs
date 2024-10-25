@@ -177,14 +177,14 @@ namespace Foreman
 			ItemChooserPanel itemChooser = new ItemChooserPanel(this, drawOrigin);
 			itemChooser.ItemRequested += (o, itemRequestArgs) =>
 			{
-				AddRecipe(drawOrigin, itemRequestArgs.Item, newLocation, NewNodeType.Disconnected);
+				AddNewNode(drawOrigin, itemRequestArgs.Item, newLocation, NewNodeType.Disconnected);
 			};
 			itemChooser.PanelClosed += (o, e) => { SubwindowOpen = false; };
 
 			itemChooser.Show();
 		}
 
-		public void AddRecipe(Point drawOrigin, Item baseItem, Point newLocation, NewNodeType nNodeType, BaseNodeElement originElement = null, bool offsetLocationToItemTabLevel = false)
+		public void AddNewNode(Point drawOrigin, Item baseItem, Point newLocation, NewNodeType nNodeType, BaseNodeElement originElement = null, bool offsetLocationToItemTabLevel = false)
 		{
 			if(string.IsNullOrEmpty(DCache.PresetName))
 			{
@@ -204,19 +204,81 @@ namespace Foreman
 				draggedLinkElement.Type != BaseLinkElement.LineType.UShape ? originElement.DisplayedNode.NodeDirection :
 				originElement.DisplayedNode.NodeDirection == NodeDirection.Up ? NodeDirection.Down : NodeDirection.Up;
 
-			void ProcessNodeRequest(object o, RecipeRequestArgs recipeRequestArgs)
+            if ((Control.ModifierKeys & Keys.Control) == Keys.Control) //control key pressed -> we are making a passthrough node.
+            {
+                ProcessNodeRequest(null, new RecipeRequestArgs(NodeType.Passthrough));
+                DisposeLinkDrag();
+                Graph.UpdateNodeStates(false);
+                Invalidate();
+            } else
+            {
+                fRange tempRange = new fRange(0, 0, true);
+                if (baseItem != null && baseItem is Fluid fluid && fluid.IsTemperatureDependent)
+                {
+                    if (nNodeType == NewNodeType.Consumer) //need to check all nodes down to recipes for range of temperatures being produced
+                        tempRange = LinkChecker.GetTemperatureRange(fluid, originElement.DisplayedNode, LinkType.Output, true);
+                    else if (nNodeType == NewNodeType.Supplier) //need to check all nodes up to recipes for range of temperatures being consumed (guaranteed to be in a SINGLE [] range)
+                        tempRange = LinkChecker.GetTemperatureRange(fluid, originElement.DisplayedNode, LinkType.Input, true);
+                }
+
+                RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, tempRange, nNodeType);
+                recipeChooser.RecipeRequested += ProcessNodeRequest;
+                recipeChooser.PanelClosed += (o, e) =>
+                {
+					if (e.Option != IRChooserPanel.ChooserPanelCloseReason.RequiresItemSelection)
+					{
+						SubwindowOpen = false;
+						DisposeLinkDrag();
+						Graph.UpdateNodeStates(false);
+						Invalidate();
+					}
+                };
+
+                SubwindowOpen = true;
+                recipeChooser.Show();
+            }
+			return; //end of this function
+
+			//internal helper funtion: called upon a successfull selection of a recipe-selection screen (opened above)
+            void ProcessNodeRequest(object o, RecipeRequestArgs recipeRequestArgs)
 			{
 				ReadOnlyBaseNode newNode = null;
 				switch (recipeRequestArgs.NodeType)
 				{
 					case NodeType.Consumer:
 						newNode = Graph.CreateConsumerNode(baseItem, newLocation);
+						FinalizeNodePosition(newNode);
 						break;
 					case NodeType.Supplier:
 						newNode = Graph.CreateSupplierNode(baseItem, newLocation);
-						break;
+                        FinalizeNodePosition(newNode);
+                        break;
 					case NodeType.Passthrough:
 						newNode = Graph.CreatePassthroughNode(baseItem, newLocation);
+                        FinalizeNodePosition(newNode);
+                        break;
+					case NodeType.Spoil:
+						if (recipeRequestArgs.Direction == NodeDirection.Up)
+						{
+							newNode = Graph.CreateSpoilNode(baseItem, baseItem.SpoilResult, newLocation);
+							FinalizeNodePosition(newNode);
+						} else if (baseItem.SpoilOrigins.Count == 1)
+						{
+							newNode = Graph.CreateSpoilNode(baseItem.SpoilOrigins.ElementAt(0), baseItem, newLocation);
+							FinalizeNodePosition(newNode);
+						} else
+						{
+							//need to open up an item selection window to select a given spoil origin
+							SubwindowOpen = true;
+							ItemChooserPanel itemChooser = new ItemChooserPanel(this, drawOrigin, baseItem.SpoilOrigins);
+							itemChooser.ItemRequested += (oo, itemRequestArgs) =>
+							{
+								newNode = Graph.CreateSpoilNode(itemRequestArgs.Item, baseItem, newLocation);
+                                FinalizeNodePosition(newNode);
+                            };
+							itemChooser.PanelClosed += (oo, e) => { SubwindowOpen = false; };
+							itemChooser.Show();
+						}
 						break;
 					case NodeType.Recipe:
 						ReadOnlyRecipeNode rNode = Graph.CreateRecipeNode(recipeRequestArgs.Recipe, newLocation);
@@ -245,16 +307,20 @@ namespace Foreman
 							{
 								controller.SetAssembler(assemblerOptions.First(a => a.Fuels.Contains(baseItem)));
 								controller.SetFuel(baseItem);
-							}
-							else // if(nNodeType == NewNodeType.Supplier)
+							} else // if(nNodeType == NewNodeType.Supplier)
 							{
 								controller.SetAssembler(assemblerOptions.First(a => a.Fuels.Contains(baseItem.FuelOrigin)));
 								controller.SetFuel(baseItem.FuelOrigin);
 							}
 						}
-						break;
+                        FinalizeNodePosition(newNode);
+                        break;
 				}
+			}
 
+			//internal helper funtion: once a node has been created it will be placed where it needs to be and all intermediate states (ex: dragged item line) finalized
+			void FinalizeNodePosition(ReadOnlyBaseNode newNode)
+			{ 
 				//this is the offset to take into account multiple recipe additions (holding shift while selecting recipe). First node isnt shifted, all subsequent ones are 'attempted' to be spaced.
 				//should be updated once the node graphics are updated (so that the node size doesnt depend as much on the text)
 				BaseNodeElement newNodeElement = NodeElementDictionary[newNode];
@@ -284,38 +350,6 @@ namespace Foreman
 
 				DisposeLinkDrag();
 				Graph.UpdateNodeValues();
-			}
-
-			if ((Control.ModifierKeys & Keys.Control) == Keys.Control) //control key pressed -> we are making a passthrough node.
-			{
-				ProcessNodeRequest(null, new RecipeRequestArgs(NodeType.Passthrough, null));
-				DisposeLinkDrag();
-				Graph.UpdateNodeStates(false);
-				Invalidate();
-			}
-			else
-			{
-				fRange tempRange = new fRange(0, 0, true);
-				if (baseItem != null && baseItem is Fluid fluid && fluid.IsTemperatureDependent)
-				{
-					if (nNodeType == NewNodeType.Consumer) //need to check all nodes down to recipes for range of temperatures being produced
-						tempRange = LinkChecker.GetTemperatureRange(fluid, originElement.DisplayedNode, LinkType.Output, true);
-					else if (nNodeType == NewNodeType.Supplier) //need to check all nodes up to recipes for range of temperatures being consumed (guaranteed to be in a SINGLE [] range)
-						tempRange = LinkChecker.GetTemperatureRange(fluid, originElement.DisplayedNode, LinkType.Input, true);
-				}
-
-				RecipeChooserPanel recipeChooser = new RecipeChooserPanel(this, drawOrigin, baseItem, tempRange, nNodeType);
-				recipeChooser.RecipeRequested += ProcessNodeRequest;
-				recipeChooser.PanelClosed += (o, e) =>
-				{
-					SubwindowOpen = false;
-					DisposeLinkDrag();
-					Graph.UpdateNodeStates(false);
-					Invalidate();
-				};
-
-				SubwindowOpen = true;
-				recipeChooser.Show();
 			}
 		}
 
@@ -676,14 +710,16 @@ namespace Foreman
 		private void Graph_NodeAdded(object sender, NodeEventArgs e)
 		{
 			BaseNodeElement element = null;
-			if (e.node is ReadOnlySupplierNode snode)
-				element = new SupplierNodeElement(this, snode);
-			else if (e.node is ReadOnlyConsumerNode cnode)
-				element = new ConsumerNodeElement(this, cnode);
-			else if (e.node is ReadOnlyPassthroughNode pnode)
-				element = new PassthroughNodeElement(this, pnode);
-			else if (e.node is ReadOnlyRecipeNode rnode)
-				element = new RecipeNodeElement(this, rnode);
+			if (e.node is ReadOnlySupplierNode supplierNode)
+				element = new SupplierNodeElement(this, supplierNode);
+			else if (e.node is ReadOnlyConsumerNode consumerNode)
+				element = new ConsumerNodeElement(this, consumerNode);
+			else if (e.node is ReadOnlyPassthroughNode passthroughNode)
+				element = new PassthroughNodeElement(this, passthroughNode);
+			else if (e.node is ReadOnlyRecipeNode recipeNode)
+				element = new RecipeNodeElement(this, recipeNode);
+			else if (e.node is ReadOnlySpoilNode spoilNode)
+				element = new SpoilNodeElement(this, spoilNode);
 			else
 				Trace.Fail("Unexpected node type created in graph.");
 
@@ -751,7 +787,7 @@ namespace Foreman
 						rightClickMenu.MenuItems.Add(new MenuItem("Add Recipe",
 							new EventHandler((o, ee) =>
 							{
-								AddRecipe(screenPoint, null, ScreenToGraph(e.Location), NewNodeType.Disconnected);
+								AddNewNode(screenPoint, null, ScreenToGraph(e.Location), NewNodeType.Disconnected);
 							})));
 						rightClickMenu.Show(this, e.Location);
 					}

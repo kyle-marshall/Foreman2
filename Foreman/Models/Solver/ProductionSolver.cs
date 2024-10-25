@@ -152,7 +152,7 @@ namespace Foreman
 				objective.SetCoefficient(variableFor(node), -outputObjectiveCoefficient);
 		}
 
-		//set the node to be zero (used for passthrough nodes with no outputs)
+		//set the node to be zero (used for passthrough nodes with missing input or output)
 		public void SetZero(PassthroughNode node)
 		{
 			Variable nodeVar = variableFor(node);

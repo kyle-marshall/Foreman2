@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Foreman
 {
-	public enum NodeType { Supplier, Consumer, Passthrough, Recipe }
+	public enum NodeType { Supplier, Consumer, Passthrough, Recipe, Spoil }
 	public enum LinkType { Input, Output }
 
 	public class NodeEventArgs : EventArgs
@@ -153,6 +153,18 @@ namespace Foreman
 			node.UpdateState();
 			NodeAdded?.Invoke(this, new NodeEventArgs(node.ReadOnlyNode));
 			return (ReadOnlyPassthroughNode)node.ReadOnlyNode;
+		}
+
+		public ReadOnlySpoilNode CreateSpoilNode(Item inputItem, Item outputItem, Point location)
+		{
+			SpoilNode node = new SpoilNode(this, lastNodeID++, inputItem, outputItem);
+			node.Location = location;
+			node.NodeDirection = DefaultNodeDirection;
+			nodes.Add(node);
+			roToNode.Add(node.ReadOnlyNode, node);
+			node.UpdateState();
+			NodeAdded?.Invoke(this, new NodeEventArgs(node.ReadOnlyNode));
+			return (ReadOnlySpoilNode)node.ReadOnlyNode;
 		}
 
 		public ReadOnlyRecipeNode CreateRecipeNode(Recipe recipe, Point location) { return CreateRecipeNode(recipe, location, null); }
@@ -474,6 +486,14 @@ namespace Foreman
 							else
 								newNode = roToNode[CreatePassthroughNode(cache.MissingItems[itemName], location)];
 							((PassthroughNode)newNode).SimpleDraw = (bool)nodeJToken["SDraw"];
+							newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
+							break;
+						case NodeType.Spoil:
+							itemName = (string)nodeJToken["InputItem"];
+							string outputItemName = (string)nodeJToken["OutputItem"];
+							Item inputItem = cache.Items.ContainsKey(itemName) ? cache.Items[itemName] : cache.MissingItems[itemName];
+							Item outputItem = cache.Items.ContainsKey(outputItemName) ? cache.Items[outputItemName] : cache.MissingItems[outputItemName];
+							newNode = roToNode[CreateSpoilNode(inputItem, outputItem, location)];
 							newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
 							break;
 						case NodeType.Recipe:

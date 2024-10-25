@@ -480,7 +480,7 @@ namespace Foreman
 		private void AddRecipeButton_Click(object sender, EventArgs e)
 		{
 			Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
-			GraphViewer.AddRecipe(new Point(15, 15), null, location, NewNodeType.Disconnected);
+			GraphViewer.AddNewNode(new Point(15, 15), null, location, NewNodeType.Disconnected);
 		}
 
 		private void AddItemButton_Click(object sender, EventArgs e)
