@@ -21,6 +21,7 @@ namespace Foreman
 		public IEnumerable<Quality> AvailableQualities { get { return qualities.Values.Where(g => g.Available); } }
 		public IEnumerable<Item> AvailableItems { get { return items.Values.Where(g => g.Available); } }
 		public IEnumerable<Recipe> AvailableRecipes { get { return recipes.Values.Where(g => g.Available); } }
+		public IEnumerable<PlantProcess> AvailablePlantProcesses { get { return plantProcesses.Values.Where(g => g.Available); } }
 
 		//mods: <name, version>
 		//others: <name, object>
@@ -32,6 +33,7 @@ namespace Foreman
 		public IReadOnlyDictionary<string, Quality> Qualities { get { return qualities; } }
 		public IReadOnlyDictionary<string, Item> Items { get { return items; } }
 		public IReadOnlyDictionary<string, Recipe> Recipes { get { return recipes; } }
+		public IReadOnlyDictionary<string, PlantProcess> PlantProcesses { get { return PlantProcesses; } }
 		public IReadOnlyDictionary<string, Assembler> Assemblers { get { return assemblers; } }
 		public IReadOnlyDictionary<string, Module> Modules { get { return modules; } }
 		public IReadOnlyDictionary<string, Beacon> Beacons { get { return beacons; } }
@@ -49,6 +51,7 @@ namespace Foreman
 		public IReadOnlyDictionary<string, Module> MissingModules { get { return missingModules; } }
 		public IReadOnlyDictionary<string, Beacon> MissingBeacons { get { return missingBeacons; } }
 		public IReadOnlyDictionary<RecipeShort, Recipe> MissingRecipes { get { return missingRecipes; } }
+		public IReadOnlyDictionary<string, PlantProcess> MissingPlantProcesses { get { return missingPlantProcesses; } }
 
 		public Quality DefaultQuality { get; private set; }
 		private Quality ErrorQuality;
@@ -56,8 +59,6 @@ namespace Foreman
 		public static Bitmap UnknownIcon { get { return IconCache.GetUnknownIcon(); } }
 		private static Bitmap noBeaconIcon;
 		public static Bitmap NoBeaconIcon { get { if (noBeaconIcon == null) noBeaconIcon = IconCache.GetIcon(Path.Combine("Graphics", "NoBeacon.png"), 64); return noBeaconIcon; } }
-		public static Bitmap SpoilabeIcon { get { return IconCache.GetSpoilageIcon(); } }
-
 
 		private Dictionary<string, string> includedMods; //name : version
 		private Dictionary<string, Technology> technologies;
@@ -66,6 +67,7 @@ namespace Foreman
 		private Dictionary<string, Quality> qualities;
 		private Dictionary<string, Item> items;
 		private Dictionary<string, Recipe> recipes;
+		private Dictionary<string, PlantProcess> plantProcesses;
 		private Dictionary<string, Assembler> assemblers;
 		private Dictionary<string, Module> modules;
 		private Dictionary<string, Beacon> beacons;
@@ -77,6 +79,7 @@ namespace Foreman
 		private Dictionary<string, Module> missingModules;
 		private Dictionary<string, Beacon> missingBeacons;
 		private Dictionary<RecipeShort, Recipe> missingRecipes;
+		private Dictionary<string, PlantProcess> missingPlantProcesses;
 
 		private GroupPrototype extraFormanGroup;
 		private SubgroupPrototype extractionSubgroupItems;
@@ -119,6 +122,7 @@ namespace Foreman
 			qualities = new Dictionary<string, Quality>();
 			items = new Dictionary<string, Item>();
 			recipes = new Dictionary<string, Recipe>();
+			plantProcesses = new Dictionary<string, PlantProcess>();
 			assemblers = new Dictionary<string, Assembler>();
 			modules = new Dictionary<string, Module>();
 			beacons = new Dictionary<string, Beacon>();
@@ -130,6 +134,7 @@ namespace Foreman
 			missingModules = new Dictionary<string, Module>();
 			missingBeacons = new Dictionary<string, Beacon>();
 			missingRecipes = new Dictionary<RecipeShort, Recipe>(new RecipeShortNaInPrComparer());
+			missingPlantProcesses = new Dictionary<string, PlantProcess>();
 
 			GenerateHelperObjects();
 			Clear();
@@ -214,7 +219,6 @@ namespace Foreman
 			Dictionary<string, List<ItemPrototype>> fuelCategories = new Dictionary<string, List<ItemPrototype>>();
 			fuelCategories.Add("§§fc:liquids", new List<ItemPrototype>()); //the liquid fuels category
 			Dictionary<Item, string> burnResults = new Dictionary<Item, string>();
-			Dictionary<Item, string> plantResults = new Dictionary<Item, string>();
 			Dictionary<Item, string> spoilResults = new Dictionary<Item, string>();
 			Dictionary<Quality, string> nextQualities = new Dictionary<Quality, string>();
 			List<Recipe> miningWithFluidRecipes = new List<Recipe>();
@@ -250,11 +254,11 @@ namespace Foreman
 					ProcessFluid(objJToken, iconCache, fuelCategories);
 
 				foreach (var objJToken in jsonData["items"].ToList())
-					ProcessItem(objJToken, iconCache, fuelCategories, burnResults, plantResults, spoilResults); //items after fluids to take care of duplicates (if name exists in fluid and in item set, then only the fluid is counted)
+					ProcessItem(objJToken, iconCache, fuelCategories, burnResults, spoilResults); //items after fluids to take care of duplicates (if name exists in fluid and in item set, then only the fluid is counted)
 				foreach (ItemPrototype item in items.Values.Cast<ItemPrototype>())
 					ProcessBurnItem(item, burnResults); //link up any items with burn remains
-                foreach (ItemPrototype item in items.Values.Cast<ItemPrototype>())
-                    ProcessPlantItem(item, plantResults); //link up any items with plant results
+                foreach (var objJToken in jsonData["items"].ToList())
+                    ProcessPlantProcess(objJToken); //process items json specifically for plant processes (items should all be populated by now)
                 foreach (ItemPrototype item in items.Values.Cast<ItemPrototype>())
                     ProcessSpoilItem(item, spoilResults); //link up any items with spoil remains
 
@@ -294,7 +298,6 @@ namespace Foreman
 				resourceCategories.Clear();
 				fuelCategories.Clear();
 				burnResults.Clear();
-				plantResults.Clear();
 				spoilResults.Clear();
 
 
@@ -358,6 +361,7 @@ namespace Foreman
 			subgroups.Clear();
 			items.Clear();
 			recipes.Clear();
+			plantProcesses.Clear();
 			assemblers.Clear();
 			modules.Clear();
 			beacons.Clear();
@@ -367,6 +371,7 @@ namespace Foreman
 			missingModules.Clear();
 			missingBeacons.Clear();
 			missingRecipes.Clear();
+			missingPlantProcesses.Clear();
 
 			if (iconCache != null)
 			{
@@ -607,7 +612,7 @@ namespace Foreman
 			items.Add(item.Name, item);
 		}
 
-		private void ProcessItem(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<ItemPrototype>> fuelCategories, Dictionary<Item, string> burnResults, Dictionary<Item, string> plantResults, Dictionary<Item, string> spoilResults)
+		private void ProcessItem(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<ItemPrototype>> fuelCategories, Dictionary<Item, string> burnResults, Dictionary<Item, string> spoilResults)
 		{
 			if (items.ContainsKey((string)objJToken["name"])) //special handling for fluids which appear in both items & fluid lists (ex: fluid-unknown)
 				return;
@@ -637,13 +642,11 @@ namespace Foreman
 			}
 			if (objJToken["burnt_result"] != null)
 				burnResults.Add(item, (string)objJToken["burnt_result"]);
-            if (objJToken["plant_result"] != null)
-                plantResults.Add(item, (string)objJToken["plant_result"]);
 			if (objJToken["spoil_result"] != null)
 			{
 				spoilResults.Add(item, (string)objJToken["spoil_result"]);
-                foreach (JToken spoilToken in objJToken["q_spoil_ticks"])
-                    item.spoilageTimes.Add(qualities[(string)spoilToken["quality"]], (double)spoilToken["value"] / 60);
+                foreach (JToken spoilToken in objJToken["q_spoil_time"])
+                    item.spoilageTimes.Add(qualities[(string)spoilToken["quality"]], (double)spoilToken["value"]);
             }
 
             items.Add(item.Name, item);
@@ -657,14 +660,31 @@ namespace Foreman
 				((ItemPrototype)items[burnResults[item]]).FuelOrigin = item;
 			}
 		}
-        private void ProcessPlantItem(ItemPrototype item, Dictionary<Item, string> plantResults)
+        private void ProcessPlantProcess(JToken objJToken)
         {
-			return;
-            if (plantResults.ContainsKey(item))
-            {
-                item.PlantResult = items[plantResults[item]];
-                ((ItemPrototype)items[plantResults[item]]).plantOrigins.Add(item);
-            }
+            if (objJToken["plant_results"] != null)
+			{
+				ItemPrototype seed = (ItemPrototype)items[(string)objJToken["name"]];
+				PlantProcessPrototype plantProcess = new PlantProcessPrototype(
+					this,
+					seed.Name);
+
+				plantProcess.GrowTime = (double)objJToken["plant_growth_time"];
+
+                foreach (var productJToken in objJToken["plant_results"].ToList())
+                {
+                    ItemPrototype product = (ItemPrototype)items[(string)productJToken["name"]];
+                    double amount = (double)productJToken["amount"];
+                    if (amount != 0)
+                    {
+                        plantProcess.InternalOneWayAddProduct(product, amount);
+                        product.plantOrigins.Add(seed);
+						seed.PlantResult = plantProcess;
+                    }
+                }
+
+				plantProcesses.Add(seed.Name, plantProcess); //seed.Name = plantProcess.name, but for clarity: any searches will be done via seed's name
+			}
         }
         private void ProcessSpoilItem(ItemPrototype item, Dictionary<Item, string> spoilResults)
         {
@@ -1083,12 +1103,12 @@ namespace Foreman
 
 			//energy production
 			foreach (JToken speedToken in objJToken["q_energy_production"])
-				entity.energyProduction.Add(qualities[(string)speedToken["quality"]], (double)speedToken["value"] * 60.0f); //60 = convert ticks to seconds
+				entity.energyProduction.Add(qualities[(string)speedToken["quality"]], (double)speedToken["value"]);
 
 			//energy consumption
-			entity.energyDrain = objJToken["drain"] != null ? (double)objJToken["drain"] * 60f : 0; //seconds
+			entity.energyDrain = objJToken["drain"] != null ? (double)objJToken["drain"] : 0; //seconds
 			foreach (JToken speedToken in objJToken["q_max_energy_usage"])
-				entity.energyConsumption.Add(qualities[(string)speedToken["quality"]], (double)speedToken["value"] * 60.0f); //60 = convert ticks to seconds
+				entity.energyConsumption.Add(qualities[(string)speedToken["quality"]], (double)speedToken["value"]);
 
 			//fuel processing
 			switch (entity.EnergySource)
@@ -1347,8 +1367,8 @@ namespace Foreman
 				return false;
 			FluidPrototype ingredient = (FluidPrototype)items[(string)objJToken["fluid_ingredient"]];
 
-			double baseSpeed = (double)objJToken["fluid_usage_per_tick"];
-			double baseEnergyProduction = (double)objJToken["max_power_output"] * 60f; //in seconds
+			double baseSpeed = (double)objJToken["fluid_usage_per_sec"] / 60; //use 60 multiplier to make recipes easier
+			double baseEnergyProduction = (double)objJToken["max_power_output"]; //in seconds
 
 			foreach (Quality quality in qualities.Values)
 				aEntity.speed.Add(quality, baseSpeed * aEntity.GetEnergyProduction(quality) / baseEnergyProduction);
@@ -1749,11 +1769,13 @@ namespace Foreman
                 foreach (ItemPrototype item in items.Values.Where(i => i.Available && !i.ProductionRecipes.Any(r => r.Available && r.ProductList.Count > 1 && r.ProductList[0] != i)).Cast<ItemPrototype>())
 				{
 					bool useful = false;
+
 					foreach (RecipePrototype r in item.consumptionRecipes.Where(r => r.Available))
 					{
 
 						useful |= (r.ingredientList.Count > 1 || r.productList.Count > 1 || (r.productList.Count == 1 && r.productList[0] != item)); //recipe with multiple items coming in or some ingredients coming out (that arent itself) -> not an incineration type
 					}
+
 					if (!useful && !item.Name.StartsWith("§§"))
 					{
 						item.Available = false;
@@ -1762,6 +1784,15 @@ namespace Foreman
 							r.Available = false;
 					}
 				}
+				//4.3: go over the item list one more time and ensure that if an item that is available has any growth or spoil results then they are also available (edge case: item grows or spoils into something that has no recipes aka: unavailable, but it should be available even though its only 'use' is as a spoil or grow result)
+				foreach (ItemPrototype item in items.Values.Where(i => !i.Available).Cast<ItemPrototype>())
+				{
+					bool useful = false;
+					useful |= item.spoilOrigins.Count(i => i.Available) > 0;
+					useful |= item.plantOrigins.Count(i => i.Available) > 0;
+					item.Available = useful;
+				}
+
 			}
 
 			//step 5: set the 'default' enabled statuses of recipes,assemblers,modules & beacons to their available status.

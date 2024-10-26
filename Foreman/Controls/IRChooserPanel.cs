@@ -543,6 +543,8 @@ namespace Foreman
 			AddSupplyButton.Click += AddSupplyButton_Click;
 			AddSpoilButton.Click += AddSpoilButton_Click;
 			AddUnspoilButton.Click += AddUnSpoilButton_Click;
+			AddPlantButton.Click += AddPlantButton_Click;
+			AddUnplantButton.Click += AddUnPlantButton_Click;
 
 			AsIngredientCheckBox.CheckedChanged += FilterCheckBox_CheckedChanged;
 			AsProductCheckBox.CheckedChanged += FilterCheckBox_CheckedChanged;
@@ -569,7 +571,10 @@ namespace Foreman
 				OtherNodeOptionsBTable.Visible = true;
 				AddSpoilButton.Visible = asIngredient && KeyItem.SpoilResult != null;
 				AddUnspoilButton.Visible = asProduct && KeyItem.SpoilOrigins.Count > 0;
-				OtherNodeOptionsBTable.Visible = AddSpoilButton.Visible || AddUnspoilButton.Visible;
+				AddPlantButton.Visible = asIngredient && KeyItem.PlantResult != null;
+				AddUnplantButton.Visible = asProduct && KeyItem.PlantOrigins.Count > 0;
+				int totalVisible = (AddSpoilButton.Visible ? 1 : 0) + (AddUnspoilButton.Visible ? 1 : 0) + (AddPlantButton.Visible ? 1 : 0) + (AddUnplantButton.Visible ? 1 : 0);
+				OtherNodeOptionsBTable.Visible = totalVisible > 0;
 
 				bool hasConsumptionRecipes = Properties.Settings.Default.ShowUnavailable? KeyItem.ConsumptionRecipes.Count > 0 : KeyItem.ConsumptionRecipes.Count(r => r.Available) > 0;
 				bool hasFuelConsumptionRecipes = KeyItem.FuelsEntities.FirstOrDefault(a => (a is Assembler assembler) && assembler.Enabled && assembler.Recipes.FirstOrDefault(r => r.Enabled) != null) != null;
@@ -760,11 +765,45 @@ namespace Foreman
 
         private void AddUnSpoilButton_Click(object sender, EventArgs e)
         {
-            panelCloseReason = ChooserPanelCloseReason.RequiresItemSelection;
-            RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Spoil, NodeDirection.Down)); //this will cause an item selection to pop up, meaning that this window will auto dispose
-            //Dispose();
+			if(KeyItem.SpoilOrigins.Count < 2)
+			{
+                panelCloseReason = ChooserPanelCloseReason.AltNodeSelected;
+				RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Spoil, NodeDirection.Down));
+				Dispose(true);
+            }
+			else
+			{
+				panelCloseReason = ChooserPanelCloseReason.RequiresItemSelection;
+                RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Spoil, NodeDirection.Down));
+				//Dispose(); //since close reason is 'requires item selection, this will panel will auto close on 'recipe requested' invoke
+            }
         }
 
+        private void AddPlantButton_Click(object sender, EventArgs e)
+        {
+            RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Plant, NodeDirection.Up));
+
+            if ((Control.ModifierKeys & Keys.Shift) != Keys.Shift)
+            {
+                panelCloseReason = ChooserPanelCloseReason.AltNodeSelected;
+                Dispose();
+            }
+        }
+
+        private void AddUnPlantButton_Click(object sender, EventArgs e)
+        {
+            if (KeyItem.PlantOrigins.Count < 2)
+            {
+                panelCloseReason = ChooserPanelCloseReason.AltNodeSelected;
+                RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Plant, NodeDirection.Down));
+                Dispose(true);
+            } else
+            {
+                panelCloseReason = ChooserPanelCloseReason.RequiresItemSelection;
+                RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Plant, NodeDirection.Down));
+                //Dispose(); //since close reason is 'requires item selection, this will panel will auto close on 'recipe requested' invoke
+            }
+        }
 
         internal override void IRButton_MouseHover(object sender, EventArgs e)
 		{
@@ -798,8 +837,8 @@ namespace Foreman
         }
 		public RecipeRequestArgs(NodeType nodeType, NodeDirection direction) : this(nodeType, null, direction)
 		{
-            if (nodeType != NodeType.Spoil)
-                Trace.Fail("RecipeRequestArgs with direction only supported for spoil requests!");
+            if (nodeType != NodeType.Spoil && nodeType != NodeType.Plant)
+                Trace.Fail("RecipeRequestArgs with direction only supported for spoil & plant requests!");
         }
         public RecipeRequestArgs(NodeType nodeType, Recipe recipe, NodeDirection direction)
 		{

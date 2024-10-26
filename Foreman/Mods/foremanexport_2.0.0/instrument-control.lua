@@ -22,18 +22,60 @@ local function ProcessTemperature(temperature)
 	end
 end
 
-local function ProcessQualityValue(qualityfunction)
+local function ProcessQualityValue(qualityfunction, multiplier)
 	qualityTable = {}
 	if qualityEnabled then
 		for _, quality in pairs(prototypes.quality) do
-			table.insert(qualityTable, {['quality'] = quality.name, ['value'] = qualityfunction(quality)})
+			table.insert(qualityTable, {['quality'] = quality.name, ['value'] = qualityfunction(quality) * multiplier})
 		end
 	else
 		qualityEntity = {}
-		table.insert(qualityTable, {['quality'] = 'default', ['value'] = qualityfunction()})
+		table.insert(qualityTable, {['quality'] = 'default', ['value'] = qualityfunction() * multiplier})
 	end
 
 	return qualityTable
+end
+
+local function ProcessIngredientList(ingredients)
+	ingredientlist = {}
+	for _, ingredient in pairs(ingredients) do
+		tingredient = {}
+		tingredient['name'] = ingredient.name
+		tingredient['type'] = ingredient.type
+		tingredient['amount'] = ingredient.amount
+		if ingredient.type == 'fluid' and ingredient.minimum_temperature ~= nil then
+			tingredient['minimum_temperature'] = ProcessTemperature(ingredient.minimum_temperature)
+		end
+		if ingredient.type == 'fluid' and ingredient.maximum_temperature ~= nil then
+			tingredient['maximum_temperature'] = ProcessTemperature(ingredient.maximum_temperature)
+		end
+		table.insert(ingredientlist, tingredient)
+	end
+	return ingredientlist
+end
+
+local function ProcessProductList(products)
+	productlist = {}
+	for _, product in pairs(products) do
+		tproduct = {}
+		tproduct['name'] = product.name
+		tproduct['type'] = product.type
+
+		amount = (product.amount == nil) and ((product.amount_max + product.amount_min)/2) or product.amount
+		amount = amount * product.probability
+		amount_ignored_by_productivity = (product.ignored_by_productivity == nil) and 0 or product.ignored_by_productivity
+		if amount_ignored_by_productivity > amount then amount_ignored_by_productivity = amount end
+		amount_added_by_extra_fraction = (product.extra_count_fraction == nil) and 0 or product.extra_count_fraction
+
+		tproduct['amount'] = amount + amount_added_by_extra_fraction
+		tproduct['p_amount'] = amount - amount_ignored_by_productivity + amount_added_by_extra_fraction
+
+		if product.type == 'fluid' and product.temperate ~= nil then
+			tproduct['temperature'] = ProcessTemperature(product.temperature)
+		end
+		table.insert(productlist, tproduct)
+	end
+	return productlist
 end
 
 local function ExportModList()
@@ -144,41 +186,8 @@ local function ExportRecipes()
 			end
 		end
 
-		trecipe['ingredients'] = {}
-		for _, ingredient in pairs(recipe.ingredients) do
-			tingredient = {}
-			tingredient['name'] = ingredient.name
-			tingredient['type'] = ingredient.type
-			tingredient['amount'] = ingredient.amount
-			if ingredient.type == 'fluid' and ingredient.minimum_temperature ~= nil then
-				tingredient['minimum_temperature'] = ProcessTemperature(ingredient.minimum_temperature)
-			end
-			if ingredient.type == 'fluid' and ingredient.maximum_temperature ~= nil then
-				tingredient['maximum_temperature'] = ProcessTemperature(ingredient.maximum_temperature)
-			end
-			table.insert(trecipe['ingredients'], tingredient)
-		end
-
-		trecipe['products'] = {}
-		for _, product in pairs(recipe.products) do
-			tproduct = {}
-			tproduct['name'] = product.name
-			tproduct['type'] = product.type
-
-			amount = (product.amount == nil) and ((product.amount_max + product.amount_min)/2) or product.amount
-			amount = amount * product.probability
-			amount_ignored_by_productivity = (product.ignored_by_productivity == nil) and 0 or product.ignored_by_productivity
-			if amount_ignored_by_productivity > amount then amount_ignored_by_productivity = amount end
-			amount_added_by_extra_fraction = (product.extra_count_fraction == nil) and 0 or product.extra_count_fraction
-
-			tproduct['amount'] = amount + amount_added_by_extra_fraction
-			tproduct['p_amount'] = amount - amount_ignored_by_productivity + amount_added_by_extra_fraction
-
-			if product.type == 'fluid' and product.temperature ~= nil then
-				tproduct['temperature'] = ProcessTemperature(product.temperature)
-			end
-			table.insert(trecipe['products'], tproduct)
-		end
+		trecipe['ingredients'] = ProcessIngredientList(recipe.ingredients)
+		trecipe['products'] = ProcessProductList(recipe.products)
 
 		trecipe['lid'] = '$'..localindex		
 		ExportLocalisedString(recipe.localised_name, localindex)
@@ -241,11 +250,12 @@ local function ExportItems()
 
 		if item.spoil_result ~= nil then
 			titem['spoil_result'] = item.spoil_result.name
-			titem['q_spoil_ticks'] = ProcessQualityValue(item.get_spoil_ticks)
+			titem['q_spoil_time'] = ProcessQualityValue(item.get_spoil_ticks, 1/60)
 		end
 
-		if item.plant_result ~= nil then
-			titem['plant_result'] = item.plant_result.name
+		if item.plant_result ~= nil and item.plant_result.mineable_properties ~= nil then
+			titem['plant_results'] = ProcessProductList(item.plant_result.mineable_properties.products)
+			titem['plant_growth_time'] = item.plant_result.growth_ticks / 60
 		end
 
 		if item.rocket_launch_products ~= nil and item.rocket_launch_products[1] ~= nil then
@@ -351,10 +361,10 @@ local function ExportEntities()
 			elseif entity.type == 'offshore-pump' then
 				tentity['speed'] = entity.pumping_speed
 			elseif entity.type == 'furnace' or entity.type == 'assembling-machine' or entity.type == 'rocket-silo' then
-				tentity['q_speed'] = ProcessQualityValue(entity.get_crafting_speed)
+				tentity['q_speed'] = ProcessQualityValue(entity.get_crafting_speed, 1)
 			end
 
-			if entity.fluid_usage_per_tick ~= nil then tentity['fluid_usage_per_tick'] = entity.fluid_usage_per_tick end
+			if entity.fluid_usage_per_tick ~= nil then tentity['fluid_usage_per_sec'] = entity.fluid_usage_per_tick * 60 end
 
 			if entity.module_inventory_size ~= nil then tentity['module_inventory_size'] =  entity.module_inventory_size end
 			if entity.distribution_effectivity ~= nil then tentity['distribution_effectivity'] = entity.distribution_effectivity end
@@ -427,7 +437,7 @@ local function ExportEntities()
 				end
 			elseif entity.type == 'generator' then
 				tentity['full_power_temperature'] = ProcessTemperature(entity.maximum_temperature)
-				tentity['max_power_output'] = entity.max_power_output
+				tentity['max_power_output'] = entity.max_power_output * 60
 
 				tentity['minimum_temperature'] = ProcessTemperature(entity.fluidbox_prototypes[1].minimum_temperature)
 				tentity['maximum_temperature'] = ProcessTemperature(entity.fluidbox_prototypes[1].maximum_temperature)
@@ -464,8 +474,8 @@ local function ExportEntities()
 			end
 
 			tentity['energy_usage'] = (entity.energy_usage == nil) and 0 or entity.energy_usage
-			tentity['q_max_energy_usage'] = ProcessQualityValue(entity.get_max_energy_usage)
-			tentity['q_energy_production'] = ProcessQualityValue(entity.get_max_energy_production)
+			tentity['q_max_energy_usage'] = ProcessQualityValue(entity.get_max_energy_usage, 60)
+			tentity['q_energy_production'] = ProcessQualityValue(entity.get_max_energy_production, 60)
 
 			if entity.burner_prototype ~= null then
 				tentity['fuel_type'] = 'item'
@@ -501,7 +511,7 @@ local function ExportEntities()
 			elseif entity.electric_energy_source_prototype then
 				tentity['fuel_type'] = 'electricity'
 				tentity['fuel_effectivity'] = 1
-				tentity['drain'] = entity.electric_energy_source_prototype.drain
+				tentity['drain'] = entity.electric_energy_source_prototype.drain * 60
 
 				tentity['pollution'] = {}
 				for pollutant, quantity in pairs(entity.electric_energy_source_prototype.emissions_per_joule) do
@@ -554,26 +564,7 @@ local function ExportResources()
 				tresource['fluid_amount'] = resource.mineable_properties.fluid_amount
 			end
 
-			tresource['products'] = {}
-			for _, product in pairs(resource.mineable_properties.products) do
-				tproduct = {}
-				tproduct['name'] = product.name
-				tproduct['type'] = product.type
-
-				amount = (product.amount == nil) and ((product.amount_max + product.amount_min)/2) or product.amount
-				amount = amount * product.probability
-				amount_ignored_by_productivity = (product.ignored_by_productivity == nil) and 0 or product.ignored_by_productivity
-				if amount_ignored_by_productivity > amount then amount_ignored_by_productivity = amount end
-				amount_added_by_extra_fraction = (product.extra_count_fraction == nil) and 0 or product.extra_count_fraction
-
-				tproduct['amount'] = amount + amount_added_by_extra_fraction
-				tproduct['p_amount'] = amount - amount_ignored_by_productivity + amount_added_by_extra_fraction
-
-				if product.type == 'fluid' and product.temperate ~= nil then
-					tproduct['temperature'] = ProcessTemperature(product.temperature)
-				end
-				table.insert(tresource['products'], tproduct)
-			end
+			tresource['products'] = ProcessProductList(resource.mineable_properties.products)
 
 			tresource['lid'] = '$'..localindex
 			ExportLocalisedString(resource.localised_name, localindex)

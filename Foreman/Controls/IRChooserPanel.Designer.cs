@@ -32,7 +32,9 @@ namespace Foreman
             this.MainTable = new System.Windows.Forms.TableLayoutPanel();
             this.OtherNodeOptionsBTable = new System.Windows.Forms.TableLayoutPanel();
             this.AddSpoilButton = new System.Windows.Forms.Button();
+            this.AddPlantButton = new System.Windows.Forms.Button();
             this.AddUnspoilButton = new System.Windows.Forms.Button();
+            this.AddUnplantButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.ItemIconPanel = new System.Windows.Forms.Panel();
             this.RecipeNameOnlyFilterCheckBox = new System.Windows.Forms.CheckBox();
@@ -89,11 +91,15 @@ namespace Foreman
             // 
             this.OtherNodeOptionsBTable.AutoSize = true;
             this.OtherNodeOptionsBTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.OtherNodeOptionsBTable.ColumnCount = 2;
-            this.OtherNodeOptionsBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.OtherNodeOptionsBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.OtherNodeOptionsBTable.Controls.Add(this.AddSpoilButton, 0, 0);
+            this.OtherNodeOptionsBTable.ColumnCount = 4;
+            this.OtherNodeOptionsBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22F));
+            this.OtherNodeOptionsBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 28F));
+            this.OtherNodeOptionsBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 28F));
+            this.OtherNodeOptionsBTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22F));
+            this.OtherNodeOptionsBTable.Controls.Add(this.AddSpoilButton, 2, 0);
+            this.OtherNodeOptionsBTable.Controls.Add(this.AddPlantButton, 3, 0);
             this.OtherNodeOptionsBTable.Controls.Add(this.AddUnspoilButton, 0, 0);
+            this.OtherNodeOptionsBTable.Controls.Add(this.AddUnplantButton, 1, 0);
             this.OtherNodeOptionsBTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.OtherNodeOptionsBTable.Location = new System.Drawing.Point(0, 360);
             this.OtherNodeOptionsBTable.Margin = new System.Windows.Forms.Padding(0);
@@ -109,13 +115,26 @@ namespace Foreman
             this.AddSpoilButton.AutoSize = true;
             this.AddSpoilButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.AddSpoilButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AddSpoilButton.Location = new System.Drawing.Point(146, 0);
-            this.AddSpoilButton.Margin = new System.Windows.Forms.Padding(3, 0, 3, 1);
+            this.AddSpoilButton.Location = new System.Drawing.Point(152, 0);
+            this.AddSpoilButton.Margin = new System.Windows.Forms.Padding(9, 0, 9, 1);
             this.AddSpoilButton.Name = "AddSpoilButton";
-            this.AddSpoilButton.Size = new System.Drawing.Size(138, 23);
-            this.AddSpoilButton.TabIndex = 9;
+            this.AddSpoilButton.Size = new System.Drawing.Size(62, 23);
+            this.AddSpoilButton.TabIndex = 13;
             this.AddSpoilButton.Text = "Spoil";
             this.AddSpoilButton.UseVisualStyleBackColor = true;
+            // 
+            // AddPlantButton
+            // 
+            this.AddPlantButton.AutoSize = true;
+            this.AddPlantButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.AddPlantButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.AddPlantButton.Location = new System.Drawing.Point(226, 0);
+            this.AddPlantButton.Margin = new System.Windows.Forms.Padding(3, 0, 3, 1);
+            this.AddPlantButton.Name = "AddPlantButton";
+            this.AddPlantButton.Size = new System.Drawing.Size(58, 23);
+            this.AddPlantButton.TabIndex = 12;
+            this.AddPlantButton.Text = "Plant";
+            this.AddPlantButton.UseVisualStyleBackColor = true;
             // 
             // AddUnspoilButton
             // 
@@ -125,10 +144,23 @@ namespace Foreman
             this.AddUnspoilButton.Location = new System.Drawing.Point(3, 0);
             this.AddUnspoilButton.Margin = new System.Windows.Forms.Padding(3, 0, 3, 1);
             this.AddUnspoilButton.Name = "AddUnspoilButton";
-            this.AddUnspoilButton.Size = new System.Drawing.Size(137, 23);
-            this.AddUnspoilButton.TabIndex = 5;
-            this.AddUnspoilButton.Text = "unSpoil";
+            this.AddUnspoilButton.Size = new System.Drawing.Size(57, 23);
+            this.AddUnspoilButton.TabIndex = 11;
+            this.AddUnspoilButton.Text = "UnSpoil";
             this.AddUnspoilButton.UseVisualStyleBackColor = true;
+            // 
+            // AddUnplantButton
+            // 
+            this.AddUnplantButton.AutoSize = true;
+            this.AddUnplantButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.AddUnplantButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.AddUnplantButton.Location = new System.Drawing.Point(72, 0);
+            this.AddUnplantButton.Margin = new System.Windows.Forms.Padding(9, 0, 9, 1);
+            this.AddUnplantButton.Name = "AddUnplantButton";
+            this.AddUnplantButton.Size = new System.Drawing.Size(62, 23);
+            this.AddUnplantButton.TabIndex = 10;
+            this.AddUnplantButton.Text = "UnPlant";
+            this.AddUnplantButton.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel1
             // 
@@ -290,9 +322,9 @@ namespace Foreman
             this.OtherNodeOptionsATable.AutoSize = true;
             this.OtherNodeOptionsATable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.OtherNodeOptionsATable.ColumnCount = 3;
-            this.OtherNodeOptionsATable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.OtherNodeOptionsATable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.OtherNodeOptionsATable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.OtherNodeOptionsATable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22F));
+            this.OtherNodeOptionsATable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 56F));
+            this.OtherNodeOptionsATable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22F));
             this.OtherNodeOptionsATable.Controls.Add(this.AddSupplyButton, 0, 0);
             this.OtherNodeOptionsATable.Controls.Add(this.AddPassthroughButton, 1, 0);
             this.OtherNodeOptionsATable.Controls.Add(this.AddConsumerButton, 2, 0);
@@ -302,7 +334,6 @@ namespace Foreman
             this.OtherNodeOptionsATable.Name = "OtherNodeOptionsATable";
             this.OtherNodeOptionsATable.RowCount = 1;
             this.OtherNodeOptionsATable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.OtherNodeOptionsATable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
             this.OtherNodeOptionsATable.Size = new System.Drawing.Size(287, 24);
             this.OtherNodeOptionsATable.TabIndex = 4;
             this.OtherNodeOptionsATable.Visible = false;
@@ -315,7 +346,7 @@ namespace Foreman
             this.AddSupplyButton.Location = new System.Drawing.Point(3, 0);
             this.AddSupplyButton.Margin = new System.Windows.Forms.Padding(3, 0, 3, 1);
             this.AddSupplyButton.Name = "AddSupplyButton";
-            this.AddSupplyButton.Size = new System.Drawing.Size(65, 23);
+            this.AddSupplyButton.Size = new System.Drawing.Size(57, 23);
             this.AddSupplyButton.TabIndex = 5;
             this.AddSupplyButton.Text = "Source";
             this.AddSupplyButton.UseVisualStyleBackColor = true;
@@ -325,10 +356,10 @@ namespace Foreman
             this.AddPassthroughButton.AutoSize = true;
             this.AddPassthroughButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.AddPassthroughButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AddPassthroughButton.Location = new System.Drawing.Point(80, 0);
+            this.AddPassthroughButton.Location = new System.Drawing.Point(72, 0);
             this.AddPassthroughButton.Margin = new System.Windows.Forms.Padding(9, 0, 9, 1);
             this.AddPassthroughButton.Name = "AddPassthroughButton";
-            this.AddPassthroughButton.Size = new System.Drawing.Size(125, 23);
+            this.AddPassthroughButton.Size = new System.Drawing.Size(142, 23);
             this.AddPassthroughButton.TabIndex = 6;
             this.AddPassthroughButton.Text = "Pass-Through";
             this.AddPassthroughButton.UseVisualStyleBackColor = true;
@@ -338,10 +369,10 @@ namespace Foreman
             this.AddConsumerButton.AutoSize = true;
             this.AddConsumerButton.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.AddConsumerButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AddConsumerButton.Location = new System.Drawing.Point(217, 0);
+            this.AddConsumerButton.Location = new System.Drawing.Point(226, 0);
             this.AddConsumerButton.Margin = new System.Windows.Forms.Padding(3, 0, 2, 1);
             this.AddConsumerButton.Name = "AddConsumerButton";
-            this.AddConsumerButton.Size = new System.Drawing.Size(68, 23);
+            this.AddConsumerButton.Size = new System.Drawing.Size(59, 23);
             this.AddConsumerButton.TabIndex = 7;
             this.AddConsumerButton.Text = "Output";
             this.AddConsumerButton.UseVisualStyleBackColor = true;
@@ -362,7 +393,7 @@ namespace Foreman
             this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0004F));
             this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0004F));
             this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 9.996403F));
-            this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 14F));
+            this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 18F));
             this.IRTable.Controls.Add(this.IRScrollBar, 10, 0);
             this.IRTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.IRTable.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
@@ -463,7 +494,9 @@ namespace Foreman
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
 		protected System.Windows.Forms.CheckBox AsFuelCheckBox;
         protected System.Windows.Forms.TableLayoutPanel OtherNodeOptionsBTable;
-        protected System.Windows.Forms.Button AddUnspoilButton;
         protected System.Windows.Forms.Button AddSpoilButton;
+        protected System.Windows.Forms.Button AddPlantButton;
+        protected System.Windows.Forms.Button AddUnspoilButton;
+        protected System.Windows.Forms.Button AddUnplantButton;
     }
 }

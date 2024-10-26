@@ -162,6 +162,7 @@
     <Compile Include="DataCache\DataTypes\EntityObjectBase.cs" />
     <Compile Include="DataCache\DataTypes\Fluid.cs" />
     <Compile Include="DataCache\DataTypes\Quality.cs" />
+    <Compile Include="DataCache\DataTypes\PlantProcess.cs" />
     <Compile Include="DataCache\DataTypes\RecipeShort.cs" />
     <Compile Include="DataCache\FactorioPathsProcessor.cs" />
     <Compile Include="DataCache\IconCache.cs" />
@@ -214,6 +215,7 @@
     <Compile Include="Models\LinkChecker.cs" />
     <Compile Include="Models\ModuleSelector.cs" />
     <Compile Include="Models\Nodes\ConsumerNode.cs" />
+    <Compile Include="Models\Nodes\PlantNode.cs" />
     <Compile Include="Models\Nodes\SpoilNode.cs" />
     <Compile Include="Models\Nodes\PassthroughNode.cs" />
     <Compile Include="Models\Nodes\RecipeNode.cs" />
@@ -231,6 +233,7 @@
     <Compile Include="ProductionGraphView\Elements\BeaconElement.cs" />
     <Compile Include="ProductionGraphView\Elements\ConsumerNodeElement.cs" />
     <Compile Include="ProductionGraphView\Elements\ErrorNoticeElement.cs" />
+    <Compile Include="ProductionGraphView\Elements\PlantNodeElement.cs" />
     <Compile Include="ProductionGraphView\Elements\SpoilNodeElement.cs" />
     <Compile Include="ProductionGraphView\Elements\PassthroughNodeElement.cs" />
     <Compile Include="ProductionGraphView\Elements\RecipeNodeElement.cs" />
@@ -420,6 +423,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Graphics\HeatIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graphics\PlantAssembler.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Graphics\PlayerAssembler.png">

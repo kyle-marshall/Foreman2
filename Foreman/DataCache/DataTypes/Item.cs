@@ -37,7 +37,7 @@ namespace Foreman
 		double PollutionMultiplier { get; }
 
 		Item BurnResult { get; }
-		Item PlantResult { get; }
+		PlantProcess PlantResult { get; }
 		Item SpoilResult { get; }
 
 		Item FuelOrigin { get; }
@@ -69,7 +69,7 @@ namespace Foreman
 		public double PollutionMultiplier { get; internal set; }
 
 		public Item BurnResult { get; internal set; }
-		public Item PlantResult { get; internal set; }
+		public PlantProcess PlantResult { get; internal set; }
 		public Item SpoilResult { get; internal set; }
 
 		public Item FuelOrigin { get; internal set; }

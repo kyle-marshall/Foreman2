@@ -18771,11 +18771,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 30000
+          "value": 1800000
         },
         {
           "quality": "quality-unknown",
-          "value": 30000
+          "value": 1800000
         }
       ],
       "q_energy_production": [
@@ -18804,13 +18804,13 @@
       "icon_alt_name": "icon.i.steam-engine",
       "order": "z-b[steam-power]-b[steam-engine]",
       "type": "generator",
-      "fluid_usage_per_tick": 0.5,
+      "fluid_usage_per_sec": 30,
       "module_inventory_size": 0,
       "items_to_place_this": [
         "steam-engine"
       ],
       "full_power_temperature": 165,
-      "max_power_output": 15000,
+      "max_power_output": 900000,
       "minimum_temperature": 100,
       "fluid_ingredient": "steam",
       "energy_usage": 0,
@@ -18827,11 +18827,11 @@
       "q_energy_production": [
         {
           "quality": "normal",
-          "value": 15000
+          "value": 900000
         },
         {
           "quality": "quality-unknown",
-          "value": 15000
+          "value": 900000
         }
       ],
       "fuel_type": "electricity",
@@ -18863,11 +18863,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 666666.66666666663
+          "value": 40000000
         },
         {
           "quality": "quality-unknown",
-          "value": 666666.66666666663
+          "value": 40000000
         }
       ],
       "q_energy_production": [
@@ -18907,11 +18907,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 166666.66666666666
+          "value": 10000000
         },
         {
           "quality": "quality-unknown",
-          "value": 166666.66666666666
+          "value": 10000000
         }
       ],
       "q_energy_production": [
@@ -18937,13 +18937,13 @@
       "icon_alt_name": "icon.i.steam-turbine",
       "order": "z-f[nuclear-energy]-d[steam-turbine]",
       "type": "generator",
-      "fluid_usage_per_tick": 1,
+      "fluid_usage_per_sec": 60,
       "module_inventory_size": 0,
       "items_to_place_this": [
         "steam-turbine"
       ],
       "full_power_temperature": 500,
-      "max_power_output": 97000,
+      "max_power_output": 5820000,
       "minimum_temperature": 100,
       "fluid_ingredient": "steam",
       "energy_usage": 0,
@@ -18960,11 +18960,11 @@
       "q_energy_production": [
         {
           "quality": "normal",
-          "value": 97000
+          "value": 5820000
         },
         {
           "quality": "quality-unknown",
-          "value": 97000
+          "value": 5820000
         }
       ],
       "fuel_type": "electricity",
@@ -19016,11 +19016,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 2500
+          "value": 150000
         },
         {
           "quality": "quality-unknown",
-          "value": 2500
+          "value": 150000
         }
       ],
       "q_energy_production": [
@@ -19084,11 +19084,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 1500
+          "value": 90000
         },
         {
           "quality": "quality-unknown",
-          "value": 1500
+          "value": 90000
         }
       ],
       "q_energy_production": [
@@ -19130,11 +19130,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 1000
+          "value": 60000
         },
         {
           "quality": "quality-unknown",
-          "value": 1000
+          "value": 60000
         }
       ],
       "q_energy_production": [
@@ -19195,11 +19195,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 1500
+          "value": 90000
         },
         {
           "quality": "quality-unknown",
-          "value": 1500
+          "value": 90000
         }
       ],
       "q_energy_production": [
@@ -19271,11 +19271,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 1500
+          "value": 90000
         },
         {
           "quality": "quality-unknown",
-          "value": 1500
+          "value": 90000
         }
       ],
       "q_energy_production": [
@@ -19348,11 +19348,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 1500
+          "value": 90000
         },
         {
           "quality": "quality-unknown",
-          "value": 1500
+          "value": 90000
         }
       ],
       "q_energy_production": [
@@ -19425,11 +19425,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 3000
+          "value": 180000
         },
         {
           "quality": "quality-unknown",
-          "value": 3000
+          "value": 180000
         }
       ],
       "q_energy_production": [
@@ -19444,7 +19444,7 @@
       ],
       "fuel_type": "electricity",
       "fuel_effectivity": 1,
-      "drain": 100,
+      "drain": 6000,
       "pollution": {
         "pollution": 9.2592592592592591E-08
       },
@@ -19504,11 +19504,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 1250
+          "value": 75000
         },
         {
           "quality": "quality-unknown",
-          "value": 1250
+          "value": 75000
         }
       ],
       "q_energy_production": [
@@ -19523,7 +19523,7 @@
       ],
       "fuel_type": "electricity",
       "fuel_effectivity": 1,
-      "drain": 41.666666666666664,
+      "drain": 2500,
       "pollution": {
         "pollution": 8.88888888888889E-07
       },
@@ -19584,11 +19584,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 2500
+          "value": 150000
         },
         {
           "quality": "quality-unknown",
-          "value": 2500
+          "value": 150000
         }
       ],
       "q_energy_production": [
@@ -19603,7 +19603,7 @@
       ],
       "fuel_type": "electricity",
       "fuel_effectivity": 1,
-      "drain": 83.333333333333329,
+      "drain": 5000,
       "pollution": {
         "pollution": 3.3333333333333335E-07
       },
@@ -19663,11 +19663,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 6250
+          "value": 375000
         },
         {
           "quality": "quality-unknown",
-          "value": 6250
+          "value": 375000
         }
       ],
       "q_energy_production": [
@@ -19682,7 +19682,7 @@
       ],
       "fuel_type": "electricity",
       "fuel_effectivity": 1,
-      "drain": 208.33333333333334,
+      "drain": 12500,
       "pollution": {
         "pollution": 8.88888888888889E-08
       },
@@ -19739,11 +19739,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 7000
+          "value": 420000
         },
         {
           "quality": "quality-unknown",
-          "value": 7000
+          "value": 420000
         }
       ],
       "q_energy_production": [
@@ -19758,7 +19758,7 @@
       ],
       "fuel_type": "electricity",
       "fuel_effectivity": 1,
-      "drain": 233.33333333333334,
+      "drain": 14000,
       "pollution": {
         "pollution": 2.3809523809523809E-07
       },
@@ -19815,11 +19815,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 3500
+          "value": 210000
         },
         {
           "quality": "quality-unknown",
-          "value": 3500
+          "value": 210000
         }
       ],
       "q_energy_production": [
@@ -19834,7 +19834,7 @@
       ],
       "fuel_type": "electricity",
       "fuel_effectivity": 1,
-      "drain": 116.66666666666667,
+      "drain": 7000,
       "pollution": {
         "pollution": 3.1746031746031743E-07
       },
@@ -19891,11 +19891,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 5833.333333333333
+          "value": 350000
         },
         {
           "quality": "quality-unknown",
-          "value": 5833.333333333333
+          "value": 350000
         }
       ],
       "q_energy_production": [
@@ -19910,7 +19910,7 @@
       ],
       "fuel_type": "electricity",
       "fuel_effectivity": 1,
-      "drain": 194.44444444444443,
+      "drain": 11666.666666666666,
       "pollution": {
         "pollution": 1.9047619047619048E-07
       },
@@ -20057,11 +20057,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 8000
+          "value": 480000
         },
         {
           "quality": "quality-unknown",
-          "value": 8000
+          "value": 480000
         }
       ],
       "q_energy_production": [
@@ -20076,7 +20076,7 @@
       ],
       "fuel_type": "electricity",
       "fuel_effectivity": 1,
-      "drain": 8000,
+      "drain": 480000,
       "pollution": {
         "pollution": 0
       },
@@ -20133,11 +20133,11 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 66500
+          "value": 3990000
         },
         {
           "quality": "quality-unknown",
-          "value": 66500
+          "value": 3990000
         }
       ],
       "q_energy_production": [
@@ -20152,7 +20152,7 @@
       ],
       "fuel_type": "electricity",
       "fuel_effectivity": 1,
-      "drain": 138.88888888888889,
+      "drain": 8333.3333333333339,
       "pollution": {
         "pollution": 0
       },
@@ -20178,21 +20178,21 @@
       "q_max_energy_usage": [
         {
           "quality": "normal",
-          "value": 16666.666666666668
+          "value": 1000000.0000000001
         },
         {
           "quality": "quality-unknown",
-          "value": 16666.666666666668
+          "value": 1000000.0000000001
         }
       ],
       "q_energy_production": [
         {
           "quality": "normal",
-          "value": 16666.666666666668
+          "value": 1000000.0000000001
         },
         {
           "quality": "quality-unknown",
-          "value": 16666.666666666668
+          "value": 1000000.0000000001
         }
       ],
       "fuel_type": "item",

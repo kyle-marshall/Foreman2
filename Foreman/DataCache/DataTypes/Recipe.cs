@@ -11,7 +11,7 @@ namespace Foreman
 	{
 		Subgroup MySubgroup { get; }
 
-		double Time { get; set; }
+		double Time { get; }
 		long RecipeID { get; }
 		bool IsMissing { get; }
 
@@ -50,7 +50,7 @@ namespace Foreman
 	{
 		public Subgroup MySubgroup { get { return mySubgroup; } }
 
-		public double Time { get; set; }
+		public double Time { get; internal set; }
 
 		public IReadOnlyDictionary<Item, double> ProductSet { get { return productSet; } }
 		public IReadOnlyDictionary<Item, double> ProductPSet { get { return productPSet; } }

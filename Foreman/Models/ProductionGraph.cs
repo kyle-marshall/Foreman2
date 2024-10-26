@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Foreman
 {
-	public enum NodeType { Supplier, Consumer, Passthrough, Recipe, Spoil }
+	public enum NodeType { Supplier, Consumer, Passthrough, Recipe, Spoil, Plant }
 	public enum LinkType { Input, Output }
 
 	public class NodeEventArgs : EventArgs
@@ -46,6 +46,7 @@ namespace Foreman
 
 		public const double MaxSetFlow = 1e7; //10 million (per second) item flow should be enough for pretty much everything with a generous helping of 'oh god thats way too much!'
 		public const double MaxFactories = 1e6; //1 million factories should be good enough as well. NOTE: the auto values can go higher, you just cant set more than 1 million on the manual setting.
+		public const double MaxTiles = 1e7; //10 million tiles for planting should be good enough
 		public const double MaxInventorySlots = 1e6; // 1 million inventory slots for spoiling should be good enough
 		private const int XBorder = 200;
 		private const int YBorder = 200;
@@ -168,7 +169,19 @@ namespace Foreman
 			return (ReadOnlySpoilNode)node.ReadOnlyNode;
 		}
 
-		public ReadOnlyRecipeNode CreateRecipeNode(Recipe recipe, Point location) { return CreateRecipeNode(recipe, location, null); }
+        public ReadOnlyPlantNode CreatePlantNode(Item inputItem, PlantProcess plantProcess, Point location)
+        {
+			PlantNode node = new PlantNode(this, lastNodeID++, inputItem, plantProcess);
+            node.Location = location;
+            node.NodeDirection = DefaultNodeDirection;
+            nodes.Add(node);
+            roToNode.Add(node.ReadOnlyNode, node);
+            node.UpdateState();
+            NodeAdded?.Invoke(this, new NodeEventArgs(node.ReadOnlyNode));
+            return (ReadOnlyPlantNode)node.ReadOnlyNode;
+        }
+
+        public ReadOnlyRecipeNode CreateRecipeNode(Recipe recipe, Point location) { return CreateRecipeNode(recipe, location, null); }
 		private ReadOnlyRecipeNode CreateRecipeNode(Recipe recipe, Point location, Action<RecipeNode> nodeSetupAction) //node setup action is used to populate the node prior to informing everyone of its creation
 		{
 			RecipeNode node = new RecipeNode(this, lastNodeID++, recipe);
@@ -497,6 +510,14 @@ namespace Foreman
 							newNode = roToNode[CreateSpoilNode(inputItem, outputItem, location)];
 							newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
 							break;
+						case NodeType.Plant:
+                            itemName = (string)nodeJToken["Seed"];
+                            string plantProcessName = (string)nodeJToken["SeedPlantProcess"];
+                            Item seed = cache.Items.ContainsKey(itemName) ? cache.Items[itemName] : cache.MissingItems[itemName];
+                            PlantProcess plantProcess = cache.PlantProcesses.ContainsKey(plantProcessName) ? cache.PlantProcesses[plantProcessName] : cache.MissingPlantProcesses[plantProcessName];
+                            newNode = roToNode[CreatePlantNode(seed, plantProcess, location)];
+                            newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
+                            break;
 						case NodeType.Recipe:
 							long recipeID = (long)nodeJToken["RecipeID"];
 							newNode = roToNode[CreateRecipeNode(recipeLinks[recipeID], location, (rNode) =>

@@ -282,6 +282,31 @@ namespace Foreman
 							itemChooser.Show();
 						}
 						break;
+					case NodeType.Plant:
+                        if (recipeRequestArgs.Direction == NodeDirection.Up)
+                        {
+                            newNode = Graph.CreatePlantNode(baseItem, baseItem.PlantResult, newLocation);
+                            FinalizeNodePosition(newNode);
+                        }
+						else if (baseItem.PlantOrigins.Count == 1)
+                        {
+                            newNode = Graph.CreatePlantNode(baseItem.PlantOrigins.ElementAt(0), baseItem.PlantOrigins.ElementAt(0).PlantResult, newLocation);
+                            FinalizeNodePosition(newNode);
+                        }
+						else
+                        {
+                            //need to open up an item selection window to select a given spoil origin
+                            SubwindowOpen = true;
+                            ItemChooserPanel itemChooser = new ItemChooserPanel(this, drawOrigin, baseItem.PlantOrigins);
+                            itemChooser.ItemRequested += (oo, itemRequestArgs) =>
+                            {
+                                newNode = Graph.CreatePlantNode(itemRequestArgs.Item, itemRequestArgs.Item.PlantResult, newLocation);
+                                FinalizeNodePosition(newNode);
+                            };
+                            itemChooser.PanelClosed += (oo, e) => { SubwindowOpen = false; };
+                            itemChooser.Show();
+                        }
+                        break;
 					case NodeType.Recipe:
 						ReadOnlyRecipeNode rNode = Graph.CreateRecipeNode(recipeRequestArgs.Recipe, newLocation);
 						newNode = rNode;
@@ -724,8 +749,10 @@ namespace Foreman
 				element = new RecipeNodeElement(this, recipeNode);
 			else if (e.node is ReadOnlySpoilNode spoilNode)
 				element = new SpoilNodeElement(this, spoilNode);
-			else
-				Trace.Fail("Unexpected node type created in graph.");
+            else if (e.node is ReadOnlyPlantNode plantNode)
+                element = new PlantNodeElement(this, plantNode);
+            else
+                Trace.Fail("Unexpected node type created in graph.");
 
 			nodeElementDictionary.Add(e.node, element);
 			nodeElements.Add(element);
