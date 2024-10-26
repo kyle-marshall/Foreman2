@@ -110,7 +110,7 @@ namespace Foreman
 			LoadUnfilteredKeyNodesList(nodes.Where(n => n.KeyNode), unfilteredKeyNodesList);
 
 			//building totals
-			double buildingTotal = nodes.Where(n => n is ReadOnlyRecipeNode).Sum(n => Math.Ceiling(((ReadOnlyRecipeNode)n).ActualAssemblerCount));
+			double buildingTotal = nodes.Where(n => n is ReadOnlyRecipeNode).Sum(n => Math.Ceiling(((ReadOnlyRecipeNode)n).ActualSetValue));
 			double beaconTotal = nodes.Where(n => n is ReadOnlyRecipeNode).Sum(n => ((ReadOnlyRecipeNode)n).GetTotalBeacons());
 			BuildingCountLabel.Text += GraphicsStuff.DoubleToString(buildingTotal);
 			BeaconCountLabel.Text += GraphicsStuff.DoubleToString(beaconTotal);
@@ -141,7 +141,7 @@ namespace Foreman
 					buildingCounters.Add(rnode.SelectedAssembler, 0);
 					buildingElectricalPower.Add(rnode.SelectedAssembler, new Tuple<double, double>(0,0));
 				}
-				buildingCounters[rnode.SelectedAssembler] += (int)Math.Ceiling(rnode.ActualAssemblerCount); //should probably check the validity of ceiling in case of near correct (ex: 1.0001 assemblers should really be counted as 1 instead of 2)
+				buildingCounters[rnode.SelectedAssembler] += (int)Math.Ceiling(rnode.ActualSetValue); //should probably check the validity of ceiling in case of near correct (ex: 1.0001 assemblers should really be counted as 1 instead of 2)
 				Tuple<double, double> oldValues = buildingElectricalPower[rnode.SelectedAssembler];
 				buildingElectricalPower[rnode.SelectedAssembler] = new Tuple<double,double>(oldValues.Item1 + rnode.GetTotalGeneratorElectricalProduction() + rnode.GetTotalAssemblerElectricalConsumption(), oldValues.Item2 + rnode.GetTotalBeaconElectricalConsumption());
 			}
@@ -349,7 +349,7 @@ namespace Foreman
 				if(node is ReadOnlyRecipeNode rrNode)
 				{
 					lvItem.SubItems.Add(new ListViewItem.ListViewSubItem() { Text = "-", Tag = (double)0 });
-					lvItem.SubItems.Add(new ListViewItem.ListViewSubItem() { Text = GraphicsStuff.DoubleToString(rrNode.ActualAssemblerCount), Tag = rrNode.ActualAssemblerCount });
+					lvItem.SubItems.Add(new ListViewItem.ListViewSubItem() { Text = GraphicsStuff.DoubleToString(rrNode.ActualSetValue), Tag = rrNode.ActualSetValue });
 				}
 				else
 				{

@@ -250,6 +250,14 @@ namespace Foreman
 				original["Version"] = 5;
 			}
 
+			if ((int)original["Version"] == 5)
+			{
+				//Version update 5 -> 6:
+				//  will need to add plant and spoil recipe processing
+
+                original["Version"] = 6;
+			}
+
 			return original;
 		}
 
@@ -310,7 +318,24 @@ namespace Foreman
 				original["Solver_LowPriorityPower"] = 2f;
 			}
 
-			return original;
+			if ((int)original["Version"] == 5)
+			{
+                //Version update 5 -> 6:
+                //  All nodes now feature a unified 'DesiredSetValue' that replaces the "DesiredAssemblers" from recipe nodes and "DesiredRatePerSec" from all other nodes
+                //  This value is specific to each node type (ex: recipe = #assemblers, spoil = #stacks, grow = #tiles, most other nodes = #throughput/s)
+
+                foreach(JToken nodeJToken in original["Nodes"])
+                {
+                    if (nodeJToken["DesiredAssemblers"] != null)
+                        nodeJToken["DesiredSetValue"] = (double)nodeJToken["DesiredAssemblers"];
+                    if (nodeJToken["DesiredRatePerSec"] != null)
+                        nodeJToken["DesiredSetValue"] = (double)nodeJToken["DesiredRatePerSec"];
+                }
+
+                original["Version"] = 6;
+            }
+
+            return original;
 		}
 	}
 }

@@ -46,6 +46,7 @@ namespace Foreman
 
 		public const double MaxSetFlow = 1e7; //10 million (per second) item flow should be enough for pretty much everything with a generous helping of 'oh god thats way too much!'
 		public const double MaxFactories = 1e6; //1 million factories should be good enough as well. NOTE: the auto values can go higher, you just cant set more than 1 million on the manual setting.
+		public const double MaxInventorySlots = 1e6; // 1 million inventory slots for spoiling should be good enough
 		private const int XBorder = 200;
 		private const int YBorder = 200;
 
@@ -574,12 +575,7 @@ namespace Foreman
 
 					newNode.RateType = (RateType)(int)nodeJToken["RateType"];
 					if (newNode.RateType == RateType.Manual)
-					{
-						if (newNode is RecipeNode rnewNode)
-							rnewNode.DesiredAssemblerCount = (double)nodeJToken["DesiredAssemblers"];
-						else
-							newNode.DesiredRatePerSec = (double)nodeJToken["DesiredRate"];
-					}
+						newNode.DesiredSetValue = (double)nodeJToken["DesiredSetValue"];
 
 					newNode.NodeDirection = (NodeDirection)(int)nodeJToken["Direction"];
 

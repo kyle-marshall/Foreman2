@@ -74,9 +74,13 @@ namespace Foreman
 		public List<Module> AssemblerModules { get; private set; }
 		public List<Module> BeaconModules { get; private set; }
 
-		public double DesiredAssemblerCount { get; set; }
-		public double ActualAssemblerCount { get { return ActualRatePerSec * BaseRecipe.Time / (SelectedAssembler.GetSpeed(SelectedAssembler.Owner.DefaultQuality) * GetSpeedMultiplier()); } }  //QUALITY UPDATE REQUIRED
-		public override double DesiredRatePerSec { get { return DesiredAssemblerCount * SelectedAssembler.GetSpeed(SelectedAssembler.Owner.DefaultQuality) * GetSpeedMultiplier() / (BaseRecipe.Time); } set { Trace.Fail("Desired rate set on a recipe node!"); } }  //QUALITY UPDATE REQUIRED
+		//for recipe nodes, the SetValue is 'number of assemblers/entities'
+        public override double ActualSetValue { get { return ActualRatePerSec * BaseRecipe.Time / (SelectedAssembler.GetSpeed(SelectedAssembler.Owner.DefaultQuality) * GetSpeedMultiplier()); } }  //QUALITY UPDATE REQUIRED
+        public override double DesiredSetValue { get; set; }
+        public override double MaxDesiredSetValue { get { return ProductionGraph.MaxFactories; } }
+        public override string SetValueDescription { get { return "# of Assemblers:"; } }
+
+		public override double DesiredRatePerSec { get { return DesiredSetValue * SelectedAssembler.GetSpeed(SelectedAssembler.Owner.DefaultQuality) * GetSpeedMultiplier() / (BaseRecipe.Time); } set { Trace.Fail("Desired rate set on a recipe node!"); } }  //QUALITY UPDATE REQUIRED
 
 		public double ExtraProductivityBonus { get; set; }
 
@@ -340,8 +344,7 @@ namespace Foreman
 			info.AddValue("RecipeID", BaseRecipe.RecipeID);
 			info.AddValue("Neighbours", NeighbourCount);
 			info.AddValue("ExtraProductivity", ExtraProductivityBonus);
-			if (RateType == RateType.Manual)
-				info.AddValue("DesiredAssemblers", DesiredAssemblerCount);
+
 			if (LowPriority)
 				info.AddValue("LowPriority", 1);
 
@@ -384,9 +387,6 @@ namespace Foreman
 		public double BeaconCount => MyNode.BeaconCount;
 		public double BeaconsPerAssembler => MyNode.BeaconsPerAssembler;
 		public double BeaconsConst => MyNode.BeaconsConst;
-
-		public double DesiredAssemblerCount => MyNode.DesiredAssemblerCount;
-		public double ActualAssemblerCount => MyNode.ActualAssemblerCount;
 
 		public double GetConsumptionMultiplier() => MyNode.GetConsumptionMultiplier();
 		public double GetSpeedMultiplier() => MyNode.GetSpeedMultiplier();
@@ -607,22 +607,22 @@ namespace Foreman
 			if (MyNode.SelectedAssembler.EnergySource != EnergySource.Electric)
 				return 0;
 
-			double partialAssembler = MyNode.ActualAssemblerCount % 1;
-			double entireAssemblers = MyNode.ActualAssemblerCount - partialAssembler;
+			double partialAssembler = MyNode.ActualSetValue % 1;
+			double entireAssemblers = MyNode.ActualSetValue - partialAssembler;
 
-			return (((entireAssemblers + (partialAssembler < 0.05 ? 0 : 1)) * SelectedAssembler.GetEnergyDrain()) + (ActualAssemblerCount * SelectedAssembler.GetEnergyConsumption(SelectedAssembler.Owner.DefaultQuality) * GetConsumptionMultiplier())); //if there is more than 5% of an extra assembler, assume there is +1 assembler working x% of the time (full drain, x% uptime)
+			return (((entireAssemblers + (partialAssembler < 0.05 ? 0 : 1)) * SelectedAssembler.GetEnergyDrain()) + (ActualSetValue * SelectedAssembler.GetEnergyConsumption(SelectedAssembler.Owner.DefaultQuality) * GetConsumptionMultiplier())); //if there is more than 5% of an extra assembler, assume there is +1 assembler working x% of the time (full drain, x% uptime)
 		}
 
 		public double GetTotalGeneratorElectricalProduction() // J/sec (W) ; this is also when the temperature range of incoming fuel is taken into account
 		{
-			return GetGeneratorElectricalProduction() * MyNode.ActualAssemblerCount;
+			return GetGeneratorElectricalProduction() * MyNode.ActualSetValue;
 		}
 
 		public int GetTotalBeacons()
 		{
 			if (MyNode.SelectedBeacon == null)
 				return 0;
-			return (int)Math.Ceiling(((int)(MyNode.ActualAssemblerCount + 0.8) * BeaconsPerAssembler) + BeaconsConst); //assume 0.2 assemblers (or more) is enough to warrant an extra 'beacons per assembler' row
+			return (int)Math.Ceiling(((int)(MyNode.ActualSetValue + 0.8) * BeaconsPerAssembler) + BeaconsConst); //assume 0.2 assemblers (or more) is enough to warrant an extra 'beacons per assembler' row
 		}
 
 		public double GetTotalBeaconElectricalConsumption() // J/sec (W)
@@ -744,9 +744,6 @@ namespace Foreman
 		//-----------------------------------------------------------------------Set functions
 
 		public void SetPriority(bool lowPriority) { MyNode.LowPriority = lowPriority; MyNode.UpdateState(); }
-
-		public override void SetDesiredRate(double rate) { Trace.Fail("Desired rate set requested from recipe node!"); }
-		public void SetDesiredAssemblerCount(double count) { if (MyNode.DesiredAssemblerCount != count) MyNode.DesiredAssemblerCount = count; MyNode.UpdateState(); }
 
 		public void SetNeighbourCount(double count) { if (MyNode.NeighbourCount != count) MyNode.NeighbourCount = count; MyNode.UpdateState(); }
 		public void SetExtraProductivityBonus(double bonus) { if (MyNode.ExtraProductivityBonus != bonus) MyNode.ExtraProductivityBonus = bonus; MyNode.UpdateState(); }

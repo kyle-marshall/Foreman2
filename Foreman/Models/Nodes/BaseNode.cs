@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Xml.Schema;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TreeView;
 
 namespace Foreman
 {
@@ -39,6 +41,14 @@ namespace Foreman
 
 		public double ActualRate { get { return ActualRatePerSec * MyGraph.GetRateMultipler(); } }
 		public double DesiredRate { get { return DesiredRatePerSec * MyGraph.GetRateMultipler(); } set { DesiredRatePerSec = value / MyGraph.GetRateMultipler(); } }
+
+		//'set value' values below are for flow setting - they are used to set the desired rate of the node regardless of what 'variable' they represent
+		//ex: recipe nodes will use this to 'set' the number of assemblers, passthrough/source/sink nodes use this to 'set' flowrate, plant nodes set 'plant tiles' and spoil nodes set 'inventory stacks'
+		//in its default form (below) its used for 'flowrate'
+		public virtual double ActualSetValue { get { return ActualRate; } }
+		public virtual double DesiredSetValue { get { return DesiredRate; } set { DesiredRate = value; } }
+		public virtual double MaxDesiredSetValue { get { return ProductionGraph.MaxSetFlow; } }
+		public virtual string SetValueDescription { get { return string.Format("Item Flowrate (per {0})", MyGraph.GetRateName()); } }
 
 		public abstract IEnumerable<Item> Inputs { get; }
 		public abstract IEnumerable<Item> Outputs { get; }
@@ -128,6 +138,9 @@ namespace Foreman
 			info.AddValue("Location", Location);
 			info.AddValue("RateType", RateType);
 			info.AddValue("Direction", NodeDirection);
+
+            if (RateType == RateType.Manual)
+                info.AddValue("DesiredSetValue", DesiredSetValue); 
 			if (KeyNode)
 				info.AddValue("KeyNode", KeyNodeTitle);
 		}
@@ -149,8 +162,14 @@ namespace Foreman
 
 		public RateType RateType => MyNode.RateType;
 		public double ActualRate => MyNode.ActualRate;
+		public double ActualRatePerSec => MyNode.ActualRatePerSec;
 		public double DesiredRate => MyNode.DesiredRate;
 		public NodeState State => MyNode.State;
+
+		public double ActualSetValue => MyNode.ActualSetValue;
+		public double DesiredSetValue => MyNode.DesiredSetValue;
+		public double MaxDesiredSetValue => MyNode.MaxDesiredSetValue;
+		public string SetValueDescription => MyNode.SetValueDescription;
 
 		public NodeDirection NodeDirection => MyNode.NodeDirection;
 
@@ -198,7 +217,8 @@ namespace Foreman
 		public void SetLocation(Point location) { if(MyNode.Location != location) MyNode.Location = location; }
 
 		public void SetRateType(RateType type) { if (MyNode.RateType != type) MyNode.RateType = type; }
-		public virtual void SetDesiredRate(double rate) { if (MyNode.DesiredRate != rate) MyNode.DesiredRate = rate; }
+
+		public void SetDesiredSetValue(double value) { if(MyNode.DesiredSetValue != value) MyNode.DesiredSetValue = value; MyNode.UpdateState(); }
 
 		public void SetDirection(NodeDirection direction) { if (MyNode.NodeDirection != direction) MyNode.NodeDirection = direction; }
 

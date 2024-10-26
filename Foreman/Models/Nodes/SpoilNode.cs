@@ -13,7 +13,7 @@ namespace Foreman
         {
             Clean = 0b_0000_0000_0000,
             ItemDoesntSpoil = 0b_0000_0000_0001,
-            IncorrectSpoilResult = 0b_0000_0000_0010,
+            InvalidSpoilResult = 0b_0000_0000_0010,
 			InputItemMissing = 0b_0000_0000_0100,
 			OutputItemMissing = 0b_0000_0000_1000,
             InvalidLinks = 0b_1000_0000_0000
@@ -25,12 +25,20 @@ namespace Foreman
 		public override BaseNodeController Controller { get { return controller; } }
 
 		public readonly Item InputItem;
-		public Item OutputItem;
+		public Item OutputItem { get; internal set; }
 
 		public override IEnumerable<Item> Inputs { get { yield return InputItem; } }
 		public override IEnumerable<Item> Outputs { get { yield return OutputItem; } }
 
-		public SpoilNode(ProductionGraph graph, int nodeID, Item item) : this(graph, nodeID, item, item.SpoilResult) { }
+        //for spoil nodes, the SetValue is 'number of stacks (item slots)'
+        public override double ActualSetValue { get { return ActualRatePerSec * InputItem.GetItemSpoilageTime(InputItem.Owner.DefaultQuality) / InputItem.StackSize; } }  //QUALITY UPDATE REQUIRED
+        public override double DesiredSetValue { get; set; }
+        public override double MaxDesiredSetValue { get { return ProductionGraph.MaxInventorySlots; } }
+        public override string SetValueDescription { get { return "Number of inventory slots"; } }
+
+        public override double DesiredRatePerSec { get { return DesiredSetValue * InputItem.StackSize / InputItem.GetItemSpoilageTime(InputItem.Owner.DefaultQuality); } } //QUALITY UPDATE REQUIRED
+
+        public SpoilNode(ProductionGraph graph, int nodeID, Item item) : this(graph, nodeID, item, item.SpoilResult) { }
 		public SpoilNode(ProductionGraph graph, int nodeID, Item item, Item outputItem) : base(graph, nodeID)
         {
 			InputItem = item;
@@ -49,7 +57,7 @@ namespace Foreman
 			if (InputItem.SpoilResult == null)
 				ErrorSet |= Errors.ItemDoesntSpoil;
 			if (InputItem.SpoilResult != OutputItem)
-				ErrorSet |= Errors.IncorrectSpoilResult;
+				ErrorSet |= Errors.InvalidSpoilResult;
 			if (InputItem.IsMissing)
 				ErrorSet |= Errors.InputItemMissing;
 			if  (OutputItem.IsMissing)
@@ -75,8 +83,6 @@ namespace Foreman
 			info.AddValue("NodeType", NodeType.Spoil);
 			info.AddValue("InputItem", InputItem.Name);
 			info.AddValue("OutputItem", OutputItem.Name);
-			if (RateType == RateType.Manual)
-				info.AddValue("DesiredRate", DesiredRatePerSec);
 		}
 
 		public override string ToString() { return string.Format("Spoil node for: {0} to {1}", InputItem.Name, OutputItem.Name); }
@@ -89,7 +95,7 @@ namespace Foreman
 
 		private readonly SpoilNode MyNode;
 
-		public ReadOnlySpoilNode(SpoilNode node) : base(node) { MyNode = node; }
+        public ReadOnlySpoilNode(SpoilNode node) : base(node) { MyNode = node; }
 
 		public override List<string> GetErrors()
 		{
@@ -102,7 +108,7 @@ namespace Foreman
                 errors.Add(string.Format("> Spoilage Item \"{0}\" doesnt exist in preset!", OutputItem.FriendlyName));
 			if((ErrorSet & SpoilNode.Errors.ItemDoesntSpoil) != 0)
                 errors.Add(string.Format("> Item \"{0}\" doesnt spoil!", InputItem.FriendlyName));
-            if ((ErrorSet & SpoilNode.Errors.IncorrectSpoilResult) != 0)
+            if ((ErrorSet & SpoilNode.Errors.InvalidSpoilResult) != 0)
                 errors.Add(string.Format("> Spoilage Item \"{0}\" doesnt exist in preset!", OutputItem.FriendlyName));
             if ((ErrorSet & SpoilNode.Errors.InvalidLinks) != 0)
 				errors.Add("> Some links are invalid!");
@@ -142,7 +148,7 @@ namespace Foreman
 			Dictionary<string, Action> resolutions = new Dictionary<string, Action>();
 			if ((MyNode.ErrorSet & (SpoilNode.Errors.InputItemMissing | SpoilNode.Errors.OutputItemMissing | SpoilNode.Errors.ItemDoesntSpoil)) != 0)
 				resolutions.Add("Delete node", new Action(() => this.Delete()));
-			if ((MyNode.ErrorSet & SpoilNode.Errors.IncorrectSpoilResult) != 0)
+			if ((MyNode.ErrorSet & SpoilNode.Errors.InvalidSpoilResult) != 0)
 				resolutions.Add("Update spoil result", new Action(() => UpdateSpoilResult()));
 			else
 				foreach (KeyValuePair<string, Action> kvp in GetInvalidConnectionResolutions())
@@ -151,5 +157,5 @@ namespace Foreman
 		}
 
 		public override Dictionary<string, Action> GetWarningResolutions() { Trace.Fail("Spoil node never has the warning state!"); return null; }
-	}
+    }
 }

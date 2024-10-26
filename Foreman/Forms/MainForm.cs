@@ -29,7 +29,7 @@ namespace Foreman
 		{
 			WindowState = FormWindowState.Maximized;
 
-			Properties.Settings.Default.ForemanVersion = 5;
+			Properties.Settings.Default.ForemanVersion = 6;
 
 			if (!Enum.IsDefined(typeof(ProductionGraph.RateUnit), Properties.Settings.Default.DefaultRateUnit))
 				Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraph.RateUnit.Per1Sec;

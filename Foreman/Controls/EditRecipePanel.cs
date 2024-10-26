@@ -47,8 +47,9 @@ namespace Foreman
 
 			LowPriorityCheckBox.Checked = nodeData.LowPriority;
 
-			FixedAssemblerInput.Maximum = (decimal)(ProductionGraph.MaxFactories);
+			FixedAssemblerInput.Maximum = (decimal)(node.MaxDesiredSetValue);
 
+			if (nodeData.BeaconCount % 1 != 0) BeaconCountInput.DecimalPlaces = 1;
 			BeaconCountInput.Value = Math.Min(BeaconCountInput.Maximum, (decimal)nodeData.BeaconCount);
 			BeaconsPerAssemblerInput.Value = Math.Min(BeaconsPerAssemblerInput.Maximum, (decimal)nodeData.BeaconsPerAssembler);
 			ConstantBeaconInput.Value = Math.Min(ConstantBeaconInput.Maximum, (decimal)nodeData.BeaconsConst);
@@ -123,13 +124,13 @@ namespace Foreman
 			{
 				AutoAssemblersOption.Checked = true;
 				FixedAssemblerInput.Enabled = false;
-				FixedAssemblerInput.Value = Math.Min(FixedAssemblerInput.Maximum, (decimal)nodeData.ActualAssemblerCount);
+				FixedAssemblerInput.Value = Math.Min(FixedAssemblerInput.Maximum, (decimal)nodeData.ActualSetValue);
 			}
 			else
 			{
 				FixedAssemblersOption.Checked = true;
 				FixedAssemblerInput.Enabled = true;
-				FixedAssemblerInput.Value = Math.Min(FixedAssemblerInput.Maximum, (decimal)nodeData.DesiredAssemblerCount);
+				FixedAssemblerInput.Value = Math.Min(FixedAssemblerInput.Maximum, (decimal)nodeData.DesiredSetValue);
 			}
 			UpdateFixedFlowInputDecimals(FixedAssemblerInput);
 		}
@@ -601,9 +602,9 @@ namespace Foreman
 
 		private void SetFixedRate()
 		{
-			if (nodeData.DesiredAssemblerCount != (double)FixedAssemblerInput.Value)
+			if (nodeData.DesiredSetValue != (double)FixedAssemblerInput.Value)
 			{
-				nodeController.SetDesiredAssemblerCount((double)FixedAssemblerInput.Value);
+				nodeController.SetDesiredSetValue((double)FixedAssemblerInput.Value);
 				myGraphViewer.Graph.UpdateNodeValues();
 
 				UpdateAssemblerInfo();
@@ -619,7 +620,7 @@ namespace Foreman
 			if (nodeData.RateType != updatedRateType)
 			{
 				nodeController.SetRateType(updatedRateType);
-				nodeController.SetDesiredAssemblerCount((double)FixedAssemblerInput.Value);
+				nodeController.SetDesiredSetValue((double)FixedAssemblerInput.Value);
 				myGraphViewer.Graph.UpdateNodeValues();
 
 				UpdateAssemblerInfo();

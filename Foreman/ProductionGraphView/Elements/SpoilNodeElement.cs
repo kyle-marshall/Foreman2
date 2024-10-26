@@ -11,12 +11,11 @@ namespace Foreman
 	public class SpoilNodeElement : BaseNodeElement
 	{
 		protected override Brush CleanBgBrush { get { return spoilBGBrush; } }
-		private static Brush spoilBGBrush = new SolidBrush(Color.FromArgb(200, 200, 200));
+		private static Brush spoilBGBrush = new SolidBrush(Color.FromArgb(190, 217, 212));
 
         private static readonly StringFormat textFormat = new StringFormat() { LineAlignment = StringAlignment.Center, Alignment = StringAlignment.Center };
 
         private string InputName { get { return DisplayedNode.InputItem.FriendlyName; } }
-		private string OutputName {  get { return DisplayedNode.OutputItem.FriendlyName; } }
 
 		private new readonly ReadOnlySpoilNode DisplayedNode;
 
@@ -41,10 +40,7 @@ namespace Foreman
 			if (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low)
 				textLength = GraphicsStuff.DrawText(graphics, TextBrush, textFormat, InputName + " Spoilage", BaseFont, textSlot);
 			else
-			{
-				double stackCount = DisplayedNode.ActualRate / (DisplayedNode.InputItem.StackSize / DisplayedNode.InputItem.GetItemSpoilageTime(DisplayedNode.InputItem.Owner.DefaultQuality));
-				textLength = GraphicsStuff.DrawText(graphics, TextBrush, textFormat, "x" + BuildingQuantityToText(stackCount), CounterBaseFont, textSlot);
-			}
+				textLength = GraphicsStuff.DrawText(graphics, TextBrush, textFormat, BuildingQuantityToText(DisplayedNode.ActualSetValue) + " stacks", CounterBaseFont, textSlot);
 
             //spoilage icon
             graphics.DrawImage(IconCache.GetSpoilageIcon(), trans.X - Math.Min((Width / 2) - 10, (textLength / 2) + 32), trans.Y - 16, 32, 32);

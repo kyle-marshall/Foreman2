@@ -113,7 +113,7 @@ namespace Foreman
 			if (DisplayedNode.SelectedAssembler.IsMissing)
 				text += "---";
 			else
-				text += BuildingQuantityToText(DisplayedNode.ActualAssemblerCount);
+				text += BuildingQuantityToText(DisplayedNode.ActualSetValue);
 
 			GraphicsStuff.DrawText(graphics, textBrush, textFormat, text, counterBaseFont, textbox, true);
 		}

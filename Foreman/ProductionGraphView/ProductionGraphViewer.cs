@@ -262,11 +262,13 @@ namespace Foreman
 						{
 							newNode = Graph.CreateSpoilNode(baseItem, baseItem.SpoilResult, newLocation);
 							FinalizeNodePosition(newNode);
-						} else if (baseItem.SpoilOrigins.Count == 1)
+						}
+						else if (baseItem.SpoilOrigins.Count == 1)
 						{
 							newNode = Graph.CreateSpoilNode(baseItem.SpoilOrigins.ElementAt(0), baseItem, newLocation);
 							FinalizeNodePosition(newNode);
-						} else
+						}
+						else
 						{
 							//need to open up an item selection window to select a given spoil origin
 							SubwindowOpen = true;
@@ -350,6 +352,8 @@ namespace Foreman
 
 				DisposeLinkDrag();
 				Graph.UpdateNodeValues();
+				Graph.UpdateNodeStates(false);
+				Invalidate();
 			}
 		}
 
@@ -425,8 +429,8 @@ namespace Foreman
 			SubwindowOpen = true;
 			Control editPanel = new EditFlowPanel(bNodeElement.DisplayedNode, this);
 
-			//offset view if necessary to ensure entire window will be seen (with 25 pixels boundary)
-			Point screenOriginPoint = GraphToScreen(new Point(bNodeElement.X - (bNodeElement.Width / 2), bNodeElement.Y));
+            //offset view if necessary to ensure entire window will be seen (with 25 pixels boundary)
+            Point screenOriginPoint = GraphToScreen(new Point(bNodeElement.X - (bNodeElement.Width / 2), bNodeElement.Y));
 			screenOriginPoint = new Point(screenOriginPoint.X - editPanel.Width, screenOriginPoint.Y - (editPanel.Height / 2));
 			Point offset = new Point(
 				(int)(Math.Min(Math.Max(0, 25 - screenOriginPoint.X), this.Width - screenOriginPoint.X - editPanel.Width - bNodeElement.Width - 25)),
@@ -637,7 +641,7 @@ namespace Foreman
 				double pConsumption = currentSelectionNodes.Where(n => n.DisplayedNode is ReadOnlyRecipeNode).Sum(n => ((ReadOnlyRecipeNode)n.DisplayedNode).GetTotalAssemblerElectricalConsumption() + ((ReadOnlyRecipeNode)n.DisplayedNode).GetTotalBeaconElectricalConsumption());
 				double pProduction = currentSelectionNodes.Where(n => n.DisplayedNode is ReadOnlyRecipeNode).Sum(n => ((ReadOnlyRecipeNode)n.DisplayedNode).GetTotalGeneratorElectricalProduction());
 				int recipeNodeCount = currentSelectionNodes.Count(n => n.DisplayedNode is ReadOnlyRecipeNode);
-				int buildingCount = (int)Math.Ceiling(currentSelectionNodes.Where(n => n.DisplayedNode is ReadOnlyRecipeNode).Sum(n => ((ReadOnlyRecipeNode)n.DisplayedNode).ActualAssemblerCount));
+				int buildingCount = (int)Math.Ceiling(currentSelectionNodes.Where(n => n.DisplayedNode is ReadOnlyRecipeNode).Sum(n => ((ReadOnlyRecipeNode)n.DisplayedNode).ActualSetValue));
 				int beaconCount = currentSelectionNodes.Where(n => n.DisplayedNode is ReadOnlyRecipeNode).Sum(n => ((ReadOnlyRecipeNode)n.DisplayedNode).GetTotalBeacons());
 
 				ToolTipRenderer.AddExtraToolTip(new TooltipInfo() { Text = string.Format("Power consumption: {0}\nPower production: {1}\nRecipe count: {2}\nBuilding count: {3}\nBeacon count: {4}", GraphicsStuff.DoubleToEnergy(pConsumption, "W"), GraphicsStuff.DoubleToEnergy(pProduction, "W"), recipeNodeCount, buildingCount, beaconCount), Direction = Direction.None, ScreenLocation = new Point(10, 10) });
@@ -1262,6 +1266,8 @@ namespace Foreman
 				json = VersionUpdater.UpdateSave(json, DCache);
 				if (json == null) //update failed
 					return;
+
+				VersionUpdater.UpdateGraph(json["ProductionGraph"]);
 			}
 
 			//grab mod list
