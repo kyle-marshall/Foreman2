@@ -60,15 +60,15 @@ namespace Foreman
 
 		public static async Task<PresetErrorPackage> TestPreset(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts)
 		{
-			try
-			{
+			//try
+			//{
 				//return await TestPresetThroughDataCache(preset, modList, itemList, entityList, recipeShorts);
 				return await TestPresetStreamlined(preset, modList, itemList, entityList, recipeShorts);
-			}
-			catch
-			{
-				return null;
-			}
+			//}
+			//catch
+			//{
+			//	return null;
+			//}
 		}
 
 		//full load of data cache and comparison. This is naturally slower than the streamlined version, since we load all the extras that arent necessary for comparison (like energy types, technologies, availability calculations, etc)
@@ -228,16 +228,7 @@ namespace Foreman
 			foreach (var objJToken in jsonData["entities"])
 			{
 				string type = (string)objJToken["type"];
-				if (type == "offshore-pump")
-				{
-					string fluidName = (string)objJToken["fluid_product"];
-					RecipeShort recipe = new RecipeShort("§§r:e:" + fluidName);
-					recipe.Products.Add(fluidName, 60);
-
-					if (!presetRecipes.ContainsKey(recipe.Name))
-						presetRecipes.Add(recipe.Name, recipe);
-				}
-				else if (type == "boiler")
+				if (type == "boiler")
 				{
 					if (objJToken["fluid_ingredient"] == null || objJToken["fluid_product"] == null)
 						continue;
