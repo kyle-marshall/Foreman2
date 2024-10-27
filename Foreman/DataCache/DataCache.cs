@@ -1813,19 +1813,18 @@ namespace Foreman
 					clean = false;
 				}
 
-                //4.2: mark any useless items as unavailable (nothing/unavailable recipes produce it, it isnt consumed by anything / only consumed by incineration / only consumed by unavailable recipes, only produced by itself)
+                //4.2: mark any useless items as unavailable (nothing/unavailable recipes produce it, it isnt consumed by anything / only consumed by incineration / only consumed by unavailable recipes, only produced by a itself->itself recipe)
                 //this will also update assembler availability status for those whose items become unavailable automatically.
                 //note: while this gets rid of those annoying 'burn/incinerate' auto-generated recipes, if the modder decided to have a 'recycle' auto-generated recipe (item->raw ore or something), we will be forced to accept those items as 'available'
                 //good example from vanilla: most of the 'garbage' items such as 'item-unknown' and 'electric-energy-interface' are removed as their only recipes are 'recycle to themselves', but 'heat interface' isnt removed as its only recipe is a 'recycle into several parts' (so nothing we can do about it)
-                foreach (ItemPrototype item in items.Values.Where(i => i.Available && !i.ProductionRecipes.Any(r => r.Available && r.ProductList.Count > 1 && r.ProductList[0] != i)).Cast<ItemPrototype>())
+                foreach (ItemPrototype item in items.Values.Where(i => i.Available && !i.ProductionRecipes.Any(r => r.Available && !(r.IngredientList.Count == 1 && r.IngredientList[0] == i) )).Cast<ItemPrototype>())
 				{
+
+
 					bool useful = false;
 
 					foreach (RecipePrototype r in item.consumptionRecipes.Where(r => r.Available))
-					{
-
 						useful |= (r.ingredientList.Count > 1 || r.productList.Count > 1 || (r.productList.Count == 1 && r.productList[0] != item)); //recipe with multiple items coming in or some ingredients coming out (that arent itself) -> not an incineration type
-					}
 
 					if (!useful && !item.Name.StartsWith("§§"))
 					{
