@@ -105,6 +105,7 @@ namespace Foreman
 		private readonly bool UseRecipeBWLists;
 		private static readonly Regex[] recipeWhiteList = { new Regex("^empty-barrel$") }; //whitelist takes priority over blacklist
 		private static readonly Regex[] recipeBlackList = { new Regex("-barrel$"), new Regex("^deadlock-packrecipe-"), new Regex("^deadlock-unpackrecipe-"), new Regex("^deadlock-plastic-packaging$") };
+		private static readonly KeyValuePair<string, Regex>[] recyclingItemNameBlackList = { new KeyValuePair<string, Regex>("barrel", new Regex("-barrel$"))};
 
 		private Dictionary<string, IconColorPair> iconCache;
 
@@ -1790,13 +1791,23 @@ namespace Foreman
 			recipe.Available = recipe.myUnlockTechnologies.Any(t => t.Available);
 
 			//step 2: mark any recipe for barelling / crating as unavailable
-			if(UseRecipeBWLists)
+			if (UseRecipeBWLists)
+			{
 				foreach (RecipePrototype recipe in recipes.Values)
+				{
+					//part 1: make unavailable if recipe fits the black & doesnt fit the white recipe black lists (these should be the 'barelling' and 'unbarelling' recipes)
 					if (!recipeWhiteList.Any(white => white.IsMatch(recipe.Name)) && recipeBlackList.Any(black => black.IsMatch(recipe.Name))) //if we dont match a whitelist and match a blacklist...
 						recipe.Available = false;
+	                //part 2: make unavailable if recipe fits the recyclingItemNameBlackList (should remove any of the barel recycling recipes added by 2.0 SA)
+					foreach(KeyValuePair<string, Regex> recycleBL in recyclingItemNameBlackList)
+						if (recipe.productList.Count == 1 && (Item)recipe.productList[0] == items[recycleBL.Key] && recipe.ingredientList.Count == 1 && recycleBL.Value.IsMatch(recipe.ingredientList[0].Name))
+							recipe.Available = false;
+				}
+            }
 
-			//step 3: mark any recipe with no unlocks, or 0->0 recipes (industrial revolution... what are those aetheric glow recipes?) as unavailable.
-			foreach (RecipePrototype recipe in recipes.Values)
+
+            //step 3: mark any recipe with no unlocks, or 0->0 recipes (industrial revolution... what are those aetheric glow recipes?) as unavailable.
+            foreach (RecipePrototype recipe in recipes.Values)
 				if (recipe.myUnlockTechnologies.Count == 0 || (recipe.productList.Count == 0 && recipe.ingredientList.Count == 0 && !recipe.Name.StartsWith("§§"))) //§§ denotes foreman added recipes. ignored during this pass (but not during the assembler check pass)
 					recipe.Available = false;
 
