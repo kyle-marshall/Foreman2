@@ -51,7 +51,7 @@ namespace Foreman
 		public IReadOnlyDictionary<string, Module> MissingModules { get { return missingModules; } }
 		public IReadOnlyDictionary<string, Beacon> MissingBeacons { get { return missingBeacons; } }
 		public IReadOnlyDictionary<RecipeShort, Recipe> MissingRecipes { get { return missingRecipes; } }
-		public IReadOnlyDictionary<string, PlantProcess> MissingPlantProcesses { get { return missingPlantProcesses; } }
+		public IReadOnlyDictionary<PlantShort, PlantProcess> MissingPlantProcesses { get { return missingPlantProcesses; } }
 
 		public Quality DefaultQuality { get; private set; }
 		private Quality ErrorQuality;
@@ -79,7 +79,7 @@ namespace Foreman
 		private Dictionary<string, Module> missingModules;
 		private Dictionary<string, Beacon> missingBeacons;
 		private Dictionary<RecipeShort, Recipe> missingRecipes;
-		private Dictionary<string, PlantProcess> missingPlantProcesses;
+		private Dictionary<PlantShort, PlantProcess> missingPlantProcesses;
 
 		private GroupPrototype extraFormanGroup;
 		private SubgroupPrototype extractionSubgroupItems;
@@ -134,7 +134,7 @@ namespace Foreman
 			missingModules = new Dictionary<string, Module>();
 			missingBeacons = new Dictionary<string, Beacon>();
 			missingRecipes = new Dictionary<RecipeShort, Recipe>(new RecipeShortNaInPrComparer());
-			missingPlantProcesses = new Dictionary<string, PlantProcess>();
+			missingPlantProcesses = new Dictionary<PlantShort, PlantProcess>();
 
 			GenerateHelperObjects();
 			Clear();
@@ -496,12 +496,62 @@ namespace Foreman
 						recipe = missingRecipe;
 					}
 				}
-				if (recipeLinks.ContainsKey(recipeShort.RecipeID))
-					;
-				recipeLinks.Add(recipeShort.RecipeID, recipe);
+				if (!recipeLinks.ContainsKey(recipeShort.RecipeID))
+					recipeLinks.Add(recipeShort.RecipeID, recipe);
 			}
 			return recipeLinks;
 		}
+
+		//pretty much a copy of the above, just for plant processes (so no ingredient list, and using different data sets)
+		public Dictionary<long, PlantProcess> ProcessImportedPlantProcessesSet(IEnumerable<PlantShort> plantShorts)
+		{
+            Dictionary<long, PlantProcess> plantLinks = new Dictionary<long, PlantProcess>();
+            foreach (PlantShort plantShort in plantShorts)
+            {
+                PlantProcess pprocess = null;
+
+                //recipe check #1 : does its name exist in database (note: we dont quite care about extra missing recipes here - so what if we have a couple identical ones? they will combine during save/load anyway)
+                bool pprocessExists = plantProcesses.ContainsKey(plantShort.Name);
+                if (pprocessExists)
+                {
+                    //recipe check #2 : do the number of ingredients & products match?
+                    pprocess = plantProcesses[plantShort.Name];
+                    pprocessExists &= plantShort.Products.Count == pprocess.ProductList.Count;
+                }
+                if (pprocessExists)
+                {
+                    //recipe check #3 : do the ingredients & products from the loaded data match the actual recipe? (names, not quantities -> this is to allow some recipes to pass; ex: normal->expensive might change the values, but importing such a recipe should just use the 'correct' quantities and soft-pass the different recipe)
+                    foreach (string product in plantShort.Products.Keys)
+                        pprocessExists &= items.ContainsKey(product) && pprocess.ProductSet.ContainsKey(items[product]);
+                }
+                if (!pprocessExists)
+                {
+                    bool missingPProcessExists = missingPlantProcesses.ContainsKey(plantShort);
+
+                    if (missingPProcessExists)
+                    {
+                        pprocess = missingPlantProcesses[plantShort];
+                    }
+					else
+                    {
+                        PlantProcessPrototype missingPProcess = new PlantProcessPrototype(this, plantShort.Name, true);
+                        foreach (var product in plantShort.Products)
+                        {
+                            if (items.ContainsKey(product.Key))
+                                missingPProcess.InternalOneWayAddProduct((ItemPrototype)items[product.Key], product.Value);
+                            else
+                                missingPProcess.InternalOneWayAddProduct((ItemPrototype)missingItems[product.Key], product.Value);
+                        }
+
+                        missingPlantProcesses.Add(plantShort, missingPProcess);
+                        pprocess = missingPProcess;
+                    }
+                }
+                if (!plantLinks.ContainsKey(plantShort.PlantID))
+                    plantLinks.Add(plantShort.PlantID, pprocess);
+            }
+            return plantLinks;
+        }
 
 		//------------------------------------------------------Data cache load helper functions (all the process functions from LoadAllData)
 
@@ -669,6 +719,7 @@ namespace Foreman
 					this,
 					seed.Name);
 
+				plantProcess.Seed = seed;
 				plantProcess.GrowTime = (double)objJToken["plant_growth_time"];
 
                 foreach (var productJToken in objJToken["plant_results"].ToList())

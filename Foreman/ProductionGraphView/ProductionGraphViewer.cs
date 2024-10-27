@@ -285,12 +285,12 @@ namespace Foreman
 					case NodeType.Plant:
                         if (recipeRequestArgs.Direction == NodeDirection.Up)
                         {
-                            newNode = Graph.CreatePlantNode(baseItem, baseItem.PlantResult, newLocation);
+                            newNode = Graph.CreatePlantNode(baseItem.PlantResult, newLocation);
                             FinalizeNodePosition(newNode);
                         }
 						else if (baseItem.PlantOrigins.Count == 1)
                         {
-                            newNode = Graph.CreatePlantNode(baseItem.PlantOrigins.ElementAt(0), baseItem.PlantOrigins.ElementAt(0).PlantResult, newLocation);
+                            newNode = Graph.CreatePlantNode(baseItem.PlantOrigins.ElementAt(0).PlantResult, newLocation);
                             FinalizeNodePosition(newNode);
                         }
 						else
@@ -300,7 +300,7 @@ namespace Foreman
                             ItemChooserPanel itemChooser = new ItemChooserPanel(this, drawOrigin, baseItem.PlantOrigins);
                             itemChooser.ItemRequested += (oo, itemRequestArgs) =>
                             {
-                                newNode = Graph.CreatePlantNode(itemRequestArgs.Item, itemRequestArgs.Item.PlantResult, newLocation);
+                                newNode = Graph.CreatePlantNode(itemRequestArgs.Item.PlantResult, newLocation);
                                 FinalizeNodePosition(newNode);
                             };
                             itemChooser.PanelClosed += (oo, e) => { SubwindowOpen = false; };
@@ -1213,6 +1213,7 @@ namespace Foreman
 			info.AddValue("EnabledAssemblers", DCache.Assemblers.Values.Where(a => a.Enabled).Select(a => a.Name));
 			info.AddValue("EnabledModules", DCache.Modules.Values.Where(m => m.Enabled).Select(m => m.Name));
 			info.AddValue("EnabledBeacons", DCache.Beacons.Values.Where(b => b.Enabled).Select(b => b.Name));
+			//planting results are always enabled
 
 			//graph :)
 			info.AddValue("ProductionGraph", Graph);
@@ -1294,7 +1295,7 @@ namespace Foreman
 				if (json == null) //update failed
 					return;
 
-				VersionUpdater.UpdateGraph(json["ProductionGraph"]);
+				VersionUpdater.UpdateGraph((JObject)json["ProductionGraph"]);
 			}
 
 			//grab mod list
@@ -1309,6 +1310,7 @@ namespace Foreman
 			List<string> itemNames = json["ProductionGraph"]["IncludedItems"].Select(t => (string)t).ToList();
 			List<string> assemblerNames = json["ProductionGraph"]["IncludedAssemblers"].Select(t => (string)t).ToList();
 			List<RecipeShort> recipeShorts = RecipeShort.GetSetFromJson(json["ProductionGraph"]["IncludedRecipes"]);
+			List<PlantShort> plantShorts = PlantShort.GetSetFromJson(json["ProductionGraph"]["IncludedPlantProcesses"]);
 
 			//now - two options:
 			// a) we are told to use the first preset (basically, the selected preset) - so that is the only one added to the possible Presets
@@ -1326,7 +1328,7 @@ namespace Foreman
 				Preset savedWPreset = allPresets.FirstOrDefault(p => p.Name == (string)json["SavedPresetName"]);
 				if (savedWPreset != null)
 				{
-					var errors = await PresetProcessor.TestPreset(savedWPreset, modSet, itemNames, assemblerNames, recipeShorts);
+					var errors = await PresetProcessor.TestPreset(savedWPreset, modSet, itemNames, assemblerNames, recipeShorts, plantShorts);
 					if (errors != null && errors.ErrorCount == 0) //no errors found here. We will then use this exact preset and not search for a different one
 						chosenPreset = savedWPreset;
 					else
@@ -1343,7 +1345,7 @@ namespace Foreman
 				{
 					foreach (Preset preset in allPresets)
 					{
-						PresetErrorPackage errors = await PresetProcessor.TestPreset(preset, modSet, itemNames, assemblerNames, recipeShorts);
+						PresetErrorPackage errors = await PresetProcessor.TestPreset(preset, modSet, itemNames, assemblerNames, recipeShorts, plantShorts);
 						if (errors != null)
 							presetErrors.Add(errors);
 					}
@@ -1420,7 +1422,7 @@ namespace Foreman
 			}
 
 			//add all nodes
-			ProductionGraph.NewNodeCollection collection = Graph.InsertNodesFromJson(DCache, json["ProductionGraph"]);
+			ProductionGraph.NewNodeCollection collection = Graph.InsertNodesFromJson(DCache, (JObject)json["ProductionGraph"]);
 
 			//check for old import
 			if (json["OldImport"] != null)

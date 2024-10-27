@@ -50,25 +50,7 @@ namespace Foreman
 
 		protected override void UpdateState()
 		{
-			int yOffset = (DisplayedNode.NodeDirection == NodeDirection.Up && InputTabs.Count == 0 && OutputTabs.Count != 0) || (DisplayedNode.NodeDirection == NodeDirection.Down && OutputTabs.Count == 0 && InputTabs.Count != 0) ? 10 :
-				(DisplayedNode.NodeDirection == NodeDirection.Down && InputTabs.Count == 0 && OutputTabs.Count != 0) || (DisplayedNode.NodeDirection == NodeDirection.Up && OutputTabs.Count == 0 && InputTabs.Count != 0) ? -10 : 0;
-			yOffset += DisplayedNode.NodeDirection == NodeDirection.Up ? 4 : 0;
-
-			AssemblerElement.Location = new Point(-26, -14 + yOffset);
-			BeaconElement.Location = new Point(-30, 27 + yOffset);
-
-			AssemblerElement.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
-			BeaconElement.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
-
-			Width = Math.Max(MinWidth, Math.Max(GetIconWidths(InputTabs), GetIconWidths(OutputTabs)) + 10);
-			if (Width % WidthD != 0)
-			{
-				Width += WidthD;
-				Width -= Width % WidthD;
-			}
-			Height = (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low) ? BaseSimpleHeight : BaseRecipeHeight;
-
-			//update tabs (necessary now that it is possible that an item was added or removed)... I am looking at you furnaces!!!
+			//update tabs (necessary now that it is possible that an item was added or removed)... I am looking at you furnaces!!! ... also - with quality added to the game it is possible that the outputs will drastically change based on selected modules (add/remove quality)
 			//done by first checking all old tabs and removing any that are no longer part of the displayed node, then looking at the displayed node io and adding any new tabs that are necessary.
 			//could potentially be done by just deleting all the old ones and remaking them from scratch, but come on - thats much more intensive than just doing some checks!
 			foreach (ItemTabElement oldTab in InputTabs.Where(tab => !DisplayedNode.Inputs.Contains(tab.Item)).ToList())
@@ -92,7 +74,26 @@ namespace Foreman
 				if (!OutputTabs.Any(tab => tab.Item == item))
 					OutputTabs.Add(new ItemTabElement(item, LinkType.Output, graphViewer, this));
 
-			base.UpdateState();
+            //now that the tabs have been updated, update the size and positioning of the node:
+            int yOffset = (DisplayedNode.NodeDirection == NodeDirection.Up && InputTabs.Count == 0 && OutputTabs.Count != 0) || (DisplayedNode.NodeDirection == NodeDirection.Down && OutputTabs.Count == 0 && InputTabs.Count != 0) ? 10 :
+						  (DisplayedNode.NodeDirection == NodeDirection.Down && InputTabs.Count == 0 && OutputTabs.Count != 0) || (DisplayedNode.NodeDirection == NodeDirection.Up && OutputTabs.Count == 0 && InputTabs.Count != 0) ? -10 : 0;
+            yOffset += DisplayedNode.NodeDirection == NodeDirection.Up ? 4 : 0;
+
+            AssemblerElement.Location = new Point(-26, -14 + yOffset);
+            BeaconElement.Location = new Point(-30, 27 + yOffset);
+
+            AssemblerElement.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
+            BeaconElement.SetVisibility(graphViewer.LevelOfDetail != ProductionGraphViewer.LOD.Low);
+
+            Width = Math.Max(MinWidth, Math.Max(GetIconWidths(InputTabs), GetIconWidths(OutputTabs)) + 10);
+            if (Width % WidthD != 0)
+            {
+                Width += WidthD;
+                Width -= Width % WidthD;
+            }
+            Height = (graphViewer.LevelOfDetail == ProductionGraphViewer.LOD.Low) ? BaseSimpleHeight : BaseRecipeHeight;
+
+            base.UpdateState();
 		}
 
 		protected override Bitmap NodeIcon() { return DisplayedNode.BaseRecipe.Icon; }

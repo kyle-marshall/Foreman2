@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -169,9 +170,9 @@ namespace Foreman
 			return (ReadOnlySpoilNode)node.ReadOnlyNode;
 		}
 
-        public ReadOnlyPlantNode CreatePlantNode(Item inputItem, PlantProcess plantProcess, Point location)
+        public ReadOnlyPlantNode CreatePlantNode(PlantProcess plantProcess, Point location)
         {
-			PlantNode node = new PlantNode(this, lastNodeID++, inputItem, plantProcess);
+			PlantNode node = new PlantNode(this, lastNodeID++, plantProcess);
             node.Location = location;
             node.NodeDirection = DefaultNodeDirection;
             nodes.Add(node);
@@ -389,12 +390,15 @@ namespace Foreman
 
 			//prepare list of items/assemblers/modules/beacons/recipes that are part of the saved set. Recipes have to include a missing component due to the possibility of different recipes having same name (ex: regular iron.recipe, missing iron.recipe, missing iron.recipe #2)
 			HashSet<string> includedItems = new HashSet<string>();
+
 			HashSet<string> includedAssemblers = new HashSet<string>();
 			HashSet<string> includedModules = new HashSet<string>();
 			HashSet<string> includedBeacons = new HashSet<string>();
 
 			HashSet<Recipe> includedRecipes = new HashSet<Recipe>();
 			HashSet<Recipe> includedMissingRecipes = new HashSet<Recipe>(new RecipeNaInPrComparer()); //compares by name, ingredients, and products (not amounts, just items)
+			HashSet<PlantProcess> includedPlantProcesses = new HashSet<PlantProcess>();
+			HashSet<PlantProcess> includedMissingPlantProcesses = new HashSet<PlantProcess>(new PlantNaInPrComparer());
 
 			foreach (BaseNode node in includedNodes)
 			{
@@ -411,6 +415,14 @@ namespace Foreman
 						includedBeacons.Add(rnode.SelectedBeacon.Name);
 					includedModules.UnionWith(rnode.AssemblerModules.Select(m => m.Name));
 					includedModules.UnionWith(rnode.BeaconModules.Select(m => m.Name));
+
+				}
+				if (node is PlantNode pnode)
+				{
+					if (pnode.BasePlantProcess.IsMissing)
+						includedMissingPlantProcesses.Add(pnode.BasePlantProcess);
+					else
+						includedPlantProcesses.Add(pnode.BasePlantProcess);
 				}
 
 				//these will process all inputs/outputs -> so fuel/burnt items are included automatically!
@@ -419,9 +431,11 @@ namespace Foreman
 			}
 			List<RecipeShort> includedRecipeShorts = includedRecipes.Select(recipe => new RecipeShort(recipe)).ToList();
 			includedRecipeShorts.AddRange(includedMissingRecipes.Select(recipe => new RecipeShort(recipe))); //add the missing after the regular, since when we compare saves to preset we will only check 1st recipe of its name (the non-missing kind then)
+            List<PlantShort> includedPlantShorts = includedPlantProcesses.Select(pprocess => new PlantShort(pprocess)).ToList();
+            includedPlantShorts.AddRange(includedMissingPlantProcesses.Select(pprocess => new PlantShort(pprocess))); //add the missing after the regular, since when we compare saves to preset we will only check 1st recipe of its name (the non-missing kind then)
 
-			//serialize
-			info.AddValue("Version", Properties.Settings.Default.ForemanVersion);
+            //serialize
+            info.AddValue("Version", Properties.Settings.Default.ForemanVersion);
 			info.AddValue("Object", "ProductionGraph");
 
 			info.AddValue("EnableExtraProductivityForNonMiners", EnableExtraProductivityForNonMiners);
@@ -432,7 +446,8 @@ namespace Foreman
 
 			info.AddValue("IncludedItems", includedItems);
 			info.AddValue("IncludedRecipes", includedRecipeShorts);
-			info.AddValue("IncludedAssemblers", includedAssemblers);
+            info.AddValue("IncludedPlantProcesses", includedPlantShorts);
+            info.AddValue("IncludedAssemblers", includedAssemblers);
 			info.AddValue("IncludedModules", includedModules);
 			info.AddValue("IncludedBeacons", includedBeacons);
 
@@ -440,7 +455,7 @@ namespace Foreman
 			info.AddValue("NodeLinks", includedLinks);
 		}
 
-		public NewNodeCollection InsertNodesFromJson(DataCache cache, JToken json) //cache is necessary since we will possibly be adding to mssing items/recipes
+		public NewNodeCollection InsertNodesFromJson(DataCache cache, JObject json) //cache is necessary since we will possibly be adding to mssing items/recipes
 		{
 			if (json["Version"] == null || (int)json["Version"] != Properties.Settings.Default.ForemanVersion || json["Object"] == null || (string)json["Object"] != "ProductionGraph")
 			{
@@ -466,6 +481,7 @@ namespace Foreman
 				cache.ProcessImportedModulesSet(json["IncludedModules"].Select(t => (string)t));
 				cache.ProcessImportedBeaconsSet(json["IncludedBeacons"].Select(t => (string)t));
 				Dictionary<long, Recipe> recipeLinks = cache.ProcessImportedRecipesSet(RecipeShort.GetSetFromJson(json["IncludedRecipes"]));
+				Dictionary<long, PlantProcess> plantProcessLinks = cache.ProcessImportedPlantProcessesSet(PlantShort.GetSetFromJson(json["IncludedPlantProcesses"]));
 
 				//add in all the graph nodes
 				foreach (JToken nodeJToken in json["Nodes"].ToList())
@@ -511,11 +527,8 @@ namespace Foreman
 							newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
 							break;
 						case NodeType.Plant:
-                            itemName = (string)nodeJToken["Seed"];
-                            string plantProcessName = (string)nodeJToken["SeedPlantProcess"];
-                            Item seed = cache.Items.ContainsKey(itemName) ? cache.Items[itemName] : cache.MissingItems[itemName];
-                            PlantProcess plantProcess = cache.PlantProcesses.ContainsKey(plantProcessName) ? cache.PlantProcesses[plantProcessName] : cache.MissingPlantProcesses[plantProcessName];
-                            newNode = roToNode[CreatePlantNode(seed, plantProcess, location)];
+                            long pprocessID = (long)nodeJToken["PlantProcessID"];
+                            newNode = roToNode[CreatePlantNode(plantProcessLinks[pprocessID], location)];
                             newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
                             break;
 						case NodeType.Recipe:

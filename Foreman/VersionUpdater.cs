@@ -243,25 +243,17 @@ namespace Foreman
 				original["ExtraProdForNonMiners"] = false;
 			}
 
-			if ((int)original["Version"] < 5)
+			if ((int)original["Version"] < 6)
 			{
-				//Version update 2 -> 5:
+				//Version update 2 -> 6:
 				//	No changes in main save (all changes are within the graph)
-				original["Version"] = 5;
-			}
-
-			if ((int)original["Version"] == 5)
-			{
-				//Version update 5 -> 6:
-				//  will need to add plant and spoil recipe processing
-
-                original["Version"] = 6;
+				original["Version"] = 6;
 			}
 
 			return original;
 		}
 
-		public static JToken UpdateGraph(JToken original)
+		public static JObject UpdateGraph(JObject original)
 		{
 			if (original["Version"] == null || original["Object"] == null || (string)original["Object"] != "ProductionGraph")
 			{
@@ -324,13 +316,19 @@ namespace Foreman
                 //  All nodes now feature a unified 'DesiredSetValue' that replaces the "DesiredAssemblers" from recipe nodes and "DesiredRatePerSec" from all other nodes
                 //  This value is specific to each node type (ex: recipe = #assemblers, spoil = #stacks, grow = #tiles, most other nodes = #throughput/s)
 
+				//  Also a new group was added to represent plant processes (IncludedPlantProcesses) - old saves will not have anything here, so just a blank node is fine
+
                 foreach(JToken nodeJToken in original["Nodes"])
                 {
                     if (nodeJToken["DesiredAssemblers"] != null)
                         nodeJToken["DesiredSetValue"] = (double)nodeJToken["DesiredAssemblers"];
-                    if (nodeJToken["DesiredRatePerSec"] != null)
-                        nodeJToken["DesiredSetValue"] = (double)nodeJToken["DesiredRatePerSec"];
+                    //if (nodeJToken["DesiredRatePerSec"] != null)
+                    //    nodeJToken["DesiredSetValue"] = (double)nodeJToken["DesiredRatePerSec"];
+					if (nodeJToken["DesiredRate"] != null)
+						nodeJToken["DesiredSetValue"] = (double)nodeJToken["DesiredRate"];
                 }
+
+				original["IncludedPlantProcesses"] = new JArray();
 
                 original["Version"] = 6;
             }

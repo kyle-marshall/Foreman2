@@ -24,9 +24,31 @@ namespace Foreman
 			Width = MinWidth;
 			Height = BaseSimpleHeight;
 			DisplayedNode = node;
+
+			UpdateState();
 		}
 
-		protected override Bitmap NodeIcon() { return IconCache.GetSpoilageIcon(); }
+		protected override void UpdateState()
+		{
+			//check for and update the output tab in the case that the spoil item has changed
+			//we are guaranteed to have just 1 item in the output, so we just need to check if it needs to be changed, if so delete it and make a new one
+			ItemTabElement oldTab = OutputTabs[0];
+			if (oldTab.Item != DisplayedNode.OutputItem)
+			{
+				foreach (ReadOnlyNodeLink link in DisplayedNode.OutputLinks)
+					graphViewer.Graph.DeleteLink(link);
+				OutputTabs.Clear();
+				oldTab.Dispose();
+
+				OutputTabs.Add(new ItemTabElement(DisplayedNode.OutputItem, LinkType.Output, graphViewer, this));
+
+				base.UpdateState();
+			}
+
+            base.UpdateState();
+        }
+
+        protected override Bitmap NodeIcon() { return IconCache.GetSpoilageIcon(); }
 
         protected override void DetailsDraw(Graphics graphics, Point trans)
         {

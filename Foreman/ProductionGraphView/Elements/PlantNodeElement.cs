@@ -24,9 +24,37 @@ namespace Foreman
 			Width = MinWidth;
 			Height = BaseSimpleHeight;
 			DisplayedNode = node;
+
+			UpdateState();
 		}
 
-		protected override Bitmap NodeIcon() { return IconCache.GetPlantingIcon(); }
+        protected override void UpdateState()
+        {
+            //check for and update the output tabs in the case that the plant result items have changed
+            //we can have multiple output items here, so go through all of them, delete any that arent part of the correct outputs, then add any that are missing.
+            foreach (ItemTabElement oldTab in OutputTabs.Where(tab => !DisplayedNode.Outputs.Contains(tab.Item)).ToList())
+            {
+                foreach (ReadOnlyNodeLink link in DisplayedNode.OutputLinks.Where(link => link.Item == oldTab.Item).ToList())
+                    graphViewer.Graph.DeleteLink(link);
+                OutputTabs.Remove(oldTab);
+                oldTab.Dispose();
+            }
+            foreach (Item item in DisplayedNode.Outputs)
+                if (!OutputTabs.Any(tab => tab.Item == item))
+                    OutputTabs.Add(new ItemTabElement(item, LinkType.Output, graphViewer, this));
+
+            //update width based on number of output tabs
+            Width = Math.Max(MinWidth, GetIconWidths(OutputTabs) + 10);
+            if (Width % WidthD != 0)
+            {
+                Width += WidthD;
+                Width -= Width % WidthD;
+            }
+
+            base.UpdateState();
+        }
+
+        protected override Bitmap NodeIcon() { return IconCache.GetPlantingIcon(); }
 
         protected override void DetailsDraw(Graphics graphics, Point trans)
         {

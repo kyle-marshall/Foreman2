@@ -24,11 +24,11 @@ namespace Foreman
         private readonly BaseNodeController controller;
 		public override BaseNodeController Controller { get { return controller; } }
 
-		public readonly Item Seed;
-		public PlantProcess SeedPlantProcess { get; internal set; }
+		public Item Seed { get { return BasePlantProcess.Seed; } }
+		public PlantProcess BasePlantProcess { get; internal set; }
 
 		public override IEnumerable<Item> Inputs { get { yield return Seed; } }
-		public override IEnumerable<Item> Outputs { get { return SeedPlantProcess.ProductList; } }
+		public override IEnumerable<Item> Outputs { get { return BasePlantProcess.ProductList; } }
 
         //for plant nodes, the SetValue is 'number of plant tiles'
         public override double ActualSetValue { get { return ActualRatePerSec * Seed.PlantResult.GrowTime; } }
@@ -38,11 +38,10 @@ namespace Foreman
 
         public override double DesiredRatePerSec { get { return DesiredSetValue / Seed.PlantResult.GrowTime; } }
 
-        public PlantNode(ProductionGraph graph, int nodeID, Item item) : this(graph, nodeID, item, item.PlantResult) { }
-		public PlantNode(ProductionGraph graph, int nodeID, Item item, PlantProcess plantProcess) : base(graph, nodeID)
+        public PlantNode(ProductionGraph graph, int nodeID, Item item) : this(graph, nodeID, item.PlantResult) { }
+		public PlantNode(ProductionGraph graph, int nodeID, PlantProcess plantProcess) : base(graph, nodeID)
         {
-			Seed = item;
-			SeedPlantProcess = plantProcess;
+			BasePlantProcess = plantProcess;
 			controller = PlantNodeController.GetController(this);
 			ReadOnlyNode = new ReadOnlyPlantNode(this);
 		}
@@ -56,11 +55,11 @@ namespace Foreman
 
 			if (Seed.PlantResult == null)
 				ErrorSet |= Errors.ItemDoesntGrow;
-			if (Seed.PlantResult != SeedPlantProcess)
+			if (Seed.PlantResult != BasePlantProcess)
 				ErrorSet |= Errors.InvalidGrowResult;
 			if (Seed.IsMissing)
 				ErrorSet |= Errors.InputItemMissing;
-			if  (SeedPlantProcess.IsMissing)
+			if  (BasePlantProcess.IsMissing)
 				ErrorSet |= Errors.PlantProcessMissing;
 			if (!AllLinksValid)
 				ErrorSet |= Errors.InvalidLinks;
@@ -74,15 +73,14 @@ namespace Foreman
 		public override double GetSupplyRate(Item item) { return ActualRate * outputRateFor(item); }
 
 		internal override double inputRateFor(Item item) { return 1; }
-		internal override double outputRateFor(Item item) { return SeedPlantProcess.ProductSet[item]; }
+		internal override double outputRateFor(Item item) { return BasePlantProcess.ProductSet[item]; }
 
 		public override void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			base.GetObjectData(info, context);
 
-			info.AddValue("NodeType", NodeType.Spoil);
-			info.AddValue("Seed", Seed.Name);
-			info.AddValue("SeedPlantProcess", SeedPlantProcess.Name);
+			info.AddValue("NodeType", NodeType.Plant);
+			info.AddValue("PlantProcessID", BasePlantProcess.PlantID);
 		}
 
 		public override string ToString() { return string.Format("Plant Growth node for: {0}", Seed.Name); }
@@ -91,7 +89,7 @@ namespace Foreman
 	public class ReadOnlyPlantNode : ReadOnlyBaseNode
 	{
 		public Item Seed => MyNode.Seed;
-		public PlantProcess SeedPlantProcess => MyNode.SeedPlantProcess;
+		public PlantProcess SeedPlantProcess => MyNode.BasePlantProcess;
 
 		private readonly PlantNode MyNode;
 
@@ -133,10 +131,10 @@ namespace Foreman
 
         public void UpdatePlantResult()
         {
-			if(MyNode.SeedPlantProcess != MyNode.Seed.PlantResult)
+			if(MyNode.BasePlantProcess != MyNode.Seed.PlantResult)
 			{
-				MyNode.SeedPlantProcess = MyNode.Seed.PlantResult;
-				foreach(NodeLink link in MyNode.OutputLinks.Where(l => !MyNode.SeedPlantProcess.ProductList.Contains(l.Item)))
+				MyNode.BasePlantProcess = MyNode.Seed.PlantResult;
+				foreach(NodeLink link in MyNode.OutputLinks.Where(l => !MyNode.BasePlantProcess.ProductList.Contains(l.Item)))
 					link.Controller.Delete();
 				MyNode.UpdateState();
 			}
@@ -148,7 +146,7 @@ namespace Foreman
 			if ((MyNode.ErrorSet & (PlantNode.Errors.InputItemMissing | PlantNode.Errors.PlantProcessMissing | PlantNode.Errors.ItemDoesntGrow)) != 0)
 				resolutions.Add("Delete node", new Action(() => this.Delete()));
 			if ((MyNode.ErrorSet & PlantNode.Errors.InvalidGrowResult) != 0)
-				resolutions.Add("Update spoil result", new Action(() => UpdatePlantResult()));
+				resolutions.Add("Update plant results", new Action(() => UpdatePlantResult()));
 			else
 				foreach (KeyValuePair<string, Action> kvp in GetInvalidConnectionResolutions())
 					resolutions.Add(kvp.Key, kvp.Value);

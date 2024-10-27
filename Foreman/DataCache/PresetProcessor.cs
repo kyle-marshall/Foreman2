@@ -44,7 +44,7 @@ namespace Foreman
 				JObject cjsonData = JObject.Parse(File.ReadAllText(presetCustomPath));
 				foreach (var groupToken in cjsonData)
 				{
-					foreach (JObject itemToken in groupToken.Value)
+					foreach (JObject itemToken in groupToken.Value.Cast<JObject>())
 					{
 						JObject presetItemToken = (JObject)jsonData[groupToken.Key].FirstOrDefault(t => (string)t["name"] == (string)itemToken["name"]);
 						if (presetItemToken != null)
@@ -58,12 +58,12 @@ namespace Foreman
 			return jsonData;
 		}
 
-		public static async Task<PresetErrorPackage> TestPreset(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts)
+		public static async Task<PresetErrorPackage> TestPreset(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts, List<PlantShort> plantShorts)
 		{
-			//try
-			//{
-				//return await TestPresetThroughDataCache(preset, modList, itemList, entityList, recipeShorts);
-				return await TestPresetStreamlined(preset, modList, itemList, entityList, recipeShorts);
+            //try
+            //{
+            //return await TestPresetThroughDataCache(preset, modList, itemList, entityList, recipeShorts);
+            return await TestPresetStreamlined(preset, modList, itemList, entityList, recipeShorts, plantShorts);
 			//}
 			//catch
 			//{
@@ -73,7 +73,7 @@ namespace Foreman
 
 		//full load of data cache and comparison. This is naturally slower than the streamlined version, since we load all the extras that arent necessary for comparison (like energy types, technologies, availability calculations, etc)
 		//but on the +ve side any changes to preset json format is incorporated into data cache and requires no update to this function.
-		private static async Task<PresetErrorPackage> TestPresetThroughDataCache(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts)
+		private static async Task<PresetErrorPackage> TestPresetThroughDataCache(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts, List<PlantShort> plantShorts)
 		{
 			string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".pjson" });
 			if (!File.Exists(presetPath))
@@ -124,14 +124,33 @@ namespace Foreman
 				}
 			}
 
-			return errors;
+			foreach (PlantShort plantS in plantShorts)
+			{
+				errors.RequiredPlanting.Add(plantS.Name);
+                if (plantS.isMissing)
+                {
+                    if (presetCache.PlantProcesses.ContainsKey(plantS.Name) && plantS.Equals(presetCache.PlantProcesses[plantS.Name]))
+                        errors.ValidMissingPlanting.Add(plantS.Name);
+                    else
+                        errors.IncorrectPlanting.Add(plantS.Name);
+                }
+				else
+                {
+                    if (!presetCache.PlantProcesses.ContainsKey(plantS.Name))
+                        errors.MissingPlanting.Add(plantS.Name);
+                    else if (!plantS.Equals(presetCache.PlantProcesses[plantS.Name]))
+                        errors.IncorrectPlanting.Add(plantS.Name);
+                }
+            }
+
+            return errors;
 		}
 
 		//this preset comparer loads a 'light' version of the preset - basically loading the items and entities as strings only (no data), and only the minimal info for recipes (name, ingredients + amounts, products + amounts)
 		//this speeds things up such that the comparison takes around 150ms for a large preset like seablock (10x vanilla), instead of 250ms as for a full datacache load.
 		//still, this is only really helpful if you are using 10 presets (1.5 sec load inatead of 2.5 sec) or more, but hey; i will keep it.
 		//any changes to preset json style have to be reflected here though (unlike for a full data cache loader above, which just incorporates any changes to data cache as long as they dont impact the outputs)
-		private static async Task<PresetErrorPackage> TestPresetStreamlined(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts)
+		private static async Task<PresetErrorPackage> TestPresetStreamlined(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts, List<PlantShort> plantShorts)
 		{
 			JObject jsonData = PrepPreset(preset);
 
@@ -139,6 +158,7 @@ namespace Foreman
 			HashSet<string> presetItems = new HashSet<string>();
 			HashSet<string> presetEntities = new HashSet<string>();
 			Dictionary<string, RecipeShort> presetRecipes = new Dictionary<string, RecipeShort>();
+			Dictionary<string, PlantShort> presetPlantProcesses = new Dictionary<string, PlantShort>();
 			Dictionary<string, string> presetMods = new Dictionary<string, string>();
 
 			//built in items
@@ -153,11 +173,29 @@ namespace Foreman
 			presetEntities.Add("§§a:player-assembler");
 			presetEntities.Add("§§a:rocket-assembler");
 
-			//read in mods, items and entities
+			//read in mods, items, spoilage, planting, and entities
 			foreach (var objJToken in jsonData["mods"].ToList())
 				presetMods.Add((string)objJToken["name"], (string)objJToken["version"]);
 			foreach (var objJToken in jsonData["items"].ToList())
+			{
 				presetItems.Add((string)objJToken["name"]);
+                if (objJToken["plant_results"] != null)
+				{
+					PlantShort plantProcess = new PlantShort((string)objJToken["name"]);
+					foreach(var productJToken in objJToken["plant_results"])
+					{
+                        double amount = (double)productJToken["amount"];
+                        if (amount > 0)
+                        {
+                            string productName = (string)productJToken["name"];
+                            if (plantProcess.Products.ContainsKey(productName))
+                                plantProcess.Products[productName] += amount;
+                            else
+                                plantProcess.Products.Add(productName, amount);
+                        }
+                    }
+				}
+			}
 			foreach (var objJToken in jsonData["fluids"].ToList())
 				presetItems.Add((string)objJToken["name"]);
 			foreach (var objJToken in jsonData["entities"].ToList())
@@ -196,7 +234,7 @@ namespace Foreman
 				presetRecipes.Add(recipe.Name, recipe);
 			}
 
-			//have to process mining, offshore pumps, and boilers (since we convert them to recipes as well)
+			//have to process mining, generators and boilers (since we convert them to recipes as well)
 			foreach (var objJToken in jsonData["resources"])
 			{
 				if (objJToken["products"].Count() == 0)
@@ -331,7 +369,26 @@ namespace Foreman
 				}
 			}
 
-			return errors;
+            foreach (PlantShort plantS in plantShorts)
+            {
+                errors.RequiredPlanting.Add(plantS.Name);
+                if (plantS.isMissing)
+                {
+                    if (presetPlantProcesses.ContainsKey(plantS.Name) && plantS.Equals(presetPlantProcesses[plantS.Name]))
+                        errors.ValidMissingPlanting.Add(plantS.Name);
+                    else
+                        errors.IncorrectPlanting.Add(plantS.Name);
+                }
+				else
+                {
+                    if (!presetPlantProcesses.ContainsKey(plantS.Name))
+                        errors.MissingPlanting.Add(plantS.Name);
+                    else if (!plantS.Equals(presetPlantProcesses[plantS.Name]))
+                        errors.IncorrectPlanting.Add(plantS.Name);
+                }
+            }
+
+            return errors;
 		}
 	}
 }
