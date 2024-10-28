@@ -496,7 +496,7 @@ local function ExportEntities()
 				tentity['fuel_effectivity'] = entity.fluid_energy_source_prototype.effectivity
 
 				tentity['pollution'] = {}
-				for pollutant, quantity in pairs(entity.burner_prototype.emissions_per_joule) do
+				for pollutant, quantity in pairs(entity.fluid_energy_source_prototype.emissions_per_joule) do
 					tentity['pollution'][pollutant] = quantity
 				end
 				tentity['burns_fluid'] = entity.fluid_energy_source_prototype.burns_fluid
