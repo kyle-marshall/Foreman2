@@ -13,52 +13,12 @@
       "version": "2.0.13"
     },
     {
-      "name": "belt-visualizer",
-      "version": "2.0.2"
-    },
-    {
-      "name": "vehicle-corpses",
-      "version": "0.1.1"
-    },
-    {
-      "name": "VehicleSnap",
-      "version": "2.0.0"
-    },
-    {
       "name": "elevated-rails",
       "version": "2.0.13"
     },
     {
-      "name": "even-distribution",
-      "version": "2.0.2"
-    },
-    {
-      "name": "flib",
-      "version": "0.15.0"
-    },
-    {
-      "name": "playtime",
-      "version": "1.1.1"
-    },
-    {
       "name": "quality",
       "version": "2.0.13"
-    },
-    {
-      "name": "Trashcan",
-      "version": "1.0.5"
-    },
-    {
-      "name": "Wr_Enhanced_Map_Colors",
-      "version": "1.5.7"
-    },
-    {
-      "name": "BottleneckLite",
-      "version": "1.3.0"
-    },
-    {
-      "name": "customizable-quality-names",
-      "version": "1.0.0"
     },
     {
       "name": "space-age",
@@ -10070,20 +10030,6 @@
       ],
       "research_unit_count": 2500,
       "localised_name": "Spidertron"
-    },
-    {
-      "name": "enable-logistics-tab",
-      "icon_name": "icon.t.enable-logistics-tab",
-      "enabled": false,
-      "essential": true,
-      "hidden": true,
-      "prerequisites": {},
-      "successors": {},
-      "recipes": {},
-      "alt_modifiers": {},
-      "research_unit_ingredients": {},
-      "research_unit_count": 1,
-      "localised_name": "Even Distribution"
     }
   ],
   "recipes": [
@@ -39297,7 +39243,7 @@
       "mining_drill_resource_drain_multiplier": 1,
       "next_probability": 0.1,
       "next": "uncommon",
-      "localised_name": "Standard"
+      "localised_name": "Normal"
     },
     {
       "name": "uncommon",
@@ -39309,7 +39255,7 @@
       "mining_drill_resource_drain_multiplier": 0.83333331346511841,
       "next_probability": 0.1,
       "next": "rare",
-      "localised_name": "Improved"
+      "localised_name": "Uncommon"
     },
     {
       "name": "rare",
@@ -39321,7 +39267,7 @@
       "mining_drill_resource_drain_multiplier": 0.66666668653488159,
       "next_probability": 0.1,
       "next": "epic",
-      "localised_name": "Superior"
+      "localised_name": "Rare"
     },
     {
       "name": "epic",
@@ -39333,7 +39279,7 @@
       "mining_drill_resource_drain_multiplier": 0.5,
       "next_probability": 0.1,
       "next": "legendary",
-      "localised_name": "Exceptional"
+      "localised_name": "Epic"
     },
     {
       "name": "legendary",
@@ -39343,7 +39289,7 @@
       "level": 5,
       "beacon_power_multiplier": 0.1666666716337204,
       "mining_drill_resource_drain_multiplier": 0.1666666716337204,
-      "localised_name": "Flawless"
+      "localised_name": "Legendary"
     },
     {
       "name": "quality-unknown",

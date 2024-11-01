@@ -289,9 +289,9 @@ namespace Foreman
 
 		}
 
-        public void UpdateInputsAndOutputs()
+        public void UpdateInputsAndOutputs(bool forceUpdate = false)
         {
-			if (!ioUpdateRequired)
+			if (!ioUpdateRequired && !forceUpdate)
 				return;
 			ioUpdateRequired = false;
 
@@ -358,13 +358,13 @@ namespace Foreman
 							currentProduct = new ItemQualityPair(item, currentProduct.Quality.NextQuality);
 							if (currentMultiplier == 0)
 								break;
+							if (!currentProduct.Quality.Enabled || !currentProduct.Quality.Available)
+								break;
 
 							outputList.Add(currentProduct);
 							outputSet.Add(currentProduct, Math.Min(currentMultiplier, 1.0) * amount);
 							outputSet[lastProduct] -= outputSet[currentProduct];
 
-							if (!currentProduct.Quality.Enabled || !currentProduct.Quality.Available)
-								break;
 						}
 					}
 				}

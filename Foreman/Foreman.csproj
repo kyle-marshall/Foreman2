@@ -385,6 +385,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <None Include="Presets\Factorio 2.0 Space Age.dat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Presets\Factorio 2.0 Space Age.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Presets\Factorio 2.0 Space Age.pjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Presets\Factorio 2.0 Vanilla.dat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

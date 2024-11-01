@@ -296,6 +296,15 @@ namespace Foreman
 			lastNodeID = 0;
 		}
 
+		public void UpdateNodeMaxQualities()
+		{
+			foreach(RecipeNode rnode in nodes.Where(n => n is RecipeNode).Cast<RecipeNode>())
+			{
+				rnode.UpdateInputsAndOutputs(true);
+				rnode.UpdateState();
+			}
+		}
+
 		public void UpdateNodeStates(bool markAllAsDirty)
 		{
 			foreach (BaseNode node in nodes)

@@ -378,6 +378,7 @@ namespace Foreman
 			options.EnabledObjects.UnionWith(GraphViewer.DCache.Assemblers.Values.Where(r => r.Enabled));
 			options.EnabledObjects.UnionWith(GraphViewer.DCache.Beacons.Values.Where(r => r.Enabled));
 			options.EnabledObjects.UnionWith(GraphViewer.DCache.Modules.Values.Where(r => r.Enabled));
+			options.EnabledObjects.UnionWith(GraphViewer.DCache.Qualities.Values.Where(r => r.Enabled));
 
 			using (SettingsForm form = new SettingsForm(options))
 			{
@@ -405,6 +406,9 @@ namespace Foreman
 							beacon.Enabled = options.EnabledObjects.Contains(beacon);
 						foreach (Module module in GraphViewer.DCache.Modules.Values)
 							module.Enabled = options.EnabledObjects.Contains(module);
+						foreach (Quality quality in GraphViewer.DCache.Qualities.Values)
+							quality.Enabled = options.EnabledObjects.Contains(quality);
+						GraphViewer.DCache.DefaultQuality.Enabled = true;
 						GraphViewer.DCache.RocketAssembler.Enabled = GraphViewer.DCache.Assemblers["rocket-silo"]?.Enabled?? false;
 					}
 
@@ -459,6 +463,7 @@ namespace Foreman
 					Properties.Settings.Default.ShowUnavailable = options.DEV_ShowUnavailableItems;
 					Properties.Settings.Default.Save();
 
+					GraphViewer.Graph.UpdateNodeMaxQualities();
 					GraphViewer.Graph.UpdateNodeStates(true);
 					GraphViewer.Graph.UpdateNodeValues();
 
