@@ -402,22 +402,29 @@ namespace Foreman
 		private HashSet<Item> requestedItemList;
 		private bool showAllItems;
 
+		private List<Quality> qualitySelectorIndexSet;
+
 		public ItemChooserPanel(ProductionGraphViewer parent, Point originPoint, IReadOnlyCollection<Item> itemList = null, Quality itemQuality = null) : base(parent, originPoint)
 		{
 			showAllItems = (itemList == null);
 			DCache = parent.DCache;
+			qualitySelectorIndexSet = new List<Quality>();
 
 			if (itemQuality == null)
 			{
 				QualitySelectorTable.Visible = true;
 				foreach (Quality quality in parent.DCache.AvailableQualities.Where(q => q.Enabled))
-					QualitySelector.Items.Add(quality.Name);
+				{
+					QualitySelector.Items.Add(quality.FriendlyName);
+					qualitySelectorIndexSet.Add(quality);
+				}
 
                 if (QualitySelector.Items.Count == 1)
                     QualitySelector.Enabled = false;
             } else
 			{
-				QualitySelector.Items.Add(itemQuality.Name);
+				QualitySelector.Items.Add(itemQuality.FriendlyName);
+				qualitySelectorIndexSet.Add(itemQuality);
 				QualitySelector.Enabled = false;
 			}
 			QualitySelector.SelectedIndex = 0;
@@ -537,7 +544,7 @@ namespace Foreman
 			if (e.Button == MouseButtons.Left)
 			{
 				panelCloseReason = ChooserPanelCloseReason.ItemSelected;
-                selectedItem = new ItemQualityPair((Item)((Button)sender).Tag, DCache.Qualities[(string)QualitySelector.Items[QualitySelector.SelectedIndex]]);
+                selectedItem = new ItemQualityPair((Item)((Button)sender).Tag, qualitySelectorIndexSet[QualitySelector.SelectedIndex]);
 				Dispose();
 			}
 		}
@@ -555,21 +562,29 @@ namespace Foreman
 		private ToolTip rToolTip = new RecipeToolTip();
 		protected override ToolTip IRButtonToolTip { get { return rToolTip; } }
 
+		private List<Quality> qualitySelectorIndexSet;
+
 		public RecipeChooserPanel(ProductionGraphViewer parent, Point originPoint, ItemQualityPair item, fRange tempRange, NewNodeType nodeType) : base(parent, originPoint)
 		{
 			DCache = parent.DCache;
+			qualitySelectorIndexSet = new List<Quality>();
 
             if (item.Quality == null)
             {
                 QualitySelectorTable.Visible = true;
-                foreach (Quality quality in parent.DCache.AvailableQualities.Where(q => q.Enabled))
-                    QualitySelector.Items.Add(quality.Name);
+				foreach (Quality quality in parent.DCache.AvailableQualities.Where(q => q.Enabled))
+				{
+					QualitySelector.Items.Add(quality.FriendlyName);
+                    qualitySelectorIndexSet.Add(quality);
 
-				if (QualitySelector.Items.Count == 1)
+                }
+
+                if (QualitySelector.Items.Count == 1)
 					QualitySelector.Enabled = false;
             } else
             {
-                QualitySelector.Items.Add(item.Quality.Name);
+                QualitySelector.Items.Add(item.Quality.FriendlyName);
+				qualitySelectorIndexSet.Add(item.Quality);
                 QualitySelector.Enabled = false;
             }
             QualitySelector.SelectedIndex = 0;
@@ -747,7 +762,7 @@ namespace Foreman
 			if (e.Button == MouseButtons.Left) //select recipe
 			{
 				Recipe sRecipe = (Recipe)((Button)sender).Tag;
-                RecipeRequested?.Invoke(this, new RecipeRequestArgs(new RecipeQualityPair((Recipe)((Button)sender).Tag, DCache.Qualities[(string)QualitySelector.SelectedItem] )));
+                RecipeRequested?.Invoke(this, new RecipeRequestArgs(new RecipeQualityPair((Recipe)((Button)sender).Tag, qualitySelectorIndexSet[QualitySelector.SelectedIndex])));
 
 				if ((Control.ModifierKeys & Keys.Shift) != Keys.Shift)
 				{

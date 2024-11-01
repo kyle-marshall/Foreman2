@@ -33,6 +33,8 @@ namespace Foreman
             this.AutoAssemblersOption = new System.Windows.Forms.RadioButton();
             this.FixedAssemblersOption = new System.Windows.Forms.RadioButton();
             this.AssemblerInfoTable = new System.Windows.Forms.TableLayoutPanel();
+            this.AssemblerQualityPercentLabel = new System.Windows.Forms.Label();
+            this.AssemblerQualityTitleLabel = new System.Windows.Forms.Label();
             this.ExtraProductivityLabel = new System.Windows.Forms.Label();
             this.AssemblerPollutionLabel = new System.Windows.Forms.Label();
             this.AssemblerEnergyTitleLabel = new System.Windows.Forms.Label();
@@ -97,13 +99,13 @@ namespace Foreman
             this.SelectedAssemblerIcon = new System.Windows.Forms.PictureBox();
             this.SelectedFuelIcon = new System.Windows.Forms.PictureBox();
             this.RateOptionsTable = new System.Windows.Forms.TableLayoutPanel();
+            this.QualitySelectorLabel = new System.Windows.Forms.Label();
             this.KeyNodeTitleInput = new System.Windows.Forms.TextBox();
             this.KeyNodeCheckBox = new System.Windows.Forms.CheckBox();
             this.FixedAssemblerInput = new System.Windows.Forms.NumericUpDown();
             this.LowPriorityCheckBox = new System.Windows.Forms.CheckBox();
             this.KeyNodeTitleLabel = new System.Windows.Forms.Label();
-            this.AssemblerQualityTitleLabel = new System.Windows.Forms.Label();
-            this.AssemblerQualityPercentLabel = new System.Windows.Forms.Label();
+            this.QualitySelector = new System.Windows.Forms.ComboBox();
             this.ToolTip = new Foreman.CustomToolTip();
             this.AssemblerInfoTable.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NeighbourInput)).BeginInit();
@@ -199,6 +201,28 @@ namespace Foreman
             this.AssemblerInfoTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.AssemblerInfoTable.Size = new System.Drawing.Size(310, 147);
             this.AssemblerInfoTable.TabIndex = 9;
+            // 
+            // AssemblerQualityPercentLabel
+            // 
+            this.AssemblerQualityPercentLabel.AutoSize = true;
+            this.AssemblerQualityPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.AssemblerQualityPercentLabel.Location = new System.Drawing.Point(103, 61);
+            this.AssemblerQualityPercentLabel.Margin = new System.Windows.Forms.Padding(1, 1, 5, 1);
+            this.AssemblerQualityPercentLabel.Name = "AssemblerQualityPercentLabel";
+            this.AssemblerQualityPercentLabel.Size = new System.Drawing.Size(45, 18);
+            this.AssemblerQualityPercentLabel.TabIndex = 20;
+            this.AssemblerQualityPercentLabel.Text = "0%";
+            // 
+            // AssemblerQualityTitleLabel
+            // 
+            this.AssemblerQualityTitleLabel.AutoSize = true;
+            this.AssemblerQualityTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.AssemblerQualityTitleLabel.Location = new System.Drawing.Point(1, 61);
+            this.AssemblerQualityTitleLabel.Margin = new System.Windows.Forms.Padding(1);
+            this.AssemblerQualityTitleLabel.Name = "AssemblerQualityTitleLabel";
+            this.AssemblerQualityTitleLabel.Size = new System.Drawing.Size(100, 18);
+            this.AssemblerQualityTitleLabel.TabIndex = 19;
+            this.AssemblerQualityTitleLabel.Text = "Quality:";
             // 
             // ExtraProductivityLabel
             // 
@@ -444,7 +468,7 @@ namespace Foreman
             this.AssemblerRateLabel.Location = new System.Drawing.Point(3, 1);
             this.AssemblerRateLabel.Margin = new System.Windows.Forms.Padding(3, 1, 3, 3);
             this.AssemblerRateLabel.Name = "AssemblerRateLabel";
-            this.AssemblerRateLabel.Size = new System.Drawing.Size(215, 22);
+            this.AssemblerRateLabel.Size = new System.Drawing.Size(203, 22);
             this.AssemblerRateLabel.TabIndex = 3;
             this.AssemblerRateLabel.Text = "# of Assemblers:";
             this.AssemblerRateLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -480,7 +504,7 @@ namespace Foreman
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.MainTable.Size = new System.Drawing.Size(472, 685);
+            this.MainTable.Size = new System.Drawing.Size(472, 689);
             this.MainTable.TabIndex = 17;
             // 
             // BeaconTable
@@ -503,7 +527,7 @@ namespace Foreman
             this.BeaconTable.Controls.Add(this.BeaconValuesTable, 2, 1);
             this.BeaconTable.Controls.Add(this.SelectedBeaconIcon, 3, 0);
             this.BeaconTable.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.BeaconTable.Location = new System.Drawing.Point(3, 460);
+            this.BeaconTable.Location = new System.Drawing.Point(3, 464);
             this.BeaconTable.Name = "BeaconTable";
             this.BeaconTable.RowCount = 4;
             this.BeaconTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -865,6 +889,7 @@ namespace Foreman
             // 
             // BeaconCountInput
             // 
+            this.BeaconCountInput.DecimalPlaces = 2;
             this.BeaconCountInput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.BeaconCountInput.Location = new System.Drawing.Point(70, 3);
             this.BeaconCountInput.Maximum = new decimal(new int[] {
@@ -922,7 +947,7 @@ namespace Foreman
             this.AssemblerTable.Controls.Add(this.SelectedAssemblerIcon, 2, 0);
             this.AssemblerTable.Controls.Add(this.SelectedFuelIcon, 2, 2);
             this.AssemblerTable.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerTable.Location = new System.Drawing.Point(3, 85);
+            this.AssemblerTable.Location = new System.Drawing.Point(3, 89);
             this.AssemblerTable.Name = "AssemblerTable";
             this.AssemblerTable.RowCount = 6;
             this.AssemblerTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -1111,6 +1136,7 @@ namespace Foreman
             this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.RateOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+            this.RateOptionsTable.Controls.Add(this.QualitySelectorLabel, 1, 2);
             this.RateOptionsTable.Controls.Add(this.KeyNodeTitleInput, 2, 1);
             this.RateOptionsTable.Controls.Add(this.KeyNodeCheckBox, 0, 1);
             this.RateOptionsTable.Controls.Add(this.AssemblerRateLabel, 0, 0);
@@ -1119,6 +1145,7 @@ namespace Foreman
             this.RateOptionsTable.Controls.Add(this.FixedAssemblerInput, 4, 0);
             this.RateOptionsTable.Controls.Add(this.LowPriorityCheckBox, 0, 2);
             this.RateOptionsTable.Controls.Add(this.KeyNodeTitleLabel, 1, 1);
+            this.RateOptionsTable.Controls.Add(this.QualitySelector, 2, 2);
             this.RateOptionsTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.RateOptionsTable.Location = new System.Drawing.Point(3, 3);
             this.RateOptionsTable.Name = "RateOptionsTable";
@@ -1126,8 +1153,20 @@ namespace Foreman
             this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.RateOptionsTable.Size = new System.Drawing.Size(466, 76);
+            this.RateOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.RateOptionsTable.Size = new System.Drawing.Size(466, 80);
             this.RateOptionsTable.TabIndex = 18;
+            // 
+            // QualitySelectorLabel
+            // 
+            this.QualitySelectorLabel.AutoSize = true;
+            this.QualitySelectorLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.QualitySelectorLabel.Location = new System.Drawing.Point(212, 53);
+            this.QualitySelectorLabel.Name = "QualitySelectorLabel";
+            this.QualitySelectorLabel.Size = new System.Drawing.Size(42, 27);
+            this.QualitySelectorLabel.TabIndex = 26;
+            this.QualitySelectorLabel.Text = "Quality:";
+            this.QualitySelectorLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // KeyNodeTitleInput
             // 
@@ -1146,7 +1185,7 @@ namespace Foreman
             this.KeyNodeCheckBox.Location = new System.Drawing.Point(23, 31);
             this.KeyNodeCheckBox.Margin = new System.Windows.Forms.Padding(23, 5, 3, 5);
             this.KeyNodeCheckBox.Name = "KeyNodeCheckBox";
-            this.KeyNodeCheckBox.Size = new System.Drawing.Size(195, 17);
+            this.KeyNodeCheckBox.Size = new System.Drawing.Size(183, 17);
             this.KeyNodeCheckBox.TabIndex = 22;
             this.KeyNodeCheckBox.Text = "Key Node";
             this.KeyNodeCheckBox.UseVisualStyleBackColor = true;
@@ -1166,7 +1205,7 @@ namespace Foreman
             this.LowPriorityCheckBox.Location = new System.Drawing.Point(23, 56);
             this.LowPriorityCheckBox.Margin = new System.Windows.Forms.Padding(23, 3, 3, 3);
             this.LowPriorityCheckBox.Name = "LowPriorityCheckBox";
-            this.LowPriorityCheckBox.Size = new System.Drawing.Size(195, 17);
+            this.LowPriorityCheckBox.Size = new System.Drawing.Size(183, 21);
             this.LowPriorityCheckBox.TabIndex = 5;
             this.LowPriorityCheckBox.Text = "Low Priority Recipe";
             this.LowPriorityCheckBox.UseVisualStyleBackColor = true;
@@ -1175,34 +1214,23 @@ namespace Foreman
             // 
             this.KeyNodeTitleLabel.AutoSize = true;
             this.KeyNodeTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.KeyNodeTitleLabel.Location = new System.Drawing.Point(224, 26);
+            this.KeyNodeTitleLabel.Location = new System.Drawing.Point(212, 26);
             this.KeyNodeTitleLabel.Name = "KeyNodeTitleLabel";
-            this.KeyNodeTitleLabel.Size = new System.Drawing.Size(30, 27);
+            this.KeyNodeTitleLabel.Size = new System.Drawing.Size(42, 27);
             this.KeyNodeTitleLabel.TabIndex = 24;
             this.KeyNodeTitleLabel.Text = "Title:";
             this.KeyNodeTitleLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // AssemblerQualityTitleLabel
+            // QualitySelector
             // 
-            this.AssemblerQualityTitleLabel.AutoSize = true;
-            this.AssemblerQualityTitleLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerQualityTitleLabel.Location = new System.Drawing.Point(1, 61);
-            this.AssemblerQualityTitleLabel.Margin = new System.Windows.Forms.Padding(1);
-            this.AssemblerQualityTitleLabel.Name = "AssemblerQualityTitleLabel";
-            this.AssemblerQualityTitleLabel.Size = new System.Drawing.Size(100, 18);
-            this.AssemblerQualityTitleLabel.TabIndex = 19;
-            this.AssemblerQualityTitleLabel.Text = "Quality:";
-            // 
-            // AssemblerQualityPercentLabel
-            // 
-            this.AssemblerQualityPercentLabel.AutoSize = true;
-            this.AssemblerQualityPercentLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AssemblerQualityPercentLabel.Location = new System.Drawing.Point(103, 61);
-            this.AssemblerQualityPercentLabel.Margin = new System.Windows.Forms.Padding(1, 1, 5, 1);
-            this.AssemblerQualityPercentLabel.Name = "AssemblerQualityPercentLabel";
-            this.AssemblerQualityPercentLabel.Size = new System.Drawing.Size(45, 18);
-            this.AssemblerQualityPercentLabel.TabIndex = 20;
-            this.AssemblerQualityPercentLabel.Text = "0%";
+            this.RateOptionsTable.SetColumnSpan(this.QualitySelector, 3);
+            this.QualitySelector.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.QualitySelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.QualitySelector.FormattingEnabled = true;
+            this.QualitySelector.Location = new System.Drawing.Point(260, 56);
+            this.QualitySelector.Name = "QualitySelector";
+            this.QualitySelector.Size = new System.Drawing.Size(203, 21);
+            this.QualitySelector.TabIndex = 25;
             // 
             // ToolTip
             // 
@@ -1225,7 +1253,7 @@ namespace Foreman
             this.DoubleBuffered = true;
             this.ForeColor = System.Drawing.Color.White;
             this.Name = "EditRecipePanel";
-            this.Size = new System.Drawing.Size(472, 685);
+            this.Size = new System.Drawing.Size(472, 689);
             this.AssemblerInfoTable.ResumeLayout(false);
             this.AssemblerInfoTable.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NeighbourInput)).EndInit();
@@ -1345,5 +1373,7 @@ namespace Foreman
 		private System.Windows.Forms.Label KeyNodeTitleLabel;
         private System.Windows.Forms.Label AssemblerQualityPercentLabel;
         private System.Windows.Forms.Label AssemblerQualityTitleLabel;
+        private System.Windows.Forms.Label QualitySelectorLabel;
+        private System.Windows.Forms.ComboBox QualitySelector;
     }
 }

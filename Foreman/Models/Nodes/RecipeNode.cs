@@ -966,8 +966,12 @@ namespace Foreman
 
 			//check for invalid modules
 			for (int i = MyNode.AssemblerModules.Count - 1; i >= 0; i--)
-				if (MyNode.AssemblerModules[i].Module.IsMissing || !MyNode.SelectedAssembler.Assembler.Modules.Contains(MyNode.AssemblerModules[i].Module) || !MyNode.BaseRecipe.Recipe.Modules.Contains(MyNode.AssemblerModules[i].Module))
-					MyNode.AssemblerModulesRemoveAt(i);
+				if (MyNode.AssemblerModules[i].Module.IsMissing ||
+					!MyNode.SelectedAssembler.Assembler.Modules.Contains(MyNode.AssemblerModules[i].Module) ||
+					!MyNode.BaseRecipe.Recipe.Modules.Contains(MyNode.AssemblerModules[i].Module) ||
+					!MyNode.AssemblerModules[i].Quality.Available ||
+					MyNode.AssemblerModules[i].Quality.IsMissing)
+				{ MyNode.AssemblerModulesRemoveAt(i); }
 
 			//check for too many modules
 			while (MyNode.AssemblerModules.Count > MyNode.SelectedAssembler.Assembler.ModuleSlots)
@@ -1053,7 +1057,7 @@ namespace Foreman
 					!MyNode.BaseRecipe.Recipe.Modules.Contains(MyNode.BeaconModules[i].Module) ||
 					!MyNode.SelectedBeacon.Beacon.Modules.Contains(MyNode.BeaconModules[i].Module) ||
 					!MyNode.BeaconModules[i].Quality.Available ||
-					!MyNode.BeaconModules[i].Quality.IsMissing)
+					MyNode.BeaconModules[i].Quality.IsMissing)
 				{ MyNode.BeaconModulesRemoveAt(i); }
 			}
 			//check for too many modules

@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Google.OrTools.LinearSolver;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Dynamic;
 using System.Linq;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace Foreman
 {
@@ -30,11 +33,14 @@ namespace Foreman
 		private double RateMultiplier { get { return myGraphViewer.Graph.GetRateMultipler(); } }
 		private string RateName { get { return myGraphViewer.Graph.GetRateName(); } }
 
+		private List<Quality> qualitySelectorIndexSet;
+
 		public EditRecipePanel(ReadOnlyRecipeNode node, ProductionGraphViewer graphViewer)
 		{
 			nodeData = node;
 			nodeController = (RecipeNodeController)graphViewer.Graph.RequestNodeController(node);
 			myGraphViewer = graphViewer;
+			qualitySelectorIndexSet = new List<Quality>();
 
 			InitializeComponent();
 			SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
@@ -49,7 +55,18 @@ namespace Foreman
 
 			FixedAssemblerInput.Maximum = (decimal)(node.MaxDesiredSetValue);
 
-			if (nodeData.BeaconCount % 1 != 0) BeaconCountInput.DecimalPlaces = 1;
+			foreach (Quality quality in graphViewer.DCache.AvailableQualities.Where(q => q.Enabled))
+			{
+				QualitySelector.Items.Add(quality.FriendlyName);
+				qualitySelectorIndexSet.Add(quality);
+			}
+
+            if (QualitySelector.Items.Count == 1)
+                QualitySelector.Enabled = false;
+			Quality defQuality = graphViewer.Graph.DefaultAssemblerQuality;
+			QualitySelector.SelectedIndex = (qualitySelectorIndexSet.IndexOf(defQuality) == -1) ? 0 : qualitySelectorIndexSet.IndexOf(defQuality);
+
+            if (nodeData.BeaconCount % 1 != 0) BeaconCountInput.DecimalPlaces = 1;
 			BeaconCountInput.Value = Math.Min(BeaconCountInput.Maximum, (decimal)nodeData.BeaconCount);
 			BeaconsPerAssemblerInput.Value = Math.Min(BeaconsPerAssemblerInput.Maximum, (decimal)nodeData.BeaconsPerAssembler);
 			ConstantBeaconInput.Value = Math.Min(ConstantBeaconInput.Maximum, (decimal)nodeData.BeaconsConst);
@@ -104,9 +121,12 @@ namespace Foreman
 			BeaconCountInput.ValueChanged += BeaconInput_ValueChanged;
 			BeaconsPerAssemblerInput.ValueChanged += BeaconInput_ValueChanged;
 			ConstantBeaconInput.ValueChanged += BeaconInput_ValueChanged;
-		}
 
-		private void OptionsPanel_MouseWheel(object sender, MouseEventArgs e)
+            QualitySelector.SelectedIndexChanged += QualitySelector_SelectedIndexChanged;
+
+        }
+
+        private void OptionsPanel_MouseWheel(object sender, MouseEventArgs e)
 		{
 			//had to set up this slightly convoluted scrolling option to account for mouse wheel events being WAY too fast -> it would skip from start to end in a single tick, potentially missing out several lines worth of items.
 			Panel sPanel = sender as Panel;
@@ -142,7 +162,7 @@ namespace Foreman
 			AssemblerOptions.Clear();
 			foreach (Assembler assembler in nodeData.BaseRecipe.Recipe.Assemblers.Where(a => a.Enabled))
 			{
-				Button button = InitializeBaseButton(assembler);
+				Button button = InitializeBaseButton(assembler, qualitySelectorIndexSet[QualitySelector.SelectedIndex]);
 				button.Click += new EventHandler(AssemblerButton_Click);
 
 				AssemblerChoiceTable.Controls.Add(button, AssemblerOptions.Count % (AssemblerChoiceTable.ColumnCount - 1), AssemblerOptions.Count / (AssemblerChoiceTable.ColumnCount - 1));
@@ -156,7 +176,7 @@ namespace Foreman
 		{
 			//assembler button colors
 			foreach (Button abutton in AssemblerOptions)
-				abutton.BackColor = ((Assembler)abutton.Tag == nodeData.SelectedAssembler.Assembler) ? SelectedColor : (((Assembler)abutton.Tag).IsMissing || !((Assembler)abutton.Tag).Available) ? ErrorColor : AssemblerChoiceTable.BackColor;
+				abutton.BackColor = ((Assembler)abutton.Tag == nodeData.SelectedAssembler.Assembler && qualitySelectorIndexSet[QualitySelector.SelectedIndex] == nodeData.SelectedAssembler.Quality) ? SelectedColor : (((Assembler)abutton.Tag).IsMissing || !((Assembler)abutton.Tag).Available) ? ErrorColor : AssemblerChoiceTable.BackColor;
 
 			//neighbour count panel
 			if (nodeData.SelectedAssembler.Assembler.EntityType != EntityType.Reactor)
@@ -203,7 +223,7 @@ namespace Foreman
 			FuelOptions.Clear();
 			foreach (Item fuel in fuels)
 			{
-				Button button = InitializeBaseButton(fuel);
+				Button button = InitializeBaseButton(fuel, myGraphViewer.DCache.DefaultQuality);
 				button.Click += new EventHandler(FuelButton_Click);
 
 				FuelOptionsTable.Controls.Add(button, FuelOptions.Count % (FuelOptionsTable.ColumnCount - 1), FuelOptions.Count / (FuelOptionsTable.ColumnCount - 1));
@@ -232,7 +252,7 @@ namespace Foreman
 			AModuleOptions.Clear();
 			for (int i = 0; i < moduleOptions.Count; i++)
 			{
-				Button button = InitializeBaseButton(moduleOptions[i]);
+				Button button = InitializeBaseButton(moduleOptions[i], qualitySelectorIndexSet[QualitySelector.SelectedIndex]);
 				if (!moduleOptions[i].Available)
 					button.BackColor = ErrorColor;
 
@@ -257,7 +277,7 @@ namespace Foreman
 			AssemblerModules.Clear();
 			for (int i = 0; i < nodeData.AssemblerModules.Count; i++)
 			{
-				Button button = InitializeBaseButton(nodeData.AssemblerModules[i].Module);
+				Button button = InitializeBaseButton(nodeData.AssemblerModules[i].Module, nodeData.AssemblerModules[i].Quality);
 				if (nodeData.AssemblerModules[i].Module.IsMissing || !nodeData.AssemblerModules[i].Module.Available || !nodeData.AssemblerModules[i].Module.Enabled || !moduleOptions.Contains(nodeData.AssemblerModules[i].Module) || i >= nodeData.SelectedAssembler.Assembler.ModuleSlots)
 					button.BackColor = ErrorColor;
 				button.MouseUp += new MouseEventHandler(AModuleButton_Click);
@@ -277,7 +297,7 @@ namespace Foreman
 			BeaconOptions.Clear();
 			foreach (Beacon beacon in myGraphViewer.DCache.Beacons.Values.Where(b => b.Enabled))
 			{
-				Button button = InitializeBaseButton(beacon);
+				Button button = InitializeBaseButton(beacon, qualitySelectorIndexSet[QualitySelector.SelectedIndex]);
 				button.Click += new EventHandler(BeaconButton_Click);
 
 				BeaconChoiceTable.Controls.Add(button, BeaconOptions.Count % (BeaconChoiceTable.ColumnCount - 1), BeaconOptions.Count / (BeaconChoiceTable.ColumnCount - 1));
@@ -290,7 +310,7 @@ namespace Foreman
 		private void UpdateBeacon()
 		{
 			foreach (Button bbutton in BeaconOptions)
-				bbutton.BackColor = (((Beacon)bbutton.Tag) == nodeData.SelectedBeacon.Beacon) ? SelectedColor : (((Beacon)bbutton.Tag).IsMissing || !((Beacon)bbutton.Tag).Available) ? ErrorColor : BeaconChoiceTable.BackColor;
+				bbutton.BackColor = (((Beacon)bbutton.Tag) == nodeData.SelectedBeacon.Beacon && qualitySelectorIndexSet[QualitySelector.SelectedIndex] == nodeData.SelectedBeacon.Quality) ? SelectedColor : (((Beacon)bbutton.Tag).IsMissing || !((Beacon)bbutton.Tag).Available) ? ErrorColor : BeaconChoiceTable.BackColor;
 
 			//modules panel
 			List<Module> moduleOptions = nodeData.SelectedBeacon.Beacon == null ? new List<Module>() : nodeData.BaseRecipe.Recipe.Modules.Intersect(nodeData.SelectedAssembler.Assembler.Modules).Intersect(nodeData.SelectedBeacon.Beacon.Modules).OrderBy(m => m.LFriendlyName).ToList();
@@ -319,7 +339,7 @@ namespace Foreman
 			BModuleOptions.Clear();
 			for (int i = 0; i < moduleOptions.Count; i++)
 			{
-				Button button = InitializeBaseButton(moduleOptions[i]);
+				Button button = InitializeBaseButton(moduleOptions[i], qualitySelectorIndexSet[QualitySelector.SelectedIndex]);
 				if (!moduleOptions[i].Available)
 					button.BackColor = ErrorColor;
 
@@ -345,7 +365,7 @@ namespace Foreman
 			BeaconModules.Clear();
 			for (int i = 0; i < nodeData.BeaconModules.Count; i++)
 			{
-				Button button = InitializeBaseButton(nodeData.BeaconModules[i].Module);
+				Button button = InitializeBaseButton(nodeData.BeaconModules[i].Module, nodeData.BeaconModules[i].Quality);
 				if (nodeData.BeaconModules[i].Module.IsMissing || !nodeData.BeaconModules[i].Module.Available || !nodeData.BeaconModules[i].Module.Enabled || !moduleOptions.Contains(nodeData.BeaconModules[i].Module) || i >= moduleSlots)
 					button.BackColor = ErrorColor;
 				button.MouseUp += new MouseEventHandler(BModuleButton_Click);
@@ -427,13 +447,13 @@ namespace Foreman
 
 		//------------------------------------------------------------------------------------------------------Helper functions
 
-		private Button InitializeBaseButton(DataObjectBase obj)
+		private Button InitializeBaseButton(DataObjectBase obj, Quality quality)
 		{
 			NFButton button = new NFButton();
 			//button.BackColor = RecipeNode.SelectedAssembler == assembler? Color.DarkOrange : assembler.Available? Color.Gray : Color.DarkRed;
 			button.ForeColor = Color.Gray;
 			button.BackgroundImageLayout = ImageLayout.Zoom;
-			button.BackgroundImage = obj.Icon;
+			button.BackgroundImage = quality == myGraphViewer.DCache.DefaultQuality? obj.Icon : IconCacheProcessor.CombinedQualityIcon(obj.Icon, quality.Icon);
 			button.UseVisualStyleBackColor = false;
 			button.FlatStyle = FlatStyle.Flat;
 			button.FlatAppearance.BorderSize = 0;
@@ -480,7 +500,7 @@ namespace Foreman
 		private void AssemblerButton_Click(object sender, EventArgs e)
 		{
 			Assembler newAssembler = ((Button)sender).Tag as Assembler;
-			Quality quality = newAssembler.Owner.DefaultQuality; //QUALITY
+			Quality quality = qualitySelectorIndexSet[QualitySelector.SelectedIndex];
 			nodeController.SetAssembler(new AssemblerQualityPair(newAssembler, quality));
 			myGraphViewer.Graph.UpdateNodeValues();
 			UpdateAssembler();
@@ -517,9 +537,9 @@ namespace Foreman
 				return;
 
 			Module newModule = ((Button)sender).Tag as Module;
-			Quality quality = newModule.Owner.DefaultQuality; //QUALITY
+            Quality quality = qualitySelectorIndexSet[QualitySelector.SelectedIndex];
 
-			if (e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left)
 				nodeController.AddAssemblerModule(new ModuleQualityPair(newModule, quality));
 			else if (e.Button == MouseButtons.Right)
 				nodeController.AddAssemblerModules(new ModuleQualityPair(newModule, quality));
@@ -532,8 +552,8 @@ namespace Foreman
 		private void BeaconButton_Click(object sender, EventArgs e)
 		{
 			Beacon newBeacon = ((Button)sender).Tag as Beacon;
-			Quality quality = newBeacon.Owner.DefaultQuality;
-			BeaconQualityPair newBeaconQP = new BeaconQualityPair(newBeacon, quality);
+            Quality quality = qualitySelectorIndexSet[QualitySelector.SelectedIndex];
+            BeaconQualityPair newBeaconQP = new BeaconQualityPair(newBeacon, quality);
 
 			if (nodeData.SelectedBeacon == newBeaconQP)
 				nodeController.ClearBeacon();
@@ -566,9 +586,9 @@ namespace Foreman
 				return;
 
 			Module newModule = ((Button)sender).Tag as Module;
-			Quality quality = newModule.Owner.DefaultQuality;
+            Quality quality = qualitySelectorIndexSet[QualitySelector.SelectedIndex];
 
-			if (e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left)
 				nodeController.AddBeaconModule(new ModuleQualityPair(newModule, quality));
 			else if (e.Button == MouseButtons.Right)
 				nodeController.AddBeaconModules(new ModuleQualityPair(newModule, quality));
@@ -719,5 +739,15 @@ namespace Foreman
 			SetBeaconValues(sender == BeaconCountInput);
 			UpdateFixedFlowInputDecimals(sender as NumericUpDown, 2);
 		}
-	}
+
+        private void QualitySelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+			SetupAssemblerOptions();
+			SetupAssemblerModuleOptions();
+			SetupBeaconOptions();
+			SetupBeaconModuleOptions();
+
+			myGraphViewer.Graph.DefaultAssemblerQuality = qualitySelectorIndexSet[QualitySelector.SelectedIndex];
+        }
+    }
 }
