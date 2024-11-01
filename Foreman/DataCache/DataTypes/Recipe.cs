@@ -23,7 +23,7 @@ namespace Foreman
 
         double MaxProductivityBonus { get; }
 
-		IReadOnlyDictionary<Item, double> ProductSet { get; }
+        IReadOnlyDictionary<Item, double> ProductSet { get; }
 		IReadOnlyDictionary<Item, double> ProductPSet { get; } //extra productivity amounts [ actual amount = productSet + (productPSet * productivity bonus) ]
 		IReadOnlyList<Item> ProductList { get; }
 		IReadOnlyDictionary<Item, double> ProductTemperatureMap { get; }
@@ -52,7 +52,7 @@ namespace Foreman
 
 		public double Time { get; internal set; }
 
-		public IReadOnlyDictionary<Item, double> ProductSet { get { return productSet; } }
+        public IReadOnlyDictionary<Item, double> ProductSet { get { return productSet; } }
 		public IReadOnlyDictionary<Item, double> ProductPSet { get { return productPSet; } }
 		public IReadOnlyList<Item> ProductList { get { return productList; } }
 		public IReadOnlyDictionary<Item, double> ProductTemperatureMap { get { return productTemperatureMap; } }
@@ -67,7 +67,7 @@ namespace Foreman
 		public IReadOnlyCollection<Technology> MyUnlockTechnologies { get { return myUnlockTechnologies; } }
 		public IReadOnlyList<IReadOnlyList<Item>> MyUnlockSciencePacks { get; set; }
 
-		internal SubgroupPrototype mySubgroup;
+        internal SubgroupPrototype mySubgroup;
 
 		internal Dictionary<Item, double> productSet { get; private set; }
 		internal Dictionary<Item, double> productPSet { get; private set; }
@@ -131,7 +131,7 @@ namespace Foreman
 			MyUnlockSciencePacks = new List<List<Item>>();
 		}
 
-		public string GetIngredientFriendlyName(Item item)
+        public string GetIngredientFriendlyName(Item item)
 		{
 			if (IngredientSet.ContainsKey(item) && (item is Fluid fluid) && fluid.IsTemperatureDependent)
 				return fluid.GetTemperatureRangeFriendlyName(IngredientTemperatureMap[item]);

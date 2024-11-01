@@ -46,6 +46,7 @@ namespace Foreman
 
 		//missing objects are not linked properly and just have the minimal values necessary to function. They are just placeholders, and cant actually be added to graph except while importing. They are also not solved for.
 		public Subgroup MissingSubgroup { get { return missingSubgroup; } }
+		public IReadOnlyDictionary<string, Quality> MissingQualities { get { return missingQualities; } }
 		public IReadOnlyDictionary<string, Item> MissingItems { get { return missingItems; } }
 		public IReadOnlyDictionary<string, Assembler> MissingAssemblers { get { return missingAssemblers; } }
 		public IReadOnlyDictionary<string, Module> MissingModules { get { return missingModules; } }
@@ -54,6 +55,7 @@ namespace Foreman
 		public IReadOnlyDictionary<PlantShort, PlantProcess> MissingPlantProcesses { get { return missingPlantProcesses; } }
 
 		public Quality DefaultQuality { get; private set; }
+		public uint QualityMaxChainLength { get; private set; }
 		private Quality ErrorQuality;
 
 		public static Bitmap UnknownIcon { get { return IconCache.GetUnknownIcon(); } }
@@ -74,6 +76,7 @@ namespace Foreman
 		private List<Item> sciencePacks;
 		private Dictionary<Item, ICollection<Item>> sciencePackPrerequisites;
 
+		private Dictionary<string, Quality> missingQualities;
 		private Dictionary<string, Item> missingItems;
 		private Dictionary<string, Assembler> missingAssemblers;
 		private Dictionary<string, Module> missingModules;
@@ -130,6 +133,7 @@ namespace Foreman
 			sciencePacks = new List<Item>();
 			sciencePackPrerequisites = new Dictionary<Item, ICollection<Item>>();
 
+			missingQualities = new Dictionary<string, Quality>();
 			missingItems = new Dictionary<string, Item>();
 			missingAssemblers = new Dictionary<string, Assembler>();
 			missingModules = new Dictionary<string, Module>();
@@ -143,7 +147,7 @@ namespace Foreman
 
 		private void GenerateHelperObjects()
 		{
-			startingTech = new TechnologyPrototype(this, "§§t:starting_tech", "Starting Technology");
+            startingTech = new TechnologyPrototype(this, "§§t:starting_tech", "Starting Technology");
 			startingTech.Tier = 0;
 
 			extraFormanGroup = new GroupPrototype(this, "§§g:extra_group", "Resource Extraction\nPower Generation\nRocket Launches", "~~~z1");
@@ -173,7 +177,7 @@ namespace Foreman
 			rocketLaunchSubgroup.myGroup = extraFormanGroup;
 			extraFormanGroup.subgroups.Add(rocketLaunchSubgroup);
 
-			ErrorQuality = new QualityPrototype(this, "§§error_quality", "ERROR", "-");
+            ErrorQuality = new QualityPrototype(this, "§§error_quality", "ERROR", "-");
 
 			IconColorPair heatIcon = new IconColorPair(IconCache.GetIcon(Path.Combine("Graphics", "HeatIcon.png"), 64), Color.DarkRed);
 			IconColorPair burnerGeneratorIcon = new IconColorPair(IconCache.GetIcon(Path.Combine("Graphics", "BurnerGeneratorIcon.png"), 64), Color.DarkRed);
@@ -249,7 +253,7 @@ namespace Foreman
 					ProcessQuality(objToken, iconCache, nextQualities);
 				foreach (QualityPrototype quality in qualities.Values.Cast<QualityPrototype>())
 					ProcessQualityLink(quality, nextQualities);
-				ProcessDefaultQuality();
+				PostProcessQuality();
 
 				foreach (var objJToken in jsonData["fluids"].ToList())
 					ProcessFluid(objJToken, iconCache, fuelCategories);
@@ -405,7 +409,67 @@ namespace Foreman
 			}
 		}
 
-		public void ProcessImportedAssemblersSet(IEnumerable<string> assemblerNames)
+        public Dictionary<string, Quality> ProcessImportedQualitiesSet(IEnumerable<KeyValuePair<string, int>> qualityPairs)
+		{
+			//check that a quality exists in the set of qualities (missing or otherwise) that has the correct level; if not, make a new one
+			Dictionary<string, Quality> qualityMap = new Dictionary<string, Quality>();
+
+			foreach(var quality in qualityPairs)
+			{
+				//check quality sets for any direct matches (name & level)
+				if (qualities.Values.Any(q => q.Name == quality.Key && q.Level == quality.Value))
+				{
+					qualityMap.Add(quality.Key, qualities[quality.Key]);
+					continue;
+				}
+				else if (missingQualities.Values.Any(q => q.Name == quality.Key && q.Level == quality.Value))
+				{
+					qualityMap.Add(quality.Key, missingQualities[quality.Key]);
+					continue;
+				}
+
+                //check for any matching level quality in the base chain (starting from 'normal' and going until null)
+                Quality curQuality = DefaultQuality;
+                while (curQuality != null)
+                {
+					if (curQuality.Level == quality.Value)
+						break;
+                    curQuality = curQuality.NextQuality;
+                }
+				if (curQuality != null)
+				{
+					qualityMap.Add(quality.Key, curQuality);
+					continue;
+				}
+
+                //step 3: check if there is a quality of the same level
+                curQuality = Qualities.Values.FirstOrDefault(q => q.Level == quality.Value);
+                if (curQuality != null)
+				{
+					qualityMap.Add(quality.Key, curQuality);
+					continue;
+				}
+                curQuality = MissingQualities.Values.FirstOrDefault(q => q.Level == quality.Value);
+                if (curQuality != null)
+                {
+                    qualityMap.Add(quality.Key, curQuality);
+                    continue;
+                }
+
+				//step 4: no other option, make a new quality and add it to missing qualities
+				string missingQualityName = quality.Key;
+				while (qualities.ContainsKey(missingQualityName) || missingQualities.ContainsKey(missingQualityName))
+					missingQualityName += "_";
+
+				QualityPrototype missingQuality = new QualityPrototype(this, missingQualityName, quality.Key, "-", true);
+				missingQualities.Add(missingQuality.Name, missingQuality);
+				qualityMap.Add(quality.Key, curQuality);
+			}
+
+			return qualityMap;
+		}
+
+        public void ProcessImportedAssemblersSet(IEnumerable<string> assemblerNames)
 		{
 			foreach (string iAssembler in assemblerNames)
 			{
@@ -601,15 +665,15 @@ namespace Foreman
 			if (iconCache.ContainsKey((string)objJToken["icon_name"]))
 				quality.SetIconAndColor(iconCache[(string)objJToken["icon_name"]]);
 
-			quality.Enabled = false; //we will set the enabled qualities from default later
-			quality.Available = false;
+			quality.Available = !(bool)objJToken["hidden"];
+			quality.Enabled = quality.Available; //can be set via science packs, but this requires modifying datacache... so later
 
 			quality.Level = (int)objJToken["level"];
 			quality.BeaconPowerMultiplier = (double)objJToken["beacon_power_multiplier"];
 			quality.MiningDrillResourceDrainMultiplier = (double)objJToken["mining_drill_resource_drain_multiplier"];
-			quality.NextProbability = (double)objJToken["next_probability"];
+			quality.NextProbability = objJToken["next_probability"] != null? (double)objJToken["next_probability"] : 0;
 
-			if (objJToken["next"] != null)
+			if (quality.NextProbability != 0)
 				nextQualities.Add(quality, (string)objJToken["next"]);
 
 			qualities.Add(quality.Name, quality);
@@ -625,14 +689,33 @@ namespace Foreman
 			}
 		}
 
-		private void ProcessDefaultQuality()
+		private void PostProcessQuality()
 		{
+			//make sure that the default quality is always enabled & available
 			DefaultQuality = qualities.ContainsKey("normal") ? qualities["normal"] : ErrorQuality;
+			DefaultQuality.Enabled = true;
+			((QualityPrototype)DefaultQuality).Available = true;
+
+			//make available all qualities that are within the defaultquality chain
 			Quality cQuality = DefaultQuality;
-			while(cQuality != null)
+            while (cQuality != null)
+            {
+                ((QualityPrototype)cQuality).Available = cQuality.Enabled;
+                cQuality = cQuality.NextQuality;
+            }
+
+            Quality currentQuality;
+			uint currentChain;
+			foreach(Quality quality in qualities.Values)
 			{
-				((QualityPrototype)cQuality).Available = true;
-				cQuality =cQuality.NextQuality;
+				currentChain = 1;
+				currentQuality = quality;
+				while (currentQuality.NextQuality != null && currentQuality.NextProbability != 0)
+				{
+					currentChain++;
+					currentQuality = currentQuality.NextQuality;
+				}
+				QualityMaxChainLength = Math.Max(QualityMaxChainLength, currentChain);
 			}
 		}
 
@@ -759,11 +842,11 @@ namespace Foreman
 			else if (iconCache.ContainsKey((string)objJToken["icon_alt_name"]))
 				module.SetIconAndColor(iconCache[(string)objJToken["icon_alt_name"]]);
 
-			module.SpeedBonus = (double)objJToken["module_effects"]["speed"];
-			module.ProductivityBonus = (double)objJToken["module_effects"]["productivity"];
-			module.ConsumptionBonus = (double)objJToken["module_effects"]["consumption"];
-			module.PollutionBonus = (double)objJToken["module_effects"]["pollution"];
-			module.QualityBonus = (double)objJToken["module_effects"]["quality"];
+			module.SpeedBonus = Math.Truncate((double)objJToken["module_effects"]["speed"] * 100) / 100;
+			module.ProductivityBonus = Math.Truncate((double)objJToken["module_effects"]["productivity"] * 100) / 100;
+			module.ConsumptionBonus = Math.Truncate((double)objJToken["module_effects"]["consumption"] * 100) / 100;
+			module.PollutionBonus = Math.Truncate((double)objJToken["module_effects"]["pollution"] * 100) / 100;
+			module.QualityBonus = Math.Truncate((double)objJToken["module_effects"]["quality"] * 100) / 100;
 
 			module.Tier = (int)objJToken["tier"];
 			module.Category = (string)objJToken["category"];
@@ -1869,7 +1952,7 @@ namespace Foreman
 
 			rocketAssembler.Enabled = assemblers["rocket-silo"]?.Enabled?? false; //rocket assembler is set to enabled if rocket silo is enabled
 			rocketAssembler.Available = assemblers["rocket-silo"] != null; //override
-		}
+        }
 
 		private void CleanupGroups()
 		{

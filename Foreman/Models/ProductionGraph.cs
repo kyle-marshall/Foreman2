@@ -1,12 +1,15 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Google.OrTools.LinearSolver;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Foreman
 {
@@ -33,6 +36,8 @@ namespace Foreman
 			public List<ReadOnlyNodeLink> newLinks { get; private set; }
 			public NewNodeCollection() { newNodes = new List<ReadOnlyBaseNode>(); newLinks = new List<ReadOnlyNodeLink>(); }
 		}
+
+		//public DataCache DCache { get; private set; }
 
 		public enum RateUnit { Per1Sec, Per1Min, Per5Min, Per10Min, Per30Min, Per1Hour };//, Per6Hour, Per12Hour, Per24Hour }
 		public static readonly string[] RateUnitNames = new string[] { "1 sec", "1 min", "5 min", "10 min", "30 min", "1 hour" }; //, "6 hours", "12 hours", "24 hours" };
@@ -65,6 +70,27 @@ namespace Foreman
 		public IEnumerable<ReadOnlyBaseNode> Nodes { get { return nodes.Select(node => node.ReadOnlyNode); } }
 		public IEnumerable<ReadOnlyNodeLink> NodeLinks { get { return nodeLinks.Select(link => link.ReadOnlyLink); } }
 		public HashSet<int> SerializeNodeIdSet { get; set; } //if this isnt null then the serialized production graph will only contain these nodes (and links between them)
+
+		//editing this value will require the entire graph to be updated as any recipe nodes on it will possibly change the number of products and possibly cause a cascade of removed links
+		private uint maxQualitySteps;
+		public uint MaxQualitySteps
+		{
+			get { return maxQualitySteps; }
+			set
+			{
+				if (value != maxQualitySteps)
+				{
+					maxQualitySteps = value;
+					foreach(BaseNode node in nodes)
+					{
+						if (node is RecipeNode rnode)
+							rnode.UpdateInputsAndOutputs();
+					}
+				}
+			}
+		}
+
+		public Quality DefaultAssemblerQuality { get; set; }
 
 		public event EventHandler<NodeEventArgs> NodeAdded;
 		public event EventHandler<NodeEventArgs> NodeDeleted;
@@ -121,7 +147,7 @@ namespace Foreman
 
 		public BaseNodeController RequestNodeController(ReadOnlyBaseNode node) { if(roToNode.ContainsKey(node)) return roToNode[node].Controller; return null; }
 
-		public ReadOnlyConsumerNode CreateConsumerNode(Item item, Point location)
+		public ReadOnlyConsumerNode CreateConsumerNode(ItemQualityPair item, Point location)
 		{
 			ConsumerNode node = new ConsumerNode(this, lastNodeID++, item);
 			node.Location = location;
@@ -133,7 +159,7 @@ namespace Foreman
 			return (ReadOnlyConsumerNode)node.ReadOnlyNode;
 		}
 
-		public ReadOnlySupplierNode CreateSupplierNode(Item item, Point location)
+		public ReadOnlySupplierNode CreateSupplierNode(ItemQualityPair item, Point location)
 		{
 			SupplierNode node = new SupplierNode(this, lastNodeID++, item);
 			node.Location = location;
@@ -145,7 +171,7 @@ namespace Foreman
 			return (ReadOnlySupplierNode)node.ReadOnlyNode;
 		}
 
-		public ReadOnlyPassthroughNode CreatePassthroughNode(Item item, Point location)
+		public ReadOnlyPassthroughNode CreatePassthroughNode(ItemQualityPair item, Point location)
 		{
 			PassthroughNode node = new PassthroughNode(this, lastNodeID++, item);
 			node.Location = location;
@@ -158,7 +184,7 @@ namespace Foreman
 			return (ReadOnlyPassthroughNode)node.ReadOnlyNode;
 		}
 
-		public ReadOnlySpoilNode CreateSpoilNode(Item inputItem, Item outputItem, Point location)
+		public ReadOnlySpoilNode CreateSpoilNode(ItemQualityPair inputItem, Item outputItem, Point location)
 		{
 			SpoilNode node = new SpoilNode(this, lastNodeID++, inputItem, outputItem);
 			node.Location = location;
@@ -170,9 +196,9 @@ namespace Foreman
 			return (ReadOnlySpoilNode)node.ReadOnlyNode;
 		}
 
-        public ReadOnlyPlantNode CreatePlantNode(PlantProcess plantProcess, Point location)
+        public ReadOnlyPlantNode CreatePlantNode(PlantProcess plantProcess, Quality quality, Point location)
         {
-			PlantNode node = new PlantNode(this, lastNodeID++, plantProcess);
+			PlantNode node = new PlantNode(this, lastNodeID++, plantProcess, quality);
             node.Location = location;
             node.NodeDirection = DefaultNodeDirection;
             nodes.Add(node);
@@ -182,10 +208,10 @@ namespace Foreman
             return (ReadOnlyPlantNode)node.ReadOnlyNode;
         }
 
-        public ReadOnlyRecipeNode CreateRecipeNode(Recipe recipe, Point location) { return CreateRecipeNode(recipe, location, null); }
-		private ReadOnlyRecipeNode CreateRecipeNode(Recipe recipe, Point location, Action<RecipeNode> nodeSetupAction) //node setup action is used to populate the node prior to informing everyone of its creation
+        public ReadOnlyRecipeNode CreateRecipeNode(RecipeQualityPair recipe, Point location) { return CreateRecipeNode(recipe, location, null); }
+		private ReadOnlyRecipeNode CreateRecipeNode(RecipeQualityPair recipe, Point location, Action<RecipeNode> nodeSetupAction) //node setup action is used to populate the node prior to informing everyone of its creation
 		{
-			RecipeNode node = new RecipeNode(this, lastNodeID++, recipe);
+			RecipeNode node = new RecipeNode(this, lastNodeID++, recipe, DefaultAssemblerQuality);
 			node.Location = location;
 			node.NodeDirection = DefaultNodeDirection;
 			nodeSetupAction?.Invoke(node);
@@ -197,12 +223,12 @@ namespace Foreman
 			}
 			nodes.Add(node);
 			roToNode.Add(node.ReadOnlyNode, node);
-			node.UpdateState();
+			node.UpdateInputsAndOutputs();
 			NodeAdded?.Invoke(this, new NodeEventArgs(node.ReadOnlyNode));
 			return (ReadOnlyRecipeNode)node.ReadOnlyNode;
 		}
 
-		public ReadOnlyNodeLink CreateLink(ReadOnlyBaseNode supplier, ReadOnlyBaseNode consumer, Item item)
+		public ReadOnlyNodeLink CreateLink(ReadOnlyBaseNode supplier, ReadOnlyBaseNode consumer, ItemQualityPair item)
 		{
 			if (!roToNode.ContainsKey(supplier) || !roToNode.ContainsKey(consumer) || !supplier.Outputs.Contains(item) || !consumer.Inputs.Contains(item))
 				Trace.Fail(string.Format("Node link creation called with invalid parameters! consumer:{0}. supplier:{1}. item:{2}.", consumer.ToString(), supplier.ToString(), item.ToString()));
@@ -276,14 +302,14 @@ namespace Foreman
 				node.UpdateState(markAllAsDirty);
 		}
 
-		public IEnumerable<ReadOnlyBaseNode> GetSuppliers(Item item)
+		public IEnumerable<ReadOnlyBaseNode> GetSuppliers(ItemQualityPair item)
 		{
 			foreach (ReadOnlyBaseNode node in Nodes)
 				if (node.Outputs.Contains(item))
 					yield return node;
 		}
 
-		public IEnumerable<ReadOnlyBaseNode> GetConsumers(Item item)
+		public IEnumerable<ReadOnlyBaseNode> GetConsumers(ItemQualityPair item)
 		{
 			foreach (ReadOnlyBaseNode node in Nodes)
 				if (node.Inputs.Contains(item))
@@ -400,34 +426,59 @@ namespace Foreman
 			HashSet<PlantProcess> includedPlantProcesses = new HashSet<PlantProcess>();
 			HashSet<PlantProcess> includedMissingPlantProcesses = new HashSet<PlantProcess>(new PlantNaInPrComparer());
 
-			foreach (BaseNode node in includedNodes)
-			{
-				if (node is RecipeNode rnode)
+			HashSet<KeyValuePair<string, int>> includedQualities = new HashSet<KeyValuePair<string, int>>(); //name,level
+
+            foreach (BaseNode node in includedNodes)
+            {
+				switch(node)
 				{
-					if (rnode.BaseRecipe.IsMissing)
-						includedMissingRecipes.Add(rnode.BaseRecipe);
-					else
-						includedRecipes.Add(rnode.BaseRecipe);
+					case RecipeNode rnode:
+						if (rnode.BaseRecipe.Recipe.IsMissing)
+							includedMissingRecipes.Add(rnode.BaseRecipe.Recipe);
+						else
+							includedRecipes.Add(rnode.BaseRecipe.Recipe);
 
-					if (rnode.SelectedAssembler != null)
-						includedAssemblers.Add(rnode.SelectedAssembler.Name);
-					if (rnode.SelectedBeacon != null)
-						includedBeacons.Add(rnode.SelectedBeacon.Name);
-					includedModules.UnionWith(rnode.AssemblerModules.Select(m => m.Name));
-					includedModules.UnionWith(rnode.BeaconModules.Select(m => m.Name));
+						includedAssemblers.Add(rnode.SelectedAssembler.Assembler.Name);
 
+						if (rnode.SelectedBeacon.Beacon != null)
+							includedBeacons.Add(rnode.SelectedBeacon.Beacon.Name);
+
+						includedModules.UnionWith(rnode.AssemblerModules.Select(m => m.Module.Name));
+						includedModules.UnionWith(rnode.BeaconModules.Select(m => m.Module.Name));
+                    
+						includedQualities.Add(new KeyValuePair<string, int>(rnode.BaseRecipe.Quality.Name, rnode.BaseRecipe.Quality.Level));
+						includedQualities.Add(new KeyValuePair<string, int>(rnode.SelectedAssembler.Quality.Name, rnode.SelectedAssembler.Quality.Level));
+
+						if (rnode.SelectedBeacon.Beacon != null)
+							includedQualities.Add(new KeyValuePair<string, int>(rnode.BaseRecipe.Quality.Name, rnode.BaseRecipe.Quality.Level));
+
+						includedQualities.UnionWith(rnode.AssemblerModules.Select(m => new KeyValuePair<string, int>(m.Quality.Name, m.Quality.Level)));
+						includedQualities.UnionWith(rnode.BeaconModules.Select(m => new KeyValuePair<string, int>(m.Quality.Name, m.Quality.Level)));
+						break;
+					case PlantNode pnode:
+						if (pnode.BasePlantProcess.IsMissing)
+							includedMissingPlantProcesses.Add(pnode.BasePlantProcess);
+						else
+							includedPlantProcesses.Add(pnode.BasePlantProcess);
+						includedQualities.Add(new KeyValuePair<string, int>(pnode.Seed.Quality.Name, pnode.Seed.Quality.Level));
+                        break;
+                    case ConsumerNode cnode:
+                        includedQualities.Add(new KeyValuePair<string, int>(cnode.ConsumedItem.Quality.Name, cnode.ConsumedItem.Quality.Level));
+						break;
+					case SupplierNode snode:
+                        includedQualities.Add(new KeyValuePair<string, int>(snode.SuppliedItem.Quality.Name, snode.SuppliedItem.Quality.Level));
+                        break;
+					case PassthroughNode passnode:
+                        includedQualities.Add(new KeyValuePair<string, int>(passnode.PassthroughItem.Quality.Name, passnode.PassthroughItem.Quality.Level));
+						break;
+					case SpoilNode spoilnode:
+                        includedQualities.Add(new KeyValuePair<string, int>(spoilnode.InputItem.Quality.Name, spoilnode.InputItem.Quality.Level));
+						break;
 				}
-				if (node is PlantNode pnode)
-				{
-					if (pnode.BasePlantProcess.IsMissing)
-						includedMissingPlantProcesses.Add(pnode.BasePlantProcess);
-					else
-						includedPlantProcesses.Add(pnode.BasePlantProcess);
-				}
 
-				//these will process all inputs/outputs -> so fuel/burnt items are included automatically!
-				includedItems.UnionWith(node.Inputs.Select(i => i.Name));
-				includedItems.UnionWith(node.Outputs.Select(i => i.Name));
+                //these will process all inputs/outputs -> so fuel/burnt items are included automatically!
+                includedItems.UnionWith(node.Inputs.Select(i => i.Item.Name));
+				includedItems.UnionWith(node.Outputs.Select(i => i.Item.Name));
 			}
 			List<RecipeShort> includedRecipeShorts = includedRecipes.Select(recipe => new RecipeShort(recipe)).ToList();
 			includedRecipeShorts.AddRange(includedMissingRecipes.Select(recipe => new RecipeShort(recipe))); //add the missing after the regular, since when we compare saves to preset we will only check 1st recipe of its name (the non-missing kind then)
@@ -443,6 +494,8 @@ namespace Foreman
 			info.AddValue("Solver_PullOutputNodes", PullOutputNodes);
 			info.AddValue("Solver_PullOutputNodesPower", PullOutputNodesPower);
 			info.AddValue("Solver_LowPriorityPower", LowPriorityPower);
+			info.AddValue("MaxQualitySteps", MaxQualitySteps);
+			info.AddValue("DefaultQuality", DefaultAssemblerQuality.Name);
 
 			info.AddValue("IncludedItems", includedItems);
 			info.AddValue("IncludedRecipes", includedRecipeShorts);
@@ -450,6 +503,7 @@ namespace Foreman
             info.AddValue("IncludedAssemblers", includedAssemblers);
 			info.AddValue("IncludedModules", includedModules);
 			info.AddValue("IncludedBeacons", includedBeacons);
+			info.AddValue("IncludedQualities", includedQualities);
 
 			info.AddValue("Nodes", includedNodes);
 			info.AddValue("NodeLinks", includedLinks);
@@ -457,9 +511,9 @@ namespace Foreman
 
 		public NewNodeCollection InsertNodesFromJson(DataCache cache, JObject json) //cache is necessary since we will possibly be adding to mssing items/recipes
 		{
-			if (json["Version"] == null || (int)json["Version"] != Properties.Settings.Default.ForemanVersion || json["Object"] == null || (string)json["Object"] != "ProductionGraph")
+            if (json["Version"] == null || (int)json["Version"] != Properties.Settings.Default.ForemanVersion || json["Object"] == null || (string)json["Object"] != "ProductionGraph")
 			{
-				json = VersionUpdater.UpdateGraph(json);
+				json = VersionUpdater.UpdateGraph(json, cache);
 				if (json == null) //update failed
 					return new NewNodeCollection();
 			}
@@ -474,9 +528,11 @@ namespace Foreman
 				PullOutputNodes = (bool)json["Solver_PullOutputNodes"];
 				PullOutputNodesPower = (double)json["Solver_PullOutputNodesPower"];
 				LowPriorityPower = (double)json["Solver_LowPriorityPower"];
+				MaxQualitySteps = (uint)json["MaxQualitySteps"];
 
 				//check compliance on all items, assemblers, modules, beacons, and recipes (data-cache will take care of it) - this means add in any missing objects and handle multi-name recipes (there can be multiple versions of a missing recipe, each with identical names)
 				cache.ProcessImportedItemsSet(json["IncludedItems"].Select(t => (string)t));
+				Dictionary<string, Quality> qualityLinks = cache.ProcessImportedQualitiesSet(json["IncludedQualities"].Select(j => new KeyValuePair<string, int>((string)j["Key"], (int)j["Value"])));
 				cache.ProcessImportedAssemblersSet(json["IncludedAssemblers"].Select(t => (string)t));
 				cache.ProcessImportedModulesSet(json["IncludedModules"].Select(t => (string)t));
 				cache.ProcessImportedBeaconsSet(json["IncludedBeacons"].Select(t => (string)t));
@@ -490,50 +546,57 @@ namespace Foreman
 					string[] locationString = ((string)nodeJToken["Location"]).Split(',');
 					Point location = new Point(int.Parse(locationString[0]), int.Parse(locationString[1]));
 					string itemName; //just an early define
+					Quality quality; //early define
 
 					switch ((NodeType)(int)nodeJToken["NodeType"])
 					{
 						case NodeType.Consumer:
 							itemName = (string)nodeJToken["Item"];
+							quality = qualityLinks[(string)nodeJToken["BaseQuality"]];
 							if (cache.Items.ContainsKey(itemName))
-								newNode = roToNode[CreateConsumerNode(cache.Items[itemName], location)];
+								newNode = roToNode[CreateConsumerNode(new ItemQualityPair(cache.Items[itemName], quality), location)];
 							else
-								newNode = roToNode[CreateConsumerNode(cache.MissingItems[itemName], location)];
+								newNode = roToNode[CreateConsumerNode(new ItemQualityPair(cache.MissingItems[itemName], quality), location)];
 							newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
 							break;
 						case NodeType.Supplier:
 							itemName = (string)nodeJToken["Item"];
-							if (cache.Items.ContainsKey(itemName))
-								newNode = roToNode[CreateSupplierNode(cache.Items[itemName], location)];
+                            quality = qualityLinks[(string)nodeJToken["BaseQuality"]];
+                            if (cache.Items.ContainsKey(itemName))
+								newNode = roToNode[CreateSupplierNode(new ItemQualityPair(cache.Items[itemName], quality), location)];
 							else
-								newNode = roToNode[CreateSupplierNode(cache.MissingItems[itemName], location)];
+								newNode = roToNode[CreateSupplierNode(new ItemQualityPair(cache.MissingItems[itemName], quality), location)];
 							newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
 							break;
 						case NodeType.Passthrough:
 							itemName = (string)nodeJToken["Item"];
-							if (cache.Items.ContainsKey(itemName))
-								newNode = roToNode[CreatePassthroughNode(cache.Items[itemName], location)];
+                            quality = qualityLinks[(string)nodeJToken["BaseQuality"]];
+                            if (cache.Items.ContainsKey(itemName))
+								newNode = roToNode[CreatePassthroughNode(new ItemQualityPair(cache.Items[itemName], quality), location)];
 							else
-								newNode = roToNode[CreatePassthroughNode(cache.MissingItems[itemName], location)];
+								newNode = roToNode[CreatePassthroughNode(new ItemQualityPair(cache.MissingItems[itemName], quality), location)];
 							((PassthroughNode)newNode).SimpleDraw = (bool)nodeJToken["SDraw"];
 							newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
 							break;
 						case NodeType.Spoil:
 							itemName = (string)nodeJToken["InputItem"];
-							string outputItemName = (string)nodeJToken["OutputItem"];
+                            string outputItemName = (string)nodeJToken["OutputItem"];
+                            quality = qualityLinks[(string)nodeJToken["BaseQuality"]];
 							Item inputItem = cache.Items.ContainsKey(itemName) ? cache.Items[itemName] : cache.MissingItems[itemName];
 							Item outputItem = cache.Items.ContainsKey(outputItemName) ? cache.Items[outputItemName] : cache.MissingItems[outputItemName];
-							newNode = roToNode[CreateSpoilNode(inputItem, outputItem, location)];
+							newNode = roToNode[CreateSpoilNode(new ItemQualityPair(inputItem, quality), outputItem, location)];
 							newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
 							break;
 						case NodeType.Plant:
                             long pprocessID = (long)nodeJToken["PlantProcessID"];
-                            newNode = roToNode[CreatePlantNode(plantProcessLinks[pprocessID], location)];
+                            quality = qualityLinks[(string)nodeJToken["BaseQuality"]];
+                            newNode = roToNode[CreatePlantNode(plantProcessLinks[pprocessID], quality, location)];
                             newNodeCollection.newNodes.Add(newNode.ReadOnlyNode);
                             break;
 						case NodeType.Recipe:
 							long recipeID = (long)nodeJToken["RecipeID"];
-							newNode = roToNode[CreateRecipeNode(recipeLinks[recipeID], location, (rNode) =>
+							Quality recipeQuality = qualityLinks[(string)nodeJToken["RecipeQuality"]];
+							newNode = roToNode[CreateRecipeNode(new RecipeQualityPair(recipeLinks[recipeID], recipeQuality) , location, (rNode) =>
 							{
 								RecipeNodeController rNodeController = (RecipeNodeController)rNode.Controller;
 
@@ -543,17 +606,20 @@ namespace Foreman
 								rNode.ExtraProductivityBonus = (double)nodeJToken["ExtraProductivity"];
 
 								string assemblerName = (string)nodeJToken["Assembler"];
+								Quality assemblerQuality = qualityLinks[(string)nodeJToken["AssemblerQuality"]];
 								if (cache.Assemblers.ContainsKey(assemblerName))
-									rNodeController.SetAssembler(cache.Assemblers[assemblerName]);
+									rNodeController.SetAssembler(new AssemblerQualityPair(cache.Assemblers[assemblerName], assemblerQuality));
 								else
-									rNodeController.SetAssembler(cache.MissingAssemblers[assemblerName]);
+									rNodeController.SetAssembler(new AssemblerQualityPair(cache.MissingAssemblers[assemblerName], assemblerQuality));
 
-								foreach (string moduleName in nodeJToken["AssemblerModules"].Select(t => (string)t).ToList())
+								foreach (JToken module in nodeJToken["AssemblerModules"])
 								{
+									string moduleName = (string)module["Name"];
+									Quality moduleQuality = qualityLinks[(string)module["Quality"]];
 									if (cache.Modules.ContainsKey(moduleName))
-										rNodeController.AddAssemblerModule(cache.Modules[moduleName]);
+										rNodeController.AddAssemblerModule(new ModuleQualityPair(cache.Modules[moduleName], moduleQuality));
 									else
-										rNodeController.AddAssemblerModule(cache.MissingModules[moduleName]);
+										rNodeController.AddAssemblerModule(new ModuleQualityPair(cache.MissingModules[moduleName], moduleQuality));
 								}
 
 								if (nodeJToken["Fuel"] != null)
@@ -563,7 +629,7 @@ namespace Foreman
 									else
 										rNodeController.SetFuel(cache.MissingItems[(string)nodeJToken["Fuel"]]);
 								}
-								else if (rNode.SelectedAssembler.IsBurner) //and fuel is null... well - its the import. set it as null (and consider it an error)
+								else if (rNode.SelectedAssembler.Assembler.IsBurner) //and fuel is null... well - its the import. set it as null (and consider it an error)
 									rNodeController.SetFuel(null);
 
 								if (nodeJToken["Burnt"] != null)
@@ -582,17 +648,20 @@ namespace Foreman
 								if (nodeJToken["Beacon"] != null)
 								{
 									string beaconName = (string)nodeJToken["Beacon"];
+									Quality beaconQuality = qualityLinks[(string)nodeJToken["BeaconQuality"]];
 									if (cache.Beacons.ContainsKey(beaconName))
-										rNodeController.SetBeacon(cache.Beacons[beaconName]);
+										rNodeController.SetBeacon(new BeaconQualityPair(cache.Beacons[beaconName], beaconQuality));
 									else
-										rNodeController.SetBeacon(cache.MissingBeacons[beaconName]);
+										rNodeController.SetBeacon(new BeaconQualityPair(cache.MissingBeacons[beaconName], beaconQuality));
 
-									foreach (string moduleName in nodeJToken["BeaconModules"].Select(t => (string)t).ToList())
+									foreach (JToken module in nodeJToken["BeaconModules"])
 									{
-										if (cache.Modules.ContainsKey(moduleName))
-											rNodeController.AddBeaconModule(cache.Modules[moduleName]);
+                                        string moduleName = (string)module["Name"];
+                                        Quality moduleQuality = qualityLinks[(string)module["Quality"]];
+                                        if (cache.Modules.ContainsKey(moduleName))
+											rNodeController.AddBeaconModule(new ModuleQualityPair(cache.Modules[moduleName], moduleQuality));
 										else
-											rNodeController.AddBeaconModule(cache.MissingModules[moduleName]);
+											rNodeController.AddBeaconModule( new ModuleQualityPair(cache.MissingModules[moduleName], moduleQuality));
 									}
 
 									rNode.BeaconCount = (double)nodeJToken["BeaconCount"];
@@ -627,13 +696,14 @@ namespace Foreman
 				{
 					ReadOnlyBaseNode supplier = oldNodeIndices[(int)nodeLinkJToken["SupplierID"]];
 					ReadOnlyBaseNode consumer = oldNodeIndices[(int)nodeLinkJToken["ConsumerID"]];
-					Item item;
+					ItemQualityPair item;
+					Quality quality = qualityLinks[(string)nodeLinkJToken["Quality"]];
 
 					string itemName = (string)nodeLinkJToken["Item"];
 					if (cache.Items.ContainsKey(itemName))
-						item = cache.Items[itemName];
+						item = new ItemQualityPair(cache.Items[itemName], quality);
 					else
-						item = cache.MissingItems[itemName];
+						item = new ItemQualityPair(cache.MissingItems[itemName], quality);
 
 					if (LinkChecker.IsPossibleConnection(item, supplier, consumer)) //not necessary to test if connection is valid. It must be valid based on json
 						newNodeCollection.newLinks.Add(CreateLink(supplier, consumer, item));
@@ -641,6 +711,7 @@ namespace Foreman
 			}
 			catch (Exception e) //there was something wrong with the json (probably someone edited it by hand and it didnt link properly). Delete all added nodes and return empty
 			{
+				ErrorLogging.LogLine(string.Format("Error loading nodes into producton graph! ERROR: {0}", e));
 				Console.WriteLine(e);
 				DeleteNodes(newNodeCollection.newNodes);
 				return new NewNodeCollection();

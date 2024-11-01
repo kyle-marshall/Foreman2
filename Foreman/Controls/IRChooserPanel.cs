@@ -383,6 +383,11 @@ namespace Foreman
         {
 
         }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 
     public class ItemChooserPanel : IRChooserPanel
@@ -391,13 +396,32 @@ namespace Foreman
 
 		private ToolTip iToolTip = new CustomToolTip();
 		protected override ToolTip IRButtonToolTip { get { return iToolTip; } }
-		private Item selectedItem;
+		private ItemQualityPair selectedItem;
+		private DataCache DCache;
+
 		private HashSet<Item> requestedItemList;
 		private bool showAllItems;
 
-		public ItemChooserPanel(ProductionGraphViewer parent, Point originPoint, IReadOnlyCollection<Item> itemList = null) : base(parent, originPoint)
+		public ItemChooserPanel(ProductionGraphViewer parent, Point originPoint, IReadOnlyCollection<Item> itemList = null, Quality itemQuality = null) : base(parent, originPoint)
 		{
 			showAllItems = (itemList == null);
+			DCache = parent.DCache;
+
+			if (itemQuality == null)
+			{
+				QualitySelectorTable.Visible = true;
+				foreach (Quality quality in parent.DCache.AvailableQualities.Where(q => q.Enabled))
+					QualitySelector.Items.Add(quality.Name);
+
+                if (QualitySelector.Items.Count == 1)
+                    QualitySelector.Enabled = false;
+            } else
+			{
+				QualitySelector.Items.Add(itemQuality.Name);
+				QualitySelector.Enabled = false;
+			}
+			QualitySelector.SelectedIndex = 0;
+
 			if(!showAllItems)
 				requestedItemList = new HashSet<Item>(itemList);
 		}
@@ -405,7 +429,7 @@ namespace Foreman
 		protected override void IRChooserPanel_Disposed(object sender, EventArgs e)
 		{
 			base.IRChooserPanel_Disposed(sender, e);
-			if (selectedItem != null)
+			if (selectedItem.Item != null)
 				ItemRequested?.Invoke(this, new ItemRequestArgs(selectedItem));
 		}
 
@@ -513,7 +537,7 @@ namespace Foreman
 			if (e.Button == MouseButtons.Left)
 			{
 				panelCloseReason = ChooserPanelCloseReason.ItemSelected;
-                selectedItem = (Item)((Button)sender).Tag;
+                selectedItem = new ItemQualityPair((Item)((Button)sender).Tag, DCache.Qualities[(string)QualitySelector.Items[QualitySelector.SelectedIndex]]);
 				Dispose();
 			}
 		}
@@ -523,18 +547,37 @@ namespace Foreman
 	{
 		public event EventHandler<RecipeRequestArgs> RecipeRequested;
 
-		protected Item KeyItem;
-		protected fRange KeyItemTempRange;
+		protected ItemQualityPair KeyItem;
+        protected bool isDefaultQuality;
+        protected fRange KeyItemTempRange;
+		protected DataCache DCache;
 
 		private ToolTip rToolTip = new RecipeToolTip();
 		protected override ToolTip IRButtonToolTip { get { return rToolTip; } }
 
-		public RecipeChooserPanel(ProductionGraphViewer parent, Point originPoint, Item item, fRange tempRange, NewNodeType nodeType) : base(parent, originPoint)
+		public RecipeChooserPanel(ProductionGraphViewer parent, Point originPoint, ItemQualityPair item, fRange tempRange, NewNodeType nodeType) : base(parent, originPoint)
 		{
-			bool asIngredient = (nodeType == NewNodeType.Consumer || nodeType == NewNodeType.Disconnected);
+			DCache = parent.DCache;
+
+            if (item.Quality == null)
+            {
+                QualitySelectorTable.Visible = true;
+                foreach (Quality quality in parent.DCache.AvailableQualities.Where(q => q.Enabled))
+                    QualitySelector.Items.Add(quality.Name);
+
+				if (QualitySelector.Items.Count == 1)
+					QualitySelector.Enabled = false;
+            } else
+            {
+                QualitySelector.Items.Add(item.Quality.Name);
+                QualitySelector.Enabled = false;
+            }
+            QualitySelector.SelectedIndex = 0;
+
+            bool asIngredient = (nodeType == NewNodeType.Consumer || nodeType == NewNodeType.Disconnected);
 			bool asProduct = (nodeType == NewNodeType.Supplier || nodeType == NewNodeType.Disconnected);
 
-			AsIngredientCheckBox.Checked = asIngredient;
+            AsIngredientCheckBox.Checked = asIngredient;
 			AsProductCheckBox.Checked = asProduct;
 			ShowHiddenCheckBox.Text = "Show Disabled";
 
@@ -553,9 +596,10 @@ namespace Foreman
 
 			KeyItem = item;
 			KeyItemTempRange = (nodeType == NewNodeType.Disconnected) ? new fRange(0, 0, true) : tempRange; //cant use temp range if its a disconnected node
+			isDefaultQuality = KeyItem.Quality == null || KeyItem.Quality == DCache.DefaultQuality;
 
 			RecipeNameOnlyFilterCheckBox.Visible = true;
-			if (KeyItem == null)
+			if (KeyItem.Item == null)
 			{
 				OtherNodeOptionsATable.Visible = false;
 				OtherNodeOptionsBTable.Visible = false;
@@ -568,18 +612,18 @@ namespace Foreman
 				AddConsumerButton.Visible = asIngredient;
 				AddSupplyButton.Visible = asProduct;
 
-				OtherNodeOptionsBTable.Visible = true;
-				AddSpoilButton.Visible = asIngredient && KeyItem.SpoilResult != null;
-				AddUnspoilButton.Visible = asProduct && KeyItem.SpoilOrigins.Count > 0;
-				AddPlantButton.Visible = asIngredient && KeyItem.PlantResult != null;
-				AddUnplantButton.Visible = asProduct && KeyItem.PlantOrigins.Count > 0;
+                OtherNodeOptionsBTable.Visible = true;
+				AddSpoilButton.Visible = asIngredient && KeyItem.Item.SpoilResult != null;
+				AddUnspoilButton.Visible = asProduct && isDefaultQuality && KeyItem.Item.SpoilOrigins.Count > 0;
+				AddPlantButton.Visible = asIngredient && KeyItem.Item.PlantResult != null;
+				AddUnplantButton.Visible = asProduct && isDefaultQuality && KeyItem.Item.PlantOrigins.Count > 0;
 				int totalVisible = (AddSpoilButton.Visible ? 1 : 0) + (AddUnspoilButton.Visible ? 1 : 0) + (AddPlantButton.Visible ? 1 : 0) + (AddUnplantButton.Visible ? 1 : 0);
 				OtherNodeOptionsBTable.Visible = totalVisible > 0;
 
-				bool hasConsumptionRecipes = Properties.Settings.Default.ShowUnavailable? KeyItem.ConsumptionRecipes.Count > 0 : KeyItem.ConsumptionRecipes.Count(r => r.Available) > 0;
-				bool hasFuelConsumptionRecipes = KeyItem.FuelsEntities.FirstOrDefault(a => (a is Assembler assembler) && assembler.Enabled && assembler.Recipes.FirstOrDefault(r => r.Enabled) != null) != null;
-				bool hasProductionRecipes = Properties.Settings.Default.ShowUnavailable ? KeyItem.ProductionRecipes.Count > 0 : KeyItem.ProductionRecipes.Count(r => r.Available) > 0;
-				bool hasFuelProductionRecipes = (KeyItem.FuelOrigin != null && KeyItem.FuelOrigin.FuelsEntities.Any(a => (a is Assembler assembler) && assembler.Enabled && assembler.Recipes.Any(r => r.Enabled)));
+				bool hasConsumptionRecipes = Properties.Settings.Default.ShowUnavailable? KeyItem.Item.ConsumptionRecipes.Count > 0 : KeyItem.Item.ConsumptionRecipes.Count(r => r.Available) > 0;
+				bool hasFuelConsumptionRecipes = isDefaultQuality && (KeyItem.Item.FuelsEntities.FirstOrDefault(a => (a is Assembler assembler) && assembler.Enabled && assembler.Recipes.FirstOrDefault(r => r.Enabled) != null) != null);
+				bool hasProductionRecipes = Properties.Settings.Default.ShowUnavailable ? KeyItem.Item.ProductionRecipes.Count > 0 : KeyItem.Item.ProductionRecipes.Count(r => r.Available) > 0;
+				bool hasFuelProductionRecipes = isDefaultQuality && (KeyItem.Item.FuelOrigin != null && KeyItem.Item.FuelOrigin.FuelsEntities.Any(a => (a is Assembler assembler) && assembler.Enabled && assembler.Recipes.Any(r => r.Enabled)));
 
 				if (!(asIngredient && (hasConsumptionRecipes || hasFuelConsumptionRecipes)) && !(asProduct && (hasProductionRecipes || hasFuelProductionRecipes))) //no valid recipes
 				{
@@ -601,7 +645,7 @@ namespace Foreman
 				}
 				else if (asIngredient)
 				{
-					AsFuelCheckBox.Visible = (asIngredient && KeyItem.FuelsEntities.Count > 0);
+					AsFuelCheckBox.Visible = (asIngredient && KeyItem.Item.FuelsEntities.Count > 0);
 				}
 			}
 		}
@@ -630,8 +674,8 @@ namespace Foreman
 			bool showHidden = ShowHiddenCheckBox.Checked;
 			bool includeSuppliers = AsProductCheckBox.Checked;
 			bool includeConsumers = AsIngredientCheckBox.Checked;
-			bool includeFuel = AsFuelCheckBox.Checked;
-			bool ignoreItem = (KeyItem == null);
+			bool includeFuel = AsFuelCheckBox.Checked && isDefaultQuality;
+			bool ignoreItem = (KeyItem.Item == null);
 
 			Dictionary<Group, List<List<KeyValuePair<DataObjectBase, Color>>>> filteredRecipes = new Dictionary<Group, List<List<KeyValuePair<DataObjectBase, Color>>>>();
 			Dictionary<Group, int> filteredRecipeCount = new Dictionary<Group, int>();
@@ -644,10 +688,10 @@ namespace Foreman
 					List<KeyValuePair<DataObjectBase, Color>> recipeList = new List<KeyValuePair<DataObjectBase, Color>>();
 					//filter recipes... I tried to break up the filter into several parts to prevent this from being one GIANT '.where' call
 					foreach (Recipe recipe in sgroup.Recipes.Where(r => ignoreItem ||
-						(includeConsumers && r.IngredientSet.ContainsKey(KeyItem) && (KeyItemTempRange.Ignore || r.IngredientTemperatureMap[KeyItem].Contains(KeyItemTempRange))) || //consumers of item with temperature range containing required
-						(includeSuppliers && r.ProductSet.ContainsKey(KeyItem) && (KeyItemTempRange.Ignore || KeyItemTempRange.Contains(r.ProductTemperatureMap[KeyItem]))) || //producers of item with temperature within the temperature range
-						(includeConsumers && includeFuel && KeyItem.FuelsEntities.Count > 0 && r.Assemblers.Any(a => a.Fuels.Contains(KeyItem) && (a.Enabled || ignoreAssemblerStatus))) || //consumers of item (as fuel) -> have to check assembler status here for this specific assembler that accepts this fuel
-						(includeSuppliers && includeFuel && KeyItem.FuelOrigin != null && r.Assemblers.Any(a => a.Fuels.Contains(KeyItem.FuelOrigin) && (a.Enabled || ignoreAssemblerStatus))))) //producers of item (as fuel remains) -> check assembler status here as well for same reason
+						(includeConsumers && r.IngredientSet.ContainsKey(KeyItem.Item) && (KeyItemTempRange.Ignore || r.IngredientTemperatureMap[KeyItem.Item].Contains(KeyItemTempRange))) || //consumers of item with temperature range containing required
+						(includeSuppliers && r.ProductSet.ContainsKey(KeyItem.Item) && (KeyItemTempRange.Ignore || KeyItemTempRange.Contains(r.ProductTemperatureMap[KeyItem.Item]))) || //producers of item with temperature within the temperature range
+						(includeConsumers && includeFuel && KeyItem.Item.FuelsEntities.Count > 0 && r.Assemblers.Any(a => a.Fuels.Contains(KeyItem.Item) && (a.Enabled || ignoreAssemblerStatus))) || //consumers of item (as fuel) -> have to check assembler status here for this specific assembler that accepts this fuel
+						(includeSuppliers && includeFuel && KeyItem.Item.FuelOrigin != null && r.Assemblers.Any(a => a.Fuels.Contains(KeyItem.Item.FuelOrigin) && (a.Enabled || ignoreAssemblerStatus))))) //producers of item (as fuel remains) -> check assembler status here as well for same reason
 					{
 						//quick hidden / enabled / available assembler check (done prior to name check for speed)
 						if ((recipe.Enabled || showHidden) && (recipe.Assemblers.Any(a => a.Enabled) || ignoreAssemblerStatus) && (recipe.Available || ShowUnavailable))
@@ -703,7 +747,7 @@ namespace Foreman
 			if (e.Button == MouseButtons.Left) //select recipe
 			{
 				Recipe sRecipe = (Recipe)((Button)sender).Tag;
-                RecipeRequested?.Invoke(this, new RecipeRequestArgs((Recipe)((Button)sender).Tag));
+                RecipeRequested?.Invoke(this, new RecipeRequestArgs(new RecipeQualityPair((Recipe)((Button)sender).Tag, DCache.Qualities[(string)QualitySelector.SelectedItem] )));
 
 				if ((Control.ModifierKeys & Keys.Shift) != Keys.Shift)
 				{
@@ -765,7 +809,7 @@ namespace Foreman
 
         private void AddUnSpoilButton_Click(object sender, EventArgs e)
         {
-			if(KeyItem.SpoilOrigins.Count < 2)
+			if(KeyItem.Item.SpoilOrigins.Count < 2)
 			{
                 panelCloseReason = ChooserPanelCloseReason.AltNodeSelected;
 				RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Spoil, NodeDirection.Down));
@@ -792,7 +836,7 @@ namespace Foreman
 
         private void AddUnPlantButton_Click(object sender, EventArgs e)
         {
-            if (KeyItem.PlantOrigins.Count < 2)
+            if (KeyItem.Item.PlantOrigins.Count < 2)
             {
                 panelCloseReason = ChooserPanelCloseReason.AltNodeSelected;
                 RecipeRequested?.Invoke(this, new RecipeRequestArgs(NodeType.Plant, NodeDirection.Down));
@@ -824,23 +868,23 @@ namespace Foreman
 
 	public class RecipeRequestArgs : EventArgs
 	{
-		public Recipe Recipe;
+		public RecipeQualityPair Recipe;
 		public NodeType NodeType;
 		public NodeDirection Direction;
-		public RecipeRequestArgs(Recipe recipe) : this(NodeType.Recipe, recipe, NodeDirection.Down) { }
-        public RecipeRequestArgs(NodeType nodeType) : this(nodeType, null, NodeDirection.Down)
+		public RecipeRequestArgs(RecipeQualityPair recipe) : this(NodeType.Recipe, recipe, NodeDirection.Down) { }
+        public RecipeRequestArgs(NodeType nodeType) : this(nodeType, new RecipeQualityPair(null,null), NodeDirection.Down)
 		{
 			if(nodeType == NodeType.Recipe)
 				Trace.Fail("RecipeRequestArgs need a recipe for a recipe node request!");
             if (nodeType == NodeType.Spoil)
                 Trace.Fail("RecipeRequestArgs need a direction for a spoil node request!");
         }
-		public RecipeRequestArgs(NodeType nodeType, NodeDirection direction) : this(nodeType, null, direction)
+		public RecipeRequestArgs(NodeType nodeType, NodeDirection direction) : this(nodeType, new RecipeQualityPair(null, null), direction)
 		{
             if (nodeType != NodeType.Spoil && nodeType != NodeType.Plant)
                 Trace.Fail("RecipeRequestArgs with direction only supported for spoil & plant requests!");
         }
-        public RecipeRequestArgs(NodeType nodeType, Recipe recipe, NodeDirection direction)
+        public RecipeRequestArgs(NodeType nodeType, RecipeQualityPair recipe, NodeDirection direction)
 		{
 			Recipe = recipe;
 			NodeType = nodeType;
@@ -850,8 +894,8 @@ namespace Foreman
 
 	public class ItemRequestArgs : EventArgs
 	{
-		public Item Item;
-		public ItemRequestArgs(Item item) { Item = item; }
+		public ItemQualityPair Item;
+		public ItemRequestArgs(ItemQualityPair item) { Item = item; }
 	}
 
 	public class PanelChooserCloseArgs : EventArgs

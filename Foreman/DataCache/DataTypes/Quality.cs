@@ -11,7 +11,9 @@ namespace Foreman
         Quality PrevQuality { get; }
         double NextProbability { get; }
 
-        int Level { get; }
+        bool IsMissing { get; }
+
+        int Level { get; } //'power' of the quality
         double BeaconPowerMultiplier { get; }
         double MiningDrillResourceDrainMultiplier { get; }
 
@@ -23,13 +25,20 @@ namespace Foreman
         public Quality PrevQuality { get; internal set; }
         public double NextProbability { get; set; }
 
-        public int Level { get; set; }
+        public bool IsMissing { get; private set; }
+
+        public int Level { get; internal set; }
         public double BeaconPowerMultiplier { get; set; }
         public double MiningDrillResourceDrainMultiplier { get; set; }
 
-        public QualityPrototype(DataCache dCache, string name, string friendlyName, string order) : base(dCache, name, friendlyName, order)
+        public QualityPrototype(DataCache dCache, string name, string friendlyName, string order, bool isMissing = false) : base(dCache, name, friendlyName, order)
         {
             Enabled = true;
+            IsMissing = isMissing;
+
+            NextProbability = 0;
+            NextQuality = null;
+            PrevQuality = null;
 
             Level = 0;
             BeaconPowerMultiplier = 1;

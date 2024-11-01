@@ -207,12 +207,16 @@ local function ExportQuality()
 			tquality['name'] = quality.name
 			tquality['icon_name'] = 'icon.q.'..quality.name
 			tquality['order'] = quality.order
+			tquality['hidden'] = quality.hidden
 
 			tquality['level'] = quality.level
 			tquality['beacon_power_multiplier'] = quality.beacon_power_usage_multiplier
 			tquality['mining_drill_resource_drain_multiplier'] = quality.mining_drill_resource_drain_multiplier
-			tquality['next_probability'] = quality.next_probability
-			tquality['next'] = (quality.next ~= nil) and quality.next.name or nil
+
+			if quality.next_probability ~= 0 and quality.next ~= nil then
+				tquality['next_probability'] = quality.next_probability
+				tquality['next'] = (quality.next ~= nil) and quality.next.name or nil
+			end
 		
 			tquality['lid'] = '$'..localindex
 			ExportLocalisedString(quality.localised_name, localindex)

@@ -35,14 +35,10 @@ namespace Foreman
 			ItemTabElement oldTab = OutputTabs[0];
 			if (oldTab.Item != DisplayedNode.OutputItem)
 			{
-				foreach (ReadOnlyNodeLink link in DisplayedNode.OutputLinks)
-					graphViewer.Graph.DeleteLink(link);
 				OutputTabs.Clear();
 				oldTab.Dispose();
 
 				OutputTabs.Add(new ItemTabElement(DisplayedNode.OutputItem, LinkType.Output, graphViewer, this));
-
-				base.UpdateState();
 			}
 
             base.UpdateState();

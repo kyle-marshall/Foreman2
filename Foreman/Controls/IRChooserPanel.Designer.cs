@@ -35,7 +35,7 @@ namespace Foreman
             this.AddPlantButton = new System.Windows.Forms.Button();
             this.AddUnspoilButton = new System.Windows.Forms.Button();
             this.AddUnplantButton = new System.Windows.Forms.Button();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.TopOptionsTable = new System.Windows.Forms.TableLayoutPanel();
             this.ItemIconPanel = new System.Windows.Forms.Panel();
             this.RecipeNameOnlyFilterCheckBox = new System.Windows.Forms.CheckBox();
             this.FilterLabel = new System.Windows.Forms.Label();
@@ -46,6 +46,9 @@ namespace Foreman
             this.FilterTextBox = new System.Windows.Forms.TextBox();
             this.IgnoreAssemblerCheckBox = new System.Windows.Forms.CheckBox();
             this.ShowHiddenCheckBox = new System.Windows.Forms.CheckBox();
+            this.QualitySelectorTable = new System.Windows.Forms.TableLayoutPanel();
+            this.QualitySelector = new System.Windows.Forms.ComboBox();
+            this.QualityLabel = new System.Windows.Forms.Label();
             this.OtherNodeOptionsATable = new System.Windows.Forms.TableLayoutPanel();
             this.AddSupplyButton = new System.Windows.Forms.Button();
             this.AddPassthroughButton = new System.Windows.Forms.Button();
@@ -55,8 +58,9 @@ namespace Foreman
             this.GroupTable = new System.Windows.Forms.TableLayoutPanel();
             this.MainTable.SuspendLayout();
             this.OtherNodeOptionsBTable.SuspendLayout();
-            this.tableLayoutPanel1.SuspendLayout();
+            this.TopOptionsTable.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
+            this.QualitySelectorTable.SuspendLayout();
             this.OtherNodeOptionsATable.SuspendLayout();
             this.IRTable.SuspendLayout();
             this.SuspendLayout();
@@ -69,7 +73,7 @@ namespace Foreman
             this.MainTable.ColumnCount = 1;
             this.MainTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.MainTable.Controls.Add(this.OtherNodeOptionsBTable, 0, 4);
-            this.MainTable.Controls.Add(this.tableLayoutPanel1, 0, 0);
+            this.MainTable.Controls.Add(this.TopOptionsTable, 0, 0);
             this.MainTable.Controls.Add(this.OtherNodeOptionsATable, 0, 3);
             this.MainTable.Controls.Add(this.IRTable, 0, 2);
             this.MainTable.Controls.Add(this.GroupTable, 0, 1);
@@ -83,7 +87,7 @@ namespace Foreman
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.MainTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.MainTable.Size = new System.Drawing.Size(287, 385);
+            this.MainTable.Size = new System.Drawing.Size(287, 412);
             this.MainTable.TabIndex = 0;
             this.MainTable.Paint += new System.Windows.Forms.PaintEventHandler(this.MainTable_Paint);
             // 
@@ -101,7 +105,7 @@ namespace Foreman
             this.OtherNodeOptionsBTable.Controls.Add(this.AddUnspoilButton, 0, 0);
             this.OtherNodeOptionsBTable.Controls.Add(this.AddUnplantButton, 1, 0);
             this.OtherNodeOptionsBTable.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.OtherNodeOptionsBTable.Location = new System.Drawing.Point(0, 360);
+            this.OtherNodeOptionsBTable.Location = new System.Drawing.Point(0, 387);
             this.OtherNodeOptionsBTable.Margin = new System.Windows.Forms.Padding(0);
             this.OtherNodeOptionsBTable.Name = "OtherNodeOptionsBTable";
             this.OtherNodeOptionsBTable.RowCount = 1;
@@ -162,41 +166,44 @@ namespace Foreman
             this.AddUnplantButton.Text = "UnPlant";
             this.AddUnplantButton.UseVisualStyleBackColor = true;
             // 
-            // tableLayoutPanel1
+            // TopOptionsTable
             // 
-            this.tableLayoutPanel1.AutoSize = true;
-            this.tableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.tableLayoutPanel1.BackColor = System.Drawing.Color.DimGray;
-            this.tableLayoutPanel1.ColumnCount = 3;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.Controls.Add(this.ItemIconPanel, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.RecipeNameOnlyFilterCheckBox, 2, 0);
-            this.tableLayoutPanel1.Controls.Add(this.FilterLabel, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 1, 2);
-            this.tableLayoutPanel1.Controls.Add(this.FilterTextBox, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.IgnoreAssemblerCheckBox, 1, 1);
-            this.tableLayoutPanel1.Controls.Add(this.ShowHiddenCheckBox, 2, 1);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.ForeColor = System.Drawing.Color.White;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 5);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 3;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(281, 66);
-            this.tableLayoutPanel1.TabIndex = 1;
+            this.TopOptionsTable.AutoSize = true;
+            this.TopOptionsTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.TopOptionsTable.BackColor = System.Drawing.Color.DimGray;
+            this.TopOptionsTable.ColumnCount = 3;
+            this.TopOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.TopOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.TopOptionsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.TopOptionsTable.Controls.Add(this.ItemIconPanel, 0, 1);
+            this.TopOptionsTable.Controls.Add(this.RecipeNameOnlyFilterCheckBox, 2, 0);
+            this.TopOptionsTable.Controls.Add(this.FilterLabel, 0, 0);
+            this.TopOptionsTable.Controls.Add(this.tableLayoutPanel2, 1, 2);
+            this.TopOptionsTable.Controls.Add(this.FilterTextBox, 1, 0);
+            this.TopOptionsTable.Controls.Add(this.IgnoreAssemblerCheckBox, 1, 1);
+            this.TopOptionsTable.Controls.Add(this.ShowHiddenCheckBox, 2, 1);
+            this.TopOptionsTable.Controls.Add(this.QualitySelectorTable, 1, 3);
+            this.TopOptionsTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TopOptionsTable.ForeColor = System.Drawing.Color.White;
+            this.TopOptionsTable.Location = new System.Drawing.Point(3, 5);
+            this.TopOptionsTable.Name = "TopOptionsTable";
+            this.TopOptionsTable.RowCount = 4;
+            this.TopOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TopOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TopOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TopOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.TopOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.TopOptionsTable.Size = new System.Drawing.Size(281, 93);
+            this.TopOptionsTable.TabIndex = 1;
             // 
             // ItemIconPanel
             // 
+            this.ItemIconPanel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.ItemIconPanel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.ItemIconPanel.Location = new System.Drawing.Point(3, 23);
+            this.ItemIconPanel.Location = new System.Drawing.Point(3, 37);
             this.ItemIconPanel.Margin = new System.Windows.Forms.Padding(3, 1, 3, 1);
             this.ItemIconPanel.Name = "ItemIconPanel";
-            this.tableLayoutPanel1.SetRowSpan(this.ItemIconPanel, 2);
+            this.TopOptionsTable.SetRowSpan(this.ItemIconPanel, 3);
             this.ItemIconPanel.Size = new System.Drawing.Size(40, 40);
             this.ItemIconPanel.TabIndex = 6;
             this.ItemIconPanel.Visible = false;
@@ -228,7 +235,7 @@ namespace Foreman
             this.tableLayoutPanel2.AutoSize = true;
             this.tableLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.tableLayoutPanel2.ColumnCount = 3;
-            this.tableLayoutPanel1.SetColumnSpan(this.tableLayoutPanel2, 2);
+            this.TopOptionsTable.SetColumnSpan(this.tableLayoutPanel2, 2);
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30F));
@@ -317,6 +324,48 @@ namespace Foreman
             this.ShowHiddenCheckBox.Text = "Show Hidden";
             this.ShowHiddenCheckBox.UseVisualStyleBackColor = true;
             // 
+            // QualitySelectorTable
+            // 
+            this.QualitySelectorTable.AutoSize = true;
+            this.QualitySelectorTable.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.QualitySelectorTable.ColumnCount = 2;
+            this.TopOptionsTable.SetColumnSpan(this.QualitySelectorTable, 2);
+            this.QualitySelectorTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
+            this.QualitySelectorTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.QualitySelectorTable.Controls.Add(this.QualitySelector, 1, 0);
+            this.QualitySelectorTable.Controls.Add(this.QualityLabel, 0, 0);
+            this.QualitySelectorTable.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.QualitySelectorTable.Location = new System.Drawing.Point(49, 66);
+            this.QualitySelectorTable.Margin = new System.Windows.Forms.Padding(0);
+            this.QualitySelectorTable.Name = "QualitySelectorTable";
+            this.QualitySelectorTable.RowCount = 1;
+            this.QualitySelectorTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.QualitySelectorTable.Size = new System.Drawing.Size(232, 27);
+            this.QualitySelectorTable.TabIndex = 9;
+            this.QualitySelectorTable.Visible = false;
+            // 
+            // QualitySelector
+            // 
+            this.QualitySelector.AllowDrop = true;
+            this.QualitySelector.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.QualitySelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.QualitySelector.FormattingEnabled = true;
+            this.QualitySelector.Location = new System.Drawing.Point(83, 3);
+            this.QualitySelector.Name = "QualitySelector";
+            this.QualitySelector.Size = new System.Drawing.Size(146, 21);
+            this.QualitySelector.TabIndex = 9;
+            // 
+            // QualityLabel
+            // 
+            this.QualityLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.QualityLabel.AutoSize = true;
+            this.QualityLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.QualityLabel.Location = new System.Drawing.Point(30, 6);
+            this.QualityLabel.Name = "QualityLabel";
+            this.QualityLabel.Size = new System.Drawing.Size(47, 15);
+            this.QualityLabel.TabIndex = 10;
+            this.QualityLabel.Text = "Quality:";
+            // 
             // OtherNodeOptionsATable
             // 
             this.OtherNodeOptionsATable.AutoSize = true;
@@ -329,7 +378,7 @@ namespace Foreman
             this.OtherNodeOptionsATable.Controls.Add(this.AddPassthroughButton, 1, 0);
             this.OtherNodeOptionsATable.Controls.Add(this.AddConsumerButton, 2, 0);
             this.OtherNodeOptionsATable.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.OtherNodeOptionsATable.Location = new System.Drawing.Point(0, 336);
+            this.OtherNodeOptionsATable.Location = new System.Drawing.Point(0, 363);
             this.OtherNodeOptionsATable.Margin = new System.Windows.Forms.Padding(0);
             this.OtherNodeOptionsATable.Name = "OtherNodeOptionsATable";
             this.OtherNodeOptionsATable.RowCount = 1;
@@ -393,11 +442,11 @@ namespace Foreman
             this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0004F));
             this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0004F));
             this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 9.996403F));
-            this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 18F));
+            this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.IRTable.Controls.Add(this.IRScrollBar, 10, 0);
             this.IRTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.IRTable.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
-            this.IRTable.Location = new System.Drawing.Point(3, 125);
+            this.IRTable.Location = new System.Drawing.Point(3, 152);
             this.IRTable.Margin = new System.Windows.Forms.Padding(3, 1, 3, 3);
             this.IRTable.Name = "IRTable";
             this.IRTable.RowCount = 8;
@@ -435,7 +484,7 @@ namespace Foreman
             this.GroupTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
             this.GroupTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
             this.GroupTable.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.GroupTable.Location = new System.Drawing.Point(3, 75);
+            this.GroupTable.Location = new System.Drawing.Point(3, 102);
             this.GroupTable.Margin = new System.Windows.Forms.Padding(3, 1, 3, 3);
             this.GroupTable.Name = "GroupTable";
             this.GroupTable.RowCount = 1;
@@ -454,16 +503,18 @@ namespace Foreman
             this.DoubleBuffered = true;
             this.Margin = new System.Windows.Forms.Padding(1);
             this.Name = "IRChooserPanel";
-            this.Size = new System.Drawing.Size(287, 385);
+            this.Size = new System.Drawing.Size(287, 412);
             this.Leave += new System.EventHandler(this.IRChooserPanel_Leave);
             this.MainTable.ResumeLayout(false);
             this.MainTable.PerformLayout();
             this.OtherNodeOptionsBTable.ResumeLayout(false);
             this.OtherNodeOptionsBTable.PerformLayout();
-            this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
+            this.TopOptionsTable.ResumeLayout(false);
+            this.TopOptionsTable.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
+            this.QualitySelectorTable.ResumeLayout(false);
+            this.QualitySelectorTable.PerformLayout();
             this.OtherNodeOptionsATable.ResumeLayout(false);
             this.OtherNodeOptionsATable.PerformLayout();
             this.IRTable.ResumeLayout(false);
@@ -490,7 +541,7 @@ namespace Foreman
 		protected System.Windows.Forms.Button AddConsumerButton;
 		protected System.Windows.Forms.TableLayoutPanel IRTable;
 		protected System.Windows.Forms.TableLayoutPanel GroupTable;
-		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+		private System.Windows.Forms.TableLayoutPanel TopOptionsTable;
 		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
 		protected System.Windows.Forms.CheckBox AsFuelCheckBox;
         protected System.Windows.Forms.TableLayoutPanel OtherNodeOptionsBTable;
@@ -498,5 +549,8 @@ namespace Foreman
         protected System.Windows.Forms.Button AddPlantButton;
         protected System.Windows.Forms.Button AddUnspoilButton;
         protected System.Windows.Forms.Button AddUnplantButton;
+        protected System.Windows.Forms.Label QualityLabel;
+        internal System.Windows.Forms.TableLayoutPanel QualitySelectorTable;
+        internal System.Windows.Forms.ComboBox QualitySelector;
     }
 }

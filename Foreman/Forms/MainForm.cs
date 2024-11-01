@@ -29,7 +29,7 @@ namespace Foreman
 		{
 			WindowState = FormWindowState.Maximized;
 
-			Properties.Settings.Default.ForemanVersion = 6;
+			Properties.Settings.Default.ForemanVersion = VersionUpdater.CurrentVersion;
 
 			if (!Enum.IsDefined(typeof(ProductionGraph.RateUnit), Properties.Settings.Default.DefaultRateUnit))
 				Properties.Settings.Default.DefaultRateUnit = (int)ProductionGraph.RateUnit.Per1Sec;
@@ -480,7 +480,7 @@ namespace Foreman
 		private void AddRecipeButton_Click(object sender, EventArgs e)
 		{
 			Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
-			GraphViewer.AddNewNode(new Point(15, 15), null, location, NewNodeType.Disconnected);
+			GraphViewer.AddNewNode(new Point(15, 15), new ItemQualityPair(null, null), location, NewNodeType.Disconnected);
 		}
 
 		private void AddItemButton_Click(object sender, EventArgs e)

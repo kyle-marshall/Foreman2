@@ -89,9 +89,9 @@ namespace Foreman
 			errorNotice.SetVisibility(false);
 
 			//first stage item tab creation - absolutely necessary in the constructor due to the creation and simultaneous linking of nodes being possible (drag to new node for example).
-			foreach (Item item in DisplayedNode.Inputs)
+			foreach (ItemQualityPair item in DisplayedNode.Inputs)
 				InputTabs.Add(new ItemTabElement(item, LinkType.Input, base.graphViewer, this));
-			foreach (Item item in DisplayedNode.Outputs)
+			foreach (ItemQualityPair item in DisplayedNode.Outputs)
 				OutputTabs.Add(new ItemTabElement(item, LinkType.Output, base.graphViewer, this));
 		}
 
@@ -121,8 +121,8 @@ namespace Foreman
 
 		private void UpdateTabOrder()
 		{
-			InputTabs = InputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ThenBy(it => it.Item.Name).ToList(); //then by ensures same result no matter who came first
-			OutputTabs = OutputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ThenBy(it => it.Item.Name).ToList();
+			InputTabs = InputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ThenBy(it => it.Item.Item.Name).ThenBy(it => it.Item.Quality.Level).ThenBy(it => it.Item.Quality.Name).ToList(); //then by ensures same result no matter who came first
+			OutputTabs = OutputTabs.OrderBy(it => GetItemTabXHeuristic(it)).ThenBy(it => it.Item.Item.Name).ThenBy(it => it.Item.Quality.Level).ThenBy(it => it.Item.Quality.Name).ToList();
 
 			int x = -GetIconWidths(OutputTabs) / 2;
 			int y = DisplayedNode.NodeDirection == NodeDirection.Up ? (-Height / 2) + 1 : (Height / 2) - 1;
@@ -162,7 +162,7 @@ namespace Foreman
 			return total;
 		}
 
-		public ItemTabElement GetOutputLineItemTab(Item item)
+		public ItemTabElement GetOutputLineItemTab(ItemQualityPair item)
 		{
 			if (NodeStateRequiresUpdate)
 				UpdateState();
@@ -170,7 +170,7 @@ namespace Foreman
 
 			return OutputTabs.First(it => it.Item == item);
 		}
-		public ItemTabElement GetInputLineItemTab(Item item)
+		public ItemTabElement GetInputLineItemTab(ItemQualityPair item)
 		{
 			if (NodeStateRequiresUpdate)
 				UpdateState();
@@ -344,10 +344,10 @@ namespace Foreman
 						})));
 				}
 
-				HashSet<Item> openInputs = new HashSet<Item>(graphViewer.SelectedNodes.SelectMany(n => n.InputTabs.Where(t => !t.Links.Any()).Select(t => t.Item)));
-				HashSet<Item> openOutputs = new HashSet<Item>(graphViewer.SelectedNodes.SelectMany(n => n.OutputTabs.Where(t => !t.Links.Any()).Select(t => t.Item)));
-				HashSet<Item> availableInputs = new HashSet<Item>(graphViewer.SelectedNodes.SelectMany(n => n.InputTabs.Select(t => t.Item)));
-				HashSet<Item> availableOutputs = new HashSet<Item>(graphViewer.SelectedNodes.SelectMany(n => n.OutputTabs.Select(t => t.Item)));
+				HashSet<ItemQualityPair> openInputs = new HashSet<ItemQualityPair>(graphViewer.SelectedNodes.SelectMany(n => n.InputTabs.Where(t => !t.Links.Any()).Select(t => t.Item)));
+				HashSet<ItemQualityPair> openOutputs = new HashSet<ItemQualityPair>(graphViewer.SelectedNodes.SelectMany(n => n.OutputTabs.Where(t => !t.Links.Any()).Select(t => t.Item)));
+				HashSet<ItemQualityPair> availableInputs = new HashSet<ItemQualityPair>(graphViewer.SelectedNodes.SelectMany(n => n.InputTabs.Select(t => t.Item)));
+				HashSet<ItemQualityPair> availableOutputs = new HashSet<ItemQualityPair>(graphViewer.SelectedNodes.SelectMany(n => n.OutputTabs.Select(t => t.Item)));
 				bool matchedIO = openInputs.Intersect(availableOutputs).Any();
 				bool matchedOI = openOutputs.Intersect(availableInputs).Any();
 				if(matchedIO || matchedOI)
@@ -361,14 +361,14 @@ namespace Foreman
 							{
 								RightClickMenu.Close();
 
-								Dictionary<ReadOnlyBaseNode, List<Item>> openInputNodes = new Dictionary<ReadOnlyBaseNode, List<Item>>();
+								Dictionary<ReadOnlyBaseNode, List<ItemQualityPair>> openInputNodes = new Dictionary<ReadOnlyBaseNode, List<ItemQualityPair>>();
 								foreach(BaseNodeElement node in graphViewer.SelectedNodes.Where(n => n.InputTabs.Any(t => !t.Links.Any())))
 									openInputNodes.Add(node.DisplayedNode, node.InputTabs.Where(t => !t.Links.Any()).Select(t => t.Item).ToList());
 
-								Dictionary<Item, List<ReadOnlyBaseNode>> availableOutputNodes = new Dictionary<Item, List<ReadOnlyBaseNode>>();
+								Dictionary<ItemQualityPair, List<ReadOnlyBaseNode>> availableOutputNodes = new Dictionary<ItemQualityPair, List<ReadOnlyBaseNode>>();
 								foreach(ReadOnlyBaseNode node in graphViewer.SelectedNodes.Select(n => n.DisplayedNode).Where(n => !openInputNodes.ContainsKey(n)))
 								{
-									foreach(Item output in node.Outputs)
+									foreach(ItemQualityPair output in node.Outputs)
 									{
 										if (!availableOutputNodes.ContainsKey(output))
 											availableOutputNodes.Add(output, new List<ReadOnlyBaseNode>());
@@ -378,7 +378,7 @@ namespace Foreman
 
 								foreach(ReadOnlyBaseNode node in openInputNodes.Keys)
 								{
-									foreach (Item requiredInput in openInputNodes[node])
+									foreach (ItemQualityPair requiredInput in openInputNodes[node])
 									{
 										if (availableOutputNodes.ContainsKey(requiredInput))
 										{
@@ -399,14 +399,14 @@ namespace Foreman
 							{
 								RightClickMenu.Close();
 
-								Dictionary<ReadOnlyBaseNode, List<Item>> openOutputNodes = new Dictionary<ReadOnlyBaseNode, List<Item>>();
+								Dictionary<ReadOnlyBaseNode, List<ItemQualityPair>> openOutputNodes = new Dictionary<ReadOnlyBaseNode, List<ItemQualityPair>>();
 								foreach (BaseNodeElement node in graphViewer.SelectedNodes.Where(n => n.OutputTabs.Any(t => !t.Links.Any())))
 									openOutputNodes.Add(node.DisplayedNode, node.OutputTabs.Where(t => !t.Links.Any()).Select(t => t.Item).ToList());
 
-								Dictionary<Item, List<ReadOnlyBaseNode>> availableInputNodes = new Dictionary<Item, List<ReadOnlyBaseNode>>();
+								Dictionary<ItemQualityPair, List<ReadOnlyBaseNode>> availableInputNodes = new Dictionary<ItemQualityPair, List<ReadOnlyBaseNode>>();
 								foreach (ReadOnlyBaseNode node in graphViewer.SelectedNodes.Select(n => n.DisplayedNode).Where(n => !openOutputNodes.ContainsKey(n)))
 								{
-									foreach (Item input in node.Inputs)
+									foreach (ItemQualityPair input in node.Inputs)
 									{
 										if (!availableInputNodes.ContainsKey(input))
 											availableInputNodes.Add(input, new List<ReadOnlyBaseNode>());
@@ -416,7 +416,7 @@ namespace Foreman
 
 								foreach (ReadOnlyBaseNode node in openOutputNodes.Keys)
 								{
-									foreach (Item requiredOutput in openOutputNodes[node])
+									foreach (ItemQualityPair requiredOutput in openOutputNodes[node])
 									{
 										if (availableInputNodes.ContainsKey(requiredOutput))
 										{

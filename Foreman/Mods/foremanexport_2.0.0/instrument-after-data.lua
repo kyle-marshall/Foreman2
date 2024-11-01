@@ -70,7 +70,7 @@ output['items'] = {}
 output['fluids'] = data.raw.fluid
 output['groups'] = data.raw['item-group']
 output['entities'] = {}
-output['qualities'] = data.raw.qualities
+output['qualities'] = data.raw.quality
 
 --depreciated: 'item-with-inventory', 'item-with-label', 'item-with-tags'
 for _, section in ipairs({ 'ammo', 'armor', 'capsule', 'gun', 'item', 'item-with-entity-data', 'module', 'rail-planner', 'repair-tool', 'selection-tool', 'spider-vehicle', 'spidertron-remote', 'tool', 'upgrade-item' }) do

@@ -5,22 +5,9 @@ using System.Linq;
 
 namespace Foreman
 {
-	public readonly struct QualityItem
-	{
-		public Item Item { get; }
-		public Quality Quality { get; }
-
-		public QualityItem(Item item, Quality quality)
-		{
-			Item = item;
-			Quality = quality;
-		}
-
-		public override string ToString() => $"{Item} ({Quality})";
-    }
-
 	public interface Item : DataObjectBase
 	{
+
 		Subgroup MySubgroup { get; }
 
 		IReadOnlyCollection<Recipe> ProductionRecipes { get; }
@@ -53,6 +40,8 @@ namespace Foreman
 
 	public class ItemPrototype : DataObjectBasePrototype, Item
 	{
+		public class Test { }
+
 		public Subgroup MySubgroup { get { return mySubgroup; } }
 
 		public IReadOnlyCollection<Recipe> ProductionRecipes { get { return productionRecipes; } }

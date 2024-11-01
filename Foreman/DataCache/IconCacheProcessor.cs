@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Foreman
 {
@@ -147,7 +148,8 @@ namespace Foreman
 				iconJObject["items"].Count() +
 				iconJObject["fluids"].Count() +
 				iconJObject["entities"].Count() +
-				iconJObject["groups"].Count();
+				iconJObject["groups"].Count() +
+				iconJObject["qualities"].Count();
 
 			progress.Report(new KeyValuePair<int, string>(startingPercent, "Creating icons."));
 			int counter = 0;
@@ -187,8 +189,14 @@ namespace Foreman
 				progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
 				ProcessIcon(iconJToken, 64);
 			}
+            foreach (var iconJToken in iconJObject["qualities"].ToList())
+            {
+                if (token.IsCancellationRequested) return false;
+                progress.Report(new KeyValuePair<int, string>(startingPercent + (endingPercent - startingPercent) * counter++ / totalCount, ""));
+                ProcessIcon(iconJToken, 32);
+            }
 
-			IconCache.SaveIconCache(cachePath, myIconCache);
+            IconCache.SaveIconCache(cachePath, myIconCache);
 
 			return (FailedPathCount == 0);
 		}
@@ -508,5 +516,28 @@ namespace Foreman
 			Dispose(disposing: true);
 			GC.SuppressFinalize(this);
 		}
+
+		private static Dictionary<KeyValuePair<Bitmap, Bitmap>, Bitmap> combinedBitmapDictionary = new Dictionary<KeyValuePair<Bitmap, Bitmap>, Bitmap>();
+		private const double qualitySizeMultiplier = 0.5;
+		public static Bitmap CombinedQualityIcon(Bitmap baseIcon, Bitmap qualityIcon)
+		{
+			if (baseIcon == null)
+				return null;
+
+			if(combinedBitmapDictionary.TryGetValue(new KeyValuePair<Bitmap, Bitmap>(baseIcon, qualityIcon), out Bitmap combinedBitmap ))
+				return combinedBitmap;
+
+            //combine the two bitmaps
+            Bitmap canvas = new Bitmap(baseIcon.Width, baseIcon.Height, baseIcon.PixelFormat);
+            using (Graphics g = Graphics.FromImage(canvas))
+            {
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.DrawImage(baseIcon, new Rectangle(0, 0, baseIcon.Width, baseIcon.Height));
+                g.DrawImage(qualityIcon, new Rectangle((int)(baseIcon.Width * (1-qualitySizeMultiplier)), (int)(baseIcon.Height * (1 - qualitySizeMultiplier)), (int)(baseIcon.Width * qualitySizeMultiplier), (int)(baseIcon.Height * qualitySizeMultiplier)));
+            }
+			combinedBitmapDictionary.Add(new KeyValuePair<Bitmap, Bitmap>(baseIcon, qualityIcon), canvas);
+            return canvas;
+        }
 	}
 }

@@ -9,17 +9,17 @@ namespace Foreman
 {
 	public class DraggedLinkElement : BaseLinkElement
 	{
-		public override Item Item { get; protected set; }
+		public override ItemQualityPair Item { get; protected set; }
 		public LinkType StartConnectionType { get; private set; }
 		public Point EndpointLocation { get; set; }
 
 		private bool dragEnded;
 		private BaseNodeElement originElement;
 
-		public DraggedLinkElement(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, Item item) : base(graphViewer) { Init(graphViewer, startNode, startConnectionType, item); }
-		protected DraggedLinkElement(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, Item item, DraggedLinkElement masterLink) : base(graphViewer, masterLink) { Init(graphViewer, startNode, startConnectionType, item); }
+		public DraggedLinkElement(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, ItemQualityPair item) : base(graphViewer) { Init(graphViewer, startNode, startConnectionType, item); }
+		protected DraggedLinkElement(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, ItemQualityPair item, DraggedLinkElement masterLink) : base(graphViewer, masterLink) { Init(graphViewer, startNode, startConnectionType, item); }
 
-		protected void Init(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, Item item)
+		protected void Init(ProductionGraphViewer graphViewer, BaseNodeElement startNode, LinkType startConnectionType, ItemQualityPair item)
 		{
 			if (startNode == null)
 				Trace.Fail("Cant create a dragged link element with a null startNode!");

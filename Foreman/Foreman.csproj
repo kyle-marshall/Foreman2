@@ -228,6 +228,7 @@
     <Compile Include="Forms\SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Models\QualityPairs.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="ProductionGraphView\Elements\AssemblerElement.cs" />
     <Compile Include="ProductionGraphView\Elements\BaseLinkElement.cs" />

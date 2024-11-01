@@ -32,6 +32,7 @@ namespace Foreman
 		public List<string> RequiredItems;
 		public List<string> RequiredRecipes;
 		public List<string> RequiredPlanting;
+		public List<string> RequiredQualities;
 
 		public List<string> MissingRecipes;
 		public List<string> IncorrectRecipes;
@@ -41,11 +42,12 @@ namespace Foreman
 		public List<string> MissingPlanting;
         public List<string> ValidMissingPlanting; //any planting processes that were missing previously but have been found to fit in this current preset
         public List<string> IncorrectPlanting;
+		public List<string> MissingQualities;
 		public List<string> MissingMods;
 		public List<string> AddedMods;
 		public List<string> WrongVersionMods;
 
-		public int MICount { get { return MissingRecipes.Count + IncorrectRecipes.Count + MissingItems.Count + MissingPlanting.Count + IncorrectPlanting.Count; } }
+		public int MICount { get { return MissingRecipes.Count + IncorrectRecipes.Count + MissingItems.Count + MissingPlanting.Count + IncorrectPlanting.Count + MissingQualities.Count; } }
 		public int ErrorCount { get { return MICount + MissingMods.Count + AddedMods.Count + WrongVersionMods.Count; } }
 
 		public PresetErrorPackage(Preset preset)
@@ -55,6 +57,7 @@ namespace Foreman
 			RequiredItems = new List<string>();
 			RequiredRecipes = new List<string>();
 			RequiredPlanting = new List<string>();
+			RequiredQualities = new List<string>();
 
 			MissingRecipes = new List<string>();
 			IncorrectRecipes = new List<string>();
@@ -63,6 +66,7 @@ namespace Foreman
 			MissingPlanting = new List<string>();
 			IncorrectPlanting = new List<string>();
 			ValidMissingPlanting = new List<string>();
+			MissingQualities = new List<string>();
 			MissingMods = new List<string>(); // in mod-name|version format
 			AddedMods = new List<string>(); //in mod-name|version format
 			WrongVersionMods = new List<string>(); //in mod-name|expected-version|preset-version format

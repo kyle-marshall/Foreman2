@@ -15911,20 +15911,20 @@
       "name": "normal",
       "icon_name": "icon.q.normal",
       "order": "a",
+      "hidden": true,
       "level": 0,
       "beacon_power_multiplier": 1,
       "mining_drill_resource_drain_multiplier": 1,
-      "next_probability": 0.1,
       "localised_name": "quality-name.normal"
     },
     {
       "name": "quality-unknown",
       "icon_name": "icon.q.quality-unknown",
       "order": "z",
+      "hidden": true,
       "level": 0,
       "beacon_power_multiplier": 1,
       "mining_drill_resource_drain_multiplier": 1,
-      "next_probability": 0,
       "localised_name": "Unknown"
     }
   ],

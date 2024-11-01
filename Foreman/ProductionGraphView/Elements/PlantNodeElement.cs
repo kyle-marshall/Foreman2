@@ -34,12 +34,10 @@ namespace Foreman
             //we can have multiple output items here, so go through all of them, delete any that arent part of the correct outputs, then add any that are missing.
             foreach (ItemTabElement oldTab in OutputTabs.Where(tab => !DisplayedNode.Outputs.Contains(tab.Item)).ToList())
             {
-                foreach (ReadOnlyNodeLink link in DisplayedNode.OutputLinks.Where(link => link.Item == oldTab.Item).ToList())
-                    graphViewer.Graph.DeleteLink(link);
                 OutputTabs.Remove(oldTab);
                 oldTab.Dispose();
             }
-            foreach (Item item in DisplayedNode.Outputs)
+            foreach (ItemQualityPair item in DisplayedNode.Outputs)
                 if (!OutputTabs.Any(tab => tab.Item == item))
                     OutputTabs.Add(new ItemTabElement(item, LinkType.Output, graphViewer, this));
 

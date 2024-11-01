@@ -36,11 +36,11 @@ namespace Foreman
 				float maxLineWidth = DisplayedNode.InputLinks.Concat(DisplayedNode.OutputLinks).Select(l => graphViewer.LinkElementDictionary[l].LinkWidth).Max();
 				Point inputPoint = InputTabs[0].GetConnectionPoint();
 				Point outputPoint = OutputTabs[0].GetConnectionPoint();
-				using (Pen pen = new Pen(DisplayedNode.PassthroughItem.AverageColor, maxLineWidth) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
+				using (Pen pen = new Pen(DisplayedNode.PassthroughItem.Item.AverageColor, maxLineWidth) { EndCap = System.Drawing.Drawing2D.LineCap.Round, StartCap = System.Drawing.Drawing2D.LineCap.Round })
 					graphics.DrawLine(pen, inputPoint, outputPoint);
 				if (style == NodeDrawingStyle.Regular)
 				{
-					using (Brush brush = new SolidBrush(DisplayedNode.PassthroughItem.AverageColor))
+					using (Brush brush = new SolidBrush(DisplayedNode.PassthroughItem.Item.AverageColor))
 					{
 						graphics.FillEllipse(brush, inputPoint.X - 6, Math.Min(outputPoint.Y, inputPoint.Y) - 6 + (ItemTabElement.TabWidth / 2), 12, 12);
 						graphics.FillEllipse(brush, inputPoint.X - 6, Math.Max(outputPoint.Y, inputPoint.Y) - 6 - (ItemTabElement.TabWidth / 2), 12, 12);

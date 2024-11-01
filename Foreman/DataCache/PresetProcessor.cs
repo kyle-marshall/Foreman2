@@ -58,12 +58,12 @@ namespace Foreman
 			return jsonData;
 		}
 
-		public static async Task<PresetErrorPackage> TestPreset(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts, List<PlantShort> plantShorts)
+		public static async Task<PresetErrorPackage> TestPreset(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<string> qualityList, List<RecipeShort> recipeShorts, List<PlantShort> plantShorts)
 		{
             //try
             //{
-            //return await TestPresetThroughDataCache(preset, modList, itemList, entityList, recipeShorts);
-            return await TestPresetStreamlined(preset, modList, itemList, entityList, recipeShorts, plantShorts);
+            //return await TestPresetThroughDataCache(preset, modList, itemList, entityList, qualityList, recipeShorts);
+            return await TestPresetStreamlined(preset, modList, itemList, entityList, qualityList, recipeShorts, plantShorts);
 			//}
 			//catch
 			//{
@@ -73,7 +73,7 @@ namespace Foreman
 
 		//full load of data cache and comparison. This is naturally slower than the streamlined version, since we load all the extras that arent necessary for comparison (like energy types, technologies, availability calculations, etc)
 		//but on the +ve side any changes to preset json format is incorporated into data cache and requires no update to this function.
-		private static async Task<PresetErrorPackage> TestPresetThroughDataCache(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts, List<PlantShort> plantShorts)
+		private static async Task<PresetErrorPackage> TestPresetThroughDataCache(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<string> qualityList, List<RecipeShort> recipeShorts, List<PlantShort> plantShorts)
 		{
 			string presetPath = Path.Combine(new string[] { Application.StartupPath, "Presets", preset.Name + ".pjson" });
 			if (!File.Exists(presetPath))
@@ -143,6 +143,14 @@ namespace Foreman
                 }
             }
 
+			foreach (string qualityName in qualityList)
+			{
+				errors.RequiredQualities.Add(qualityName);
+
+                if (!presetCache.Qualities.ContainsKey(qualityName))
+                    errors.MissingQualities.Add(qualityName);
+            }
+
             return errors;
 		}
 
@@ -150,7 +158,7 @@ namespace Foreman
 		//this speeds things up such that the comparison takes around 150ms for a large preset like seablock (10x vanilla), instead of 250ms as for a full datacache load.
 		//still, this is only really helpful if you are using 10 presets (1.5 sec load inatead of 2.5 sec) or more, but hey; i will keep it.
 		//any changes to preset json style have to be reflected here though (unlike for a full data cache loader above, which just incorporates any changes to data cache as long as they dont impact the outputs)
-		private static async Task<PresetErrorPackage> TestPresetStreamlined(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<RecipeShort> recipeShorts, List<PlantShort> plantShorts)
+		private static async Task<PresetErrorPackage> TestPresetStreamlined(Preset preset, Dictionary<string, string> modList, List<string> itemList, List<string> entityList, List<string> qualityList, List<RecipeShort> recipeShorts, List<PlantShort> plantShorts)
 		{
 			JObject jsonData = PrepPreset(preset);
 
@@ -160,6 +168,7 @@ namespace Foreman
 			Dictionary<string, RecipeShort> presetRecipes = new Dictionary<string, RecipeShort>();
 			Dictionary<string, PlantShort> presetPlantProcesses = new Dictionary<string, PlantShort>();
 			Dictionary<string, string> presetMods = new Dictionary<string, string>();
+			HashSet<string> presetQualities = new HashSet<string>();
 
 			//built in items
 			presetItems.Add("§§i:heat");
@@ -173,9 +182,10 @@ namespace Foreman
 			presetEntities.Add("§§a:player-assembler");
 			presetEntities.Add("§§a:rocket-assembler");
 
-			//read in mods, items, spoilage, planting, and entities
+			//read in mods
 			foreach (var objJToken in jsonData["mods"].ToList())
 				presetMods.Add((string)objJToken["name"], (string)objJToken["version"]);
+			//read in items (and their plant results)
 			foreach (var objJToken in jsonData["items"].ToList())
 			{
 				presetItems.Add((string)objJToken["name"]);
@@ -196,10 +206,15 @@ namespace Foreman
                     }
 				}
 			}
+			//read in fluids
 			foreach (var objJToken in jsonData["fluids"].ToList())
 				presetItems.Add((string)objJToken["name"]);
+			//read in entities
 			foreach (var objJToken in jsonData["entities"].ToList())
 				presetEntities.Add((string)objJToken["name"]);
+			//read in quality data
+			foreach (var objJToken in jsonData["qualities"].ToList())
+				presetQualities.Add((string)objJToken["name"]);
 
 			//read in recipes
 			foreach (var objJToken in jsonData["recipes"].ToList())
@@ -388,6 +403,13 @@ namespace Foreman
                 }
             }
 
+            foreach (string qualityName in qualityList)
+            {
+                errors.RequiredQualities.Add(qualityName);
+
+                if (!presetQualities.Contains(qualityName))
+                    errors.MissingQualities.Add(qualityName);
+            }
             return errors;
 		}
 	}

@@ -119,15 +119,19 @@ namespace Foreman
 
 		public double GetBaseFuelConsumptionRate(Item fuel, Quality quality, double temperature = double.NaN)
 		{
+			if (IsMissing) return 0.01; //prevents failure from importing a recipe node with set fuel without a valid assembler
+
 			if ((EnergySource != EnergySource.Burner && EnergySource != EnergySource.FluidBurner && EnergySource != EnergySource.Heat))
-				Trace.Fail(string.Format("Cant ask for fuel consumption rate on a non-burner! {0}", this));
+				return 0.01; // Trace.Fail(string.Format("Cant ask for fuel consumption rate on a non-burner! {0}", this));
 			else if (!fuels.Contains(fuel))
-				Trace.Fail(string.Format("Invalid fuel! {0} for entity {1}", fuel, this));
+				return 0.01; // Trace.Fail(string.Format("Invalid fuel! {0} for entity {1}", fuel, this));
 			else if (!IsTemperatureFluidBurner)
 				return GetEnergyConsumption(quality) / (fuel.FuelValue * ConsumptionEffectivity);
 			else if (!double.IsNaN(temperature) && (fuel is Fluid fluidFuel) && (temperature > fluidFuel.DefaultTemperature) && (fluidFuel.SpecificHeatCapacity > 0)) //temperature burn of liquid
 				return GetEnergyConsumption(quality) / ((temperature - fluidFuel.DefaultTemperature) * fluidFuel.SpecificHeatCapacity * ConsumptionEffectivity);
-			return 0.01; // we cant have a 0 consumption rate as that would mess with the solver.
+			return 0.01;
+
+			//0.01 is returned in case of error and prevents the solver from crashing. These errors will be noted on the node, so dont have to worry about them here.
 		}
 
 		public string GetEntityTypeName(bool plural)
