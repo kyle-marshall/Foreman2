@@ -347,14 +347,14 @@ namespace Foreman
 					{
 						ItemQualityPair currentProduct = new ItemQualityPair(item, BaseRecipe.Quality);
 						uint currentStep = 0;
-						double currentMultiplier = 1;
 						outputList.Add(currentProduct);
-						outputSet.Add(currentProduct, Math.Min(currentMultiplier, 1.0) * amount);
+						outputSet.Add(currentProduct, amount);
+						double currentMultiplier = GetQualityMultiplier();
 						while(currentStep < MaxQualitySteps && currentProduct.Quality.NextQuality != null)
 						{
 							currentStep++;
 							ItemQualityPair lastProduct = currentProduct;
-							currentMultiplier *= currentProduct.Quality.NextProbability * GetQualityMultiplier();
+							currentMultiplier *= currentProduct.Quality.NextProbability;
 							currentProduct = new ItemQualityPair(item, currentProduct.Quality.NextQuality);
 							if (currentMultiplier == 0)
 								break;
