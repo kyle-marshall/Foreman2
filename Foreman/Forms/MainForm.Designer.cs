@@ -547,11 +547,11 @@
             // 
             this.VersionLabel.AutoSize = true;
             this.VersionLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.VersionLabel.Location = new System.Drawing.Point(882, 0);
+            this.VersionLabel.Location = new System.Drawing.Point(872, 0);
             this.VersionLabel.Name = "VersionLabel";
-            this.VersionLabel.Size = new System.Drawing.Size(43, 130);
+            this.VersionLabel.Size = new System.Drawing.Size(53, 130);
             this.VersionLabel.TabIndex = 18;
-            this.VersionLabel.Text = "v2.2.15";
+            this.VersionLabel.Text = "v2.2.15.1";
             this.VersionLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // MainForm

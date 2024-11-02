@@ -442,7 +442,7 @@ namespace Foreman
             this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0004F));
             this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 10.0004F));
             this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 9.996403F));
-            this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.IRTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 12F));
             this.IRTable.Controls.Add(this.IRScrollBar, 10, 0);
             this.IRTable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.IRTable.GrowStyle = System.Windows.Forms.TableLayoutPanelGrowStyle.FixedSize;
