@@ -365,6 +365,12 @@ namespace Foreman
 							outputSet.Add(currentProduct, Math.Min(currentMultiplier, 1.0) * amount);
 							outputSet[lastProduct] -= outputSet[currentProduct];
 
+							if (outputSet[lastProduct] <= 0)
+							{
+								outputList.Remove(lastProduct);
+								outputSet.Remove(lastProduct);
+							}
+
 						}
 					}
 				}
