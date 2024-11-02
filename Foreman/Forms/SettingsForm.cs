@@ -31,6 +31,7 @@ namespace Foreman
 			public bool RoundAssemblerCount;
 			public bool LockedRecipeEditPanelPosition;
 			public bool FlagOUSuppliedNodes;
+			public bool FlagDarkMode;
 
 			public bool ShowErrorArrows;
 			public bool ShowWarningArrows;
@@ -83,8 +84,9 @@ namespace Foreman
 		private List<ListViewItem> filteredQualityList;
 
 		private MouseHoverDetector mhDetector;
+		private MainForm mainForm;
 
-		public SettingsForm(SettingsFormOptions options)
+		public SettingsForm(SettingsFormOptions options, MainForm mainForm)
 		{
 			Options = options;
 
@@ -94,6 +96,8 @@ namespace Foreman
 			MainForm.SetDoubleBuffered(ModuleListView);
 			MainForm.SetDoubleBuffered(RecipeListView);
 			MainForm.SetDoubleBuffered(QualityListView);
+
+			this.mainForm = mainForm;
 
 			AssemblerListView.Columns[0].Width = AssemblerListView.Width - 32;
 			MinerListView.Columns[0].Width = MinerListView.Width - 32;
@@ -143,6 +147,7 @@ namespace Foreman
 			AbbreviateSciPackCheckBox.Checked = Options.AbbreviateSciPacks;
 			RecipeEditPanelPositionLockCheckBox.Checked = Options.LockedRecipeEditPanelPosition;
 			FlagOUSupplyNodesCheckBox.Checked = Options.FlagOUSuppliedNodes;
+			FlagDarkModeCheckBox.Checked = Options.FlagDarkMode;
 
 			ErrorArrowsCheckBox.Checked = Options.ShowErrorArrows;
 			WarningArrowsCheckBox.Checked = Options.ShowWarningArrows;
@@ -528,6 +533,14 @@ namespace Foreman
 			Options.Solver_PullConsumerNodes = PullConsumerNodesCheckBox.Checked;
 			Options.Solver_PullConsumerNodesPower = (double)PullConsumerNodesPowerInput.Value;
 
+			if (Options.FlagDarkMode != FlagDarkModeCheckBox.Checked) {
+				Options.FlagDarkMode = FlagDarkModeCheckBox.Checked;
+				if (Options.FlagDarkMode) {
+					mainForm.SetDarkMode();
+				} else {
+					mainForm.SetLightMode();
+				}
+			}
 		}
 
 		//PRESET FORMS (Import / compare)------------------------------------------------------------------------------------------

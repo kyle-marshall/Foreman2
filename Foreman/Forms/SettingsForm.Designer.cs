@@ -107,6 +107,7 @@
             this.SmartNodeDirectionCheckBox = new System.Windows.Forms.CheckBox();
             this.nodeGraphicsGroupBox = new System.Windows.Forms.GroupBox();
             this.NodeGraphicsTable = new System.Windows.Forms.TableLayoutPanel();
+            this.FlagDarkModeCheckBox = new System.Windows.Forms.CheckBox();
             this.ArrowsOnLinksCheckBox = new System.Windows.Forms.CheckBox();
             this.label10 = new System.Windows.Forms.Label();
             this.IconsSizeInput = new System.Windows.Forms.NumericUpDown();
@@ -971,7 +972,7 @@
             this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.GraphOptionsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.GraphOptionsTable.Size = new System.Drawing.Size(453, 777);
+            this.GraphOptionsTable.Size = new System.Drawing.Size(453, 800);
             this.GraphOptionsTable.TabIndex = 0;
             // 
             // graphOptionsGroupBox
@@ -1051,7 +1052,7 @@
             this.advancedGroupBox.Controls.Add(this.AdvancedOptionsTable);
             this.advancedGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.advancedGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-            this.advancedGroupBox.Location = new System.Drawing.Point(3, 595);
+            this.advancedGroupBox.Location = new System.Drawing.Point(3, 618);
             this.advancedGroupBox.Name = "advancedGroupBox";
             this.advancedGroupBox.Size = new System.Drawing.Size(447, 88);
             this.advancedGroupBox.TabIndex = 3;
@@ -1116,7 +1117,7 @@
             this.defaultsGroupBox.Controls.Add(this.DefaultsTable);
             this.defaultsGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.defaultsGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-            this.defaultsGroupBox.Location = new System.Drawing.Point(3, 472);
+            this.defaultsGroupBox.Location = new System.Drawing.Point(3, 495);
             this.defaultsGroupBox.Name = "defaultsGroupBox";
             this.defaultsGroupBox.Size = new System.Drawing.Size(447, 117);
             this.defaultsGroupBox.TabIndex = 1;
@@ -1254,7 +1255,7 @@
             this.nodeGraphicsGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
             this.nodeGraphicsGroupBox.Location = new System.Drawing.Point(3, 94);
             this.nodeGraphicsGroupBox.Name = "nodeGraphicsGroupBox";
-            this.nodeGraphicsGroupBox.Size = new System.Drawing.Size(447, 255);
+            this.nodeGraphicsGroupBox.Size = new System.Drawing.Size(447, 278);
             this.nodeGraphicsGroupBox.TabIndex = 0;
             this.nodeGraphicsGroupBox.TabStop = false;
             this.nodeGraphicsGroupBox.Text = "Node Graphics:";
@@ -1269,6 +1270,8 @@
             this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.NodeGraphicsTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.NodeGraphicsTable.Controls.Add(this.FlagDarkModeCheckBox, 0, 11);
             this.NodeGraphicsTable.Controls.Add(this.ArrowsOnLinksCheckBox, 0, 4);
             this.NodeGraphicsTable.Controls.Add(this.label10, 0, 2);
             this.NodeGraphicsTable.Controls.Add(this.IconsSizeInput, 1, 2);
@@ -1289,7 +1292,7 @@
             this.NodeGraphicsTable.Location = new System.Drawing.Point(3, 16);
             this.NodeGraphicsTable.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.NodeGraphicsTable.Name = "NodeGraphicsTable";
-            this.NodeGraphicsTable.RowCount = 11;
+            this.NodeGraphicsTable.RowCount = 12;
             this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -1301,9 +1304,20 @@
             this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.NodeGraphicsTable.Size = new System.Drawing.Size(441, 236);
+            this.NodeGraphicsTable.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.NodeGraphicsTable.Size = new System.Drawing.Size(441, 259);
             this.NodeGraphicsTable.TabIndex = 28;
             // 
+            // FlagDarkModeCheckBox
+            //
+            this.FlagDarkModeCheckBox.AutoSize = true;
+            this.FlagDarkModeCheckBox.Location = new System.Drawing.Point(3, 239);
+            this.FlagDarkModeCheckBox.Name = "FlagDarkModeCheckBox";
+            this.FlagDarkModeCheckBox.Size = new System.Drawing.Size(115, 17);
+            this.FlagDarkModeCheckBox.TabIndex = 23;
+            this.FlagDarkModeCheckBox.Text = "Enable Dark Mode";
+            this.FlagDarkModeCheckBox.UseVisualStyleBackColor = true;
+            //
             // ArrowsOnLinksCheckBox
             // 
             this.ArrowsOnLinksCheckBox.AutoSize = true;
@@ -1502,7 +1516,7 @@
             this.guideArrowsGroupBox.Controls.Add(this.tableLayoutPanel1);
             this.guideArrowsGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.guideArrowsGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-            this.guideArrowsGroupBox.Location = new System.Drawing.Point(3, 355);
+            this.guideArrowsGroupBox.Location = new System.Drawing.Point(3, 378);
             this.guideArrowsGroupBox.Name = "guideArrowsGroupBox";
             this.guideArrowsGroupBox.Size = new System.Drawing.Size(447, 111);
             this.guideArrowsGroupBox.TabIndex = 4;
@@ -1578,7 +1592,7 @@
             this.solverOptionsGroupBox.Controls.Add(this.tableLayoutPanel2);
             this.solverOptionsGroupBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.solverOptionsGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold);
-            this.solverOptionsGroupBox.Location = new System.Drawing.Point(3, 689);
+            this.solverOptionsGroupBox.Location = new System.Drawing.Point(3, 712);
             this.solverOptionsGroupBox.Name = "solverOptionsGroupBox";
             this.solverOptionsGroupBox.Size = new System.Drawing.Size(447, 85);
             this.solverOptionsGroupBox.TabIndex = 5;
@@ -1899,5 +1913,6 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.NumericUpDown QualityStepsInput;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.CheckBox FlagDarkModeCheckBox;
     }
 }
