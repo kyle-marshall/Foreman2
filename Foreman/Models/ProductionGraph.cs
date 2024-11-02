@@ -436,6 +436,7 @@ namespace Foreman
 			HashSet<PlantProcess> includedMissingPlantProcesses = new HashSet<PlantProcess>(new PlantNaInPrComparer());
 
 			HashSet<KeyValuePair<string, int>> includedQualities = new HashSet<KeyValuePair<string, int>>(); //name,level
+			includedQualities.Add(new KeyValuePair<string, int>(DefaultAssemblerQuality.Name, DefaultAssemblerQuality.Level));
 
             foreach (BaseNode node in includedNodes)
             {
@@ -518,7 +519,7 @@ namespace Foreman
 			info.AddValue("NodeLinks", includedLinks);
 		}
 
-		public NewNodeCollection InsertNodesFromJson(DataCache cache, JObject json) //cache is necessary since we will possibly be adding to mssing items/recipes
+		public NewNodeCollection InsertNodesFromJson(DataCache cache, JObject json, bool loadSolverValues) //cache is necessary since we will possibly be adding to mssing items/recipes
 		{
             if (json["Version"] == null || (int)json["Version"] != Properties.Settings.Default.ForemanVersion || json["Object"] == null || (string)json["Object"] != "ProductionGraph")
 			{
@@ -532,13 +533,6 @@ namespace Foreman
 
 			try
 			{
-				EnableExtraProductivityForNonMiners = (bool)json["EnableExtraProductivityForNonMiners"];
-				DefaultNodeDirection = (NodeDirection)(int)json["DefaultNodeDirection"];
-				PullOutputNodes = (bool)json["Solver_PullOutputNodes"];
-				PullOutputNodesPower = (double)json["Solver_PullOutputNodesPower"];
-				LowPriorityPower = (double)json["Solver_LowPriorityPower"];
-				MaxQualitySteps = (uint)json["MaxQualitySteps"];
-
 				//check compliance on all items, assemblers, modules, beacons, and recipes (data-cache will take care of it) - this means add in any missing objects and handle multi-name recipes (there can be multiple versions of a missing recipe, each with identical names)
 				cache.ProcessImportedItemsSet(json["IncludedItems"].Select(t => (string)t));
 				Dictionary<string, Quality> qualityLinks = cache.ProcessImportedQualitiesSet(json["IncludedQualities"].Select(j => new KeyValuePair<string, int>((string)j["Key"], (int)j["Value"])));
@@ -547,6 +541,17 @@ namespace Foreman
 				cache.ProcessImportedBeaconsSet(json["IncludedBeacons"].Select(t => (string)t));
 				Dictionary<long, Recipe> recipeLinks = cache.ProcessImportedRecipesSet(RecipeShort.GetSetFromJson(json["IncludedRecipes"]));
 				Dictionary<long, PlantProcess> plantProcessLinks = cache.ProcessImportedPlantProcessesSet(PlantShort.GetSetFromJson(json["IncludedPlantProcesses"]));
+
+				if (loadSolverValues)
+				{
+					EnableExtraProductivityForNonMiners = (bool)json["EnableExtraProductivityForNonMiners"];
+					DefaultNodeDirection = (NodeDirection)(int)json["DefaultNodeDirection"];
+					PullOutputNodes = (bool)json["Solver_PullOutputNodes"];
+					PullOutputNodesPower = (double)json["Solver_PullOutputNodesPower"];
+					LowPriorityPower = (double)json["Solver_LowPriorityPower"];
+					MaxQualitySteps = (uint)json["MaxQualitySteps"];
+					DefaultAssemblerQuality = qualityLinks[(string)json["DefaultQuality"]];
+				}
 
 				//add in all the graph nodes
 				foreach (JToken nodeJToken in json["Nodes"].ToList())

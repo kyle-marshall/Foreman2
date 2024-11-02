@@ -1011,7 +1011,7 @@ namespace Foreman
 					try
 					{
 						JObject json = JObject.Parse(Clipboard.GetText());
-						ImportNodesFromJson(json, ScreenToGraph(PointToClient(Cursor.Position)));
+						ImportNodesFromJson(json, ScreenToGraph(PointToClient(Cursor.Position)), false);
 					}
 					catch { Console.WriteLine("Non-Foreman paste detected."); } //clipboard string wasnt a proper json object, or didnt process properly. Likely answer: was a clip NOT from foreman.
 				}
@@ -1221,9 +1221,9 @@ namespace Foreman
 			info.AddValue("ProductionGraph", Graph);
 		}
 
-		public void ImportNodesFromJson(JObject json, Point origin)
+		public void ImportNodesFromJson(JObject json, Point origin, bool loadSolverValues)
 		{
-			ProductionGraph.NewNodeCollection newNodeCollection = newNodeCollection = Graph.InsertNodesFromJson(DCache, json); //NOTE: missing items & recipes may be added here!
+			ProductionGraph.NewNodeCollection newNodeCollection = newNodeCollection = Graph.InsertNodesFromJson(DCache, json, loadSolverValues); //NOTE: missing items & recipes may be added here!
 			if (newNodeCollection == null || newNodeCollection.newNodes.Count == 0)
 				return;
 
@@ -1429,7 +1429,7 @@ namespace Foreman
 			}
 
 			//add all nodes
-			ProductionGraph.NewNodeCollection collection = Graph.InsertNodesFromJson(DCache, (JObject)json["ProductionGraph"]);
+			ProductionGraph.NewNodeCollection collection = Graph.InsertNodesFromJson(DCache, (JObject)json["ProductionGraph"], true);
 
 			//check for old import
 			if (json["OldImport"] != null)
