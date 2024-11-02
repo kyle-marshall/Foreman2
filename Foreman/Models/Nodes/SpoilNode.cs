@@ -85,7 +85,7 @@ namespace Foreman
 			info.AddValue("NodeType", NodeType.Spoil);
 			info.AddValue("InputItem", InputItem.Item.Name);
 			info.AddValue("OutputItem", OutputItem.Item.Name);
-			info.AddValue("BaseQuality", InputItem.Quality);
+			info.AddValue("BaseQuality", InputItem.Quality.Name);
 		}
 
 		public override string ToString() { return string.Format("Spoil node for: {0} ({2}) to {1} ({2})", InputItem.Item.Name, OutputItem.Item.Name, InputItem.Quality.Name); }

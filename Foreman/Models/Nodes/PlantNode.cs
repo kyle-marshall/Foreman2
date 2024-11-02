@@ -91,7 +91,7 @@ namespace Foreman
 
 			info.AddValue("NodeType", NodeType.Plant);
 			info.AddValue("PlantProcessID", BasePlantProcess.PlantID);
-			info.AddValue("BaseQuality", Seed.Quality);
+			info.AddValue("BaseQuality", Seed.Quality.Name);
 		}
 
 		public override string ToString() { return string.Format("Plant Growth node for: {0} ({1})", Seed.Item.Name, Seed.Quality.Name); }

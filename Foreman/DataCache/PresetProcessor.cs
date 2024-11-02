@@ -204,6 +204,7 @@ namespace Foreman
                                 plantProcess.Products.Add(productName, amount);
                         }
                     }
+					presetPlantProcesses.Add(plantProcess.Name, plantProcess);
 				}
 			}
 			//read in fluids

@@ -166,7 +166,7 @@ namespace Foreman
 		public void AddOutputRatio(BaseNode node, ItemQualityPair item, IEnumerable<NodeLink> links, double rate)
 		{
 			Debug.Assert(links.All(x => x.SupplierNode == node));
-			AddIORatio(node, item, links, rate, node is RecipeNode);
+			AddIORatio(node, item, links, rate, node is RecipeNode || node is SpoilNode || node is PlantNode);
 		}
 
 		// Constrain a ratio on the input side of a node. Done for each unique item, and constrains the consumed item (based on the node rate) to be equal to the amount of the item provided by the links.
