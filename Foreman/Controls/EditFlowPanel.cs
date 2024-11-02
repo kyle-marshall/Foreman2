@@ -19,7 +19,7 @@ namespace Foreman
 			myGraphViewer = graphViewer;
 
 			RateLabel.Text = node.SetValueDescription;
-			FixedFlowInput.Maximum = (decimal)node.MaxDesiredSetValue;
+			FixedFlowInput.Maximum = (decimal)(node.MaxDesiredSetValue * graphViewer.Graph.GetRateMultipler());
 
 			if(node is ReadOnlyPassthroughNode pNode)
 			{
