@@ -3,6 +3,9 @@ local qualityEnabled = 0
 
 
 localindex = 0
+
+local prodTechRecipes = {} --list of recipes that have technologies with infinite productivity research
+
 local function ExportLocalisedString(lstring, index)
 	-- as could be expected if lstring doesnt have a working translation then we get a beauty of a mess... so that needs to be cleaned up outside of json table
 	localised_print('<#~#>')
@@ -111,12 +114,16 @@ local function ExportResearch()
 		end
 		
 		ttech['recipes'] = {}
-		ttech['alt_modifiers'] = {}
+		ttech['qualities'] = {}
 		for _, effect in pairs(tech.effects) do
 			if effect.type == 'unlock-recipe' then
 				table.insert(ttech['recipes'], effect.recipe)
-			elseif effect.type == 'unlock-quality' or effect.type == 'mining-with-fluid' then
-				table.insert(ttech['alt_modifiers'],effect.type)
+			elseif effect.type == 'change-recipe-productivity' then
+				prodTechRecipes[effect.recipe] = true
+			elseif effect.type == 'unlock-quality' then
+				table.insert(ttech['qualities'], effect.quality)
+			elseif effect.type == 'mining-with-fluid' then
+				ttech['unlocks-mining-with-fluid'] = true
 			end
 		end
 
@@ -148,6 +155,9 @@ local function ExportRecipes()
 			trecipe["icon_alt_name"] = 'icon.i.'..recipe.products[1].name
 		else
 			trecipe["icon_alt_name"] = 'icon.r.'..recipe.name
+		end
+		if prodTechRecipes[recipe.name] ~= nil then
+			trecipe["prod_research"] = true
 		end
 
 		trecipe['enabled'] = recipe.enabled

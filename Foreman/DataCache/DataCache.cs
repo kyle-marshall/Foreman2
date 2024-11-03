@@ -885,7 +885,10 @@ namespace Foreman
 			else if (iconCache.ContainsKey((string)objJToken["icon_alt_name"]))
 				recipe.SetIconAndColor(iconCache[(string)objJToken["icon_alt_name"]]);
 
-			foreach (var productJToken in objJToken["products"].ToList())
+			recipe.HasProductivityResearch = (objJToken["prod_research"] != null && (bool)objJToken["prod_research"]);
+			recipe.MaxProductivityBonus = objJToken["maximum_productivity"] == null ? 1000 : (double)objJToken["maximum_productivity"];
+
+            foreach (var productJToken in objJToken["products"].ToList())
 			{
 				ItemPrototype product = (ItemPrototype)items[(string)productJToken["name"]];
 				double amount = (double)productJToken["amount"];
@@ -1061,16 +1064,22 @@ namespace Foreman
 				}
 			}
 
-			foreach (var altModifier in objJToken["alt_modifiers"])
-			{
-				if((string)altModifier == "mining-with-fluid")
+            foreach (var qualityName in objJToken["qualities"])
+            {
+                if (qualities.TryGetValue((string)qualityName, out Quality quality))
+                {
+                    ((QualityPrototype)quality).myUnlockTechnologies.Add(technology);
+                    technology.unlockedQualities.Add((QualityPrototype)quality);
+                }
+            }
+
+            if (objJToken["unlocks-mining-with-fluid"] != null)
+            {
+				foreach(RecipePrototype recipe in miningWithFluidRecipes.Cast<RecipePrototype>())
 				{
-					foreach(RecipePrototype recipe in miningWithFluidRecipes.Cast<RecipePrototype>())
-					{
-						recipe.myUnlockTechnologies.Add(technology);
-						technology.unlockedRecipes.Add(recipe);
-					}
-				}	
+					recipe.myUnlockTechnologies.Add(technology);
+					technology.unlockedRecipes.Add(recipe);
+				}
 			}
 
 			foreach (var ingredientJToken in objJToken["research_unit_ingredients"].ToList())

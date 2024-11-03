@@ -186,7 +186,7 @@ namespace Foreman
 			}
 
 			//extra productivity bonus panel
-			if(nodeData.SelectedAssembler.Assembler.EntityType != EntityType.Miner && !myGraphViewer.Graph.EnableExtraProductivityForNonMiners)
+			if(!nodeData.BaseRecipe.Recipe.HasProductivityResearch && (nodeData.SelectedAssembler.Assembler.EntityType != EntityType.Miner && !myGraphViewer.Graph.EnableExtraProductivityForNonMiners))
 			{
 				ExtraProductivityInput.Visible = false;
 				ExtraProductivityLabel.Visible = false;
@@ -740,7 +740,7 @@ namespace Foreman
 		private void ExtraProductivityInput_ValueChanged(object sender, EventArgs e)
 		{
 			SetExtraProductivityBonus();
-		}
+        }
 
 		//------------------------------------------------------------------------------------------------------beacon input events
 

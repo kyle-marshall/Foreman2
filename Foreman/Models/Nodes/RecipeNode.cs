@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Xml.Schema;
 
 namespace Foreman
 {
@@ -124,7 +125,8 @@ namespace Foreman
 
 		public override double DesiredRatePerSec { get { return DesiredSetValue * SelectedAssembler.Assembler.GetSpeed(SelectedAssembler.Quality) * GetSpeedMultiplier() / (BaseRecipe.Recipe.Time); } set { Trace.Fail("Desired rate set on a recipe node!"); } }
 
-		public double ExtraProductivityBonus { get; set; }
+		private double extraProductivityBonus;
+		public double ExtraProductivityBonus { get { return extraProductivityBonus; } set { if (extraProductivityBonus != value) { extraProductivityBonus = value; ioUpdateRequired = true; UpdateState(); OnNodeValuesChanged(); } } }
 
 		public uint MaxQualitySteps { get { return maxQualitySteps; } set { if (maxQualitySteps != value) { maxQualitySteps = value; ioUpdateRequired = true; } } } //if quality bonus > 0 then we will take this many extra quality steps for products
 		private uint maxQualitySteps;
@@ -169,6 +171,8 @@ namespace Foreman
 			BeaconCount = 0;
 			BeaconsPerAssembler = 0;
 			BeaconsConst = 0;
+
+			ExtraProductivityBonus = 0;
 		}
 
 		internal override NodeState GetUpdatedState()
@@ -438,7 +442,7 @@ namespace Foreman
 
 		public double GetProductivityBonus() //unlike most of the others, this is the bonus (aka: starts from 0%, not 100%) //also: quality bonus is rounded down to 2 decimal places (1 percent)
 		{
-			double multiplier = SelectedAssembler.Assembler.BaseProductivityBonus + ((SelectedAssembler.Assembler.EntityType == EntityType.Miner || MyGraph.EnableExtraProductivityForNonMiners)? ExtraProductivityBonus : 0);
+			double multiplier = SelectedAssembler.Assembler.BaseProductivityBonus + ExtraProductivityBonus;
             foreach (ModuleQualityPair module in AssemblerModules)
                 multiplier += module.Module.GetProductivityBonus(module.Quality);
             foreach (ModuleQualityPair beaconModule in BeaconModules)

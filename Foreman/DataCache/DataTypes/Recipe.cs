@@ -15,6 +15,8 @@ namespace Foreman
 		long RecipeID { get; }
 		bool IsMissing { get; }
 
+		bool HasProductivityResearch { get; }
+
         bool AllowConsumptionBonus { get; }
         bool AllowSpeedBonus { get; }
         bool AllowProductivityBonus { get; }
@@ -94,7 +96,9 @@ namespace Foreman
         public bool AllowPollutionBonus { get; internal set; }
         public bool AllowQualityBonus { get; internal set; }
 
-		public double MaxProductivityBonus { get; internal set; }
+        public bool HasProductivityResearch { get; internal set; }
+
+        public double MaxProductivityBonus { get; internal set; }
 
 		private static long lastRecipeID = 0;
 		public long RecipeID { get; private set; }
@@ -118,6 +122,7 @@ namespace Foreman
 			this.AllowPollutionBonus = true;
 			this.AllowQualityBonus = true;
 			this.MaxProductivityBonus = 1000;
+			this.HasProductivityResearch = false;
 
 			ingredientSet = new Dictionary<Item, double>();
 			ingredientList = new List<ItemPrototype>();
