@@ -17,6 +17,8 @@ namespace Foreman
 			public Preset SelectedPreset;
 			public bool RequireReload;
 
+			public uint QualitySteps;
+
 			public ProductionGraphViewer.LOD LevelOfDetail;
 			public int NodeCountForSimpleView;
 			public int IconsOnlyIconSize;
@@ -126,6 +128,9 @@ namespace Foreman
 			PresetListBox.Items.RemoveAt(0); //0 is the currently active preset.
 
 			//settings
+
+			QualityStepsInput.Value = Options.QualitySteps;
+
 			DynamicLWCheckBox.Checked = Options.DynamicLinkWidth;
 			NodeCountForSimpleViewInput.Value = Math.Min(NodeCountForSimpleViewInput.Maximum, Options.NodeCountForSimpleView);
 
@@ -490,6 +495,8 @@ namespace Foreman
 
 		private void UpdateSettings()
 		{
+			Options.QualitySteps = (uint)QualityStepsInput.Value;
+
 			Options.LevelOfDetail = LowLodRadioButton.Checked ? ProductionGraphViewer.LOD.Low : MediumLodRadioButton.Checked ? ProductionGraphViewer.LOD.Medium : ProductionGraphViewer.LOD.High;
 			Options.NodeCountForSimpleView = (int)NodeCountForSimpleViewInput.Value;
 			Options.IconsOnlyIconSize = (int)IconsSizeInput.Value;

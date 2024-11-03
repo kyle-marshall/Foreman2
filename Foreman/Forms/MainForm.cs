@@ -342,6 +342,8 @@ namespace Foreman
 			options.Presets = GetValidPresetsList();
 			options.SelectedPreset = options.Presets[0];
 
+			options.QualitySteps = GraphViewer.Graph.MaxQualitySteps;
+
 			options.LevelOfDetail = GraphViewer.LevelOfDetail;
 			options.NodeCountForSimpleView = GraphViewer.NodeCountForSimpleView;
 			options.IconsOnlyIconSize = GraphViewer.IconsSize;
@@ -411,6 +413,8 @@ namespace Foreman
 						GraphViewer.DCache.DefaultQuality.Enabled = true;
 						GraphViewer.DCache.RocketAssembler.Enabled = GraphViewer.DCache.Assemblers["rocket-silo"]?.Enabled?? false;
 					}
+
+					GraphViewer.Graph.MaxQualitySteps = options.QualitySteps;
 
 					GraphViewer.LevelOfDetail = options.LevelOfDetail;
 					Properties.Settings.Default.LevelOfDetail = (int)options.LevelOfDetail;

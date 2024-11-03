@@ -1268,8 +1268,8 @@ namespace Foreman
 					DCache.Clear();
 				DCache = form.GetDataCache();
 				LastAssemblerQuality = DCache.DefaultQuality; //QUALITY UPDATE
-				Graph.DefaultAssemblerQuality = DCache.DefaultQuality; //QUALITY UPDATE
-				Graph.MaxQualitySteps = DCache.QualityMaxChainLength;
+				Graph.DefaultAssemblerQuality = DCache.DefaultQuality;
+				Graph.MaxQualitySteps = 5; //DCache.QualityMaxChainLength;
 
 				if (result == DialogResult.Abort)
 				{

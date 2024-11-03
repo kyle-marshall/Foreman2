@@ -84,7 +84,7 @@ namespace Foreman
 					foreach(BaseNode node in nodes)
 					{
 						if (node is RecipeNode rnode)
-							rnode.UpdateInputsAndOutputs();
+							rnode.MaxQualitySteps = maxQualitySteps;
 					}
 				}
 			}

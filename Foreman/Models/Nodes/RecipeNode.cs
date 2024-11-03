@@ -346,7 +346,7 @@ namespace Foreman
 					else
 					{
 						ItemQualityPair currentProduct = new ItemQualityPair(item, BaseRecipe.Quality);
-						uint currentStep = 0;
+						uint currentStep = 1;
 						outputList.Add(currentProduct);
 						outputSet.Add(currentProduct, amount);
 						double currentMultiplier = GetQualityMultiplier();
