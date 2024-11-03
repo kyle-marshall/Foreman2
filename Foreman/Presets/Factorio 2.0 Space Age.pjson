@@ -46440,7 +46440,7 @@
         "pollution": 0,
         "quality": 0
       },
-      "use_module_effects": false,
+      "uses_module_effects": false,
       "uses_beacon_effects": false,
       "uses_surface_effects": false,
       "allowed_effects": {

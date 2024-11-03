@@ -219,6 +219,7 @@ namespace Foreman
 			//return;
 
 			Dictionary<string, List<RecipePrototype>> craftingCategories = new Dictionary<string, List<RecipePrototype>>();
+			Dictionary<string, List<ModulePrototype>> moduleCategories = new Dictionary<string, List<ModulePrototype>>();
 			Dictionary<string, List<RecipePrototype>> resourceCategories = new Dictionary<string, List<RecipePrototype>>();
 			resourceCategories.Add("<<foreman_resource_category_water_tile>>", new List<RecipePrototype>()); //the water resources
 			Dictionary<string, List<ItemPrototype>> fuelCategories = new Dictionary<string, List<ItemPrototype>>();
@@ -268,10 +269,10 @@ namespace Foreman
                     ProcessSpoilItem(item, spoilResults); //link up any items with spoil remains
 
 				foreach (var objJToken in jsonData["modules"].ToList())
-					ProcessModule(objJToken, iconCache);
+					ProcessModule(objJToken, iconCache, moduleCategories);
 
                 foreach (var objJToken in jsonData["recipes"].ToList())
-					ProcessRecipe(objJToken, iconCache, craftingCategories);
+					ProcessRecipe(objJToken, iconCache, craftingCategories, moduleCategories);
 
 				foreach (var objJToken in jsonData["resources"].ToList())
 					ProcessResource(objJToken, resourceCategories, miningWithFluidRecipes);
@@ -284,7 +285,7 @@ namespace Foreman
 					ProcessTechnologyP2(objJToken); //required to properly link technology prerequisites
 
 				foreach (var objJToken in jsonData["entities"].ToList())
-					ProcessEntity(objJToken, iconCache, craftingCategories, resourceCategories, fuelCategories, miningWithFluidRecipes);
+					ProcessEntity(objJToken, iconCache, craftingCategories, resourceCategories, fuelCategories, miningWithFluidRecipes, moduleCategories);
 
 				//process launch products (empty now - depreciated)
 				foreach (var objJToken in jsonData["items"].Where(t => t["rocket_launch_products"] != null).ToList())
@@ -326,7 +327,7 @@ namespace Foreman
 						product.productionRecipes.Remove(recipe);
 					foreach (TechnologyPrototype tech in recipe.myUnlockTechnologies)
 						tech.unlockedRecipes.Remove(recipe);
-					foreach (ModulePrototype module in recipe.modules)
+					foreach (ModulePrototype module in recipe.assemblerModules)
 						module.recipes.Remove(recipe);
 					recipe.mySubgroup.recipes.Remove(recipe);
 
@@ -830,7 +831,7 @@ namespace Foreman
             }
         }
 
-		private void ProcessModule(JToken objJToken, Dictionary<string, IconColorPair> iconCache)
+		private void ProcessModule(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<ModulePrototype>> moduleCategories)
 		{
 			ModulePrototype module = new ModulePrototype(
 				this,
@@ -849,12 +850,16 @@ namespace Foreman
 			module.QualityBonus = Math.Truncate((double)objJToken["module_effects"]["quality"] * 100) / 100;
 
 			module.Tier = (int)objJToken["tier"];
+
 			module.Category = (string)objJToken["category"];
+			if (!moduleCategories.ContainsKey(module.Category))
+				moduleCategories.Add(module.Category, new List<ModulePrototype>());
+			moduleCategories[module.Category].Add(module);
 
 			modules.Add(module.Name, module);
 		}
 
-		private void ProcessRecipe(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<RecipePrototype>> craftingCategories)
+		private void ProcessRecipe(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<RecipePrototype>> craftingCategories, Dictionary<string, List<ModulePrototype>> moduleCategories)
 		{
 			RecipePrototype recipe = new RecipePrototype(
 				this,
@@ -911,26 +916,64 @@ namespace Foreman
 				}
 			}
 
-			foreach(ModulePrototype module in modules.Values.Cast<ModulePrototype>())
+			if (objJToken["allowed_effects"] != null)
 			{
-				bool validModule =	((bool)objJToken["allowed_effects"]["consumption"] || module.ConsumptionBonus >= 0) &&
-									((bool)objJToken["allowed_effects"]["speed"] || module.SpeedBonus <= 0) &&
-									((bool)objJToken["allowed_effects"]["productivity"] || module.ProductivityBonus <= 0) &&
-									((bool)objJToken["allowed_effects"]["pollution"] || module.PollutionBonus >= 0) &&
-									((bool)objJToken["allowed_effects"]["quality"] || module.QualityBonus <= 0);
+				recipe.AllowConsumptionBonus = (bool)objJToken["allowed_effects"]["consumption"];
+				recipe.AllowSpeedBonus = (bool)objJToken["allowed_effects"]["speed"];
+				recipe.AllowProductivityBonus = (bool)objJToken["allowed_effects"]["productivity"];
+				recipe.AllowPollutionBonus = (bool)objJToken["allowed_effects"]["pollution"];
+				recipe.AllowQualityBonus = (bool)objJToken["allowed_effects"]["quality"];
 
-				if (objJToken["allowed_module_categories"] != null)
+                foreach (ModulePrototype module in modules.Values.Cast<ModulePrototype>())
+                {
+                    bool validModule = (recipe.AllowConsumptionBonus || module.ConsumptionBonus >= 0) &&
+                                        (recipe.AllowSpeedBonus || module.SpeedBonus <= 0) &&
+                                        (recipe.AllowProductivityBonus || module.ProductivityBonus <= 0) &&
+                                        (recipe.AllowPollutionBonus || module.PollutionBonus >= 0) &&
+                                        (recipe.AllowQualityBonus || module.QualityBonus <= 0);
+                    if (validModule)
+                    {
+                        recipe.beaconModules.Add(module);
+                    }
+                }
+
+                if (objJToken["allowed_module_categories"] == null || objJToken["allowed_module_categories"].Count() == 0)
 				{
-					foreach (var moduleCategoryJToken in objJToken["allowed_module_categories"])
+					foreach (ModulePrototype module in modules.Values.Cast<ModulePrototype>())
 					{
-						validModule &= (module.Category == (string)moduleCategoryJToken);
+						bool validModule = (recipe.AllowConsumptionBonus || module.ConsumptionBonus >= 0) &&
+											(recipe.AllowSpeedBonus || module.SpeedBonus <= 0) &&
+											(recipe.AllowProductivityBonus || module.ProductivityBonus <= 0) &&
+											(recipe.AllowPollutionBonus || module.PollutionBonus >= 0) &&
+											(recipe.AllowQualityBonus || module.QualityBonus <= 0);
+						if (validModule)
+						{
+							recipe.assemblerModules.Add(module);
+							module.recipes.Add(recipe);
+						}
 					}
 				}
-
-				if (validModule)
+				else
 				{
-					recipe.modules.Add(module);
-					module.recipes.Add(recipe);
+					foreach (string moduleCategory in objJToken["allowed_module_categories"].Select(a => ((JProperty)a).Name))
+					{
+						if (moduleCategories.ContainsKey(moduleCategory))
+						{
+							foreach (ModulePrototype module in moduleCategories[moduleCategory])
+							{
+								bool validModule = (recipe.AllowConsumptionBonus || module.ConsumptionBonus >= 0) &&
+													(recipe.AllowSpeedBonus || module.SpeedBonus <= 0) &&
+													(recipe.AllowProductivityBonus || module.ProductivityBonus <= 0) &&
+													(recipe.AllowPollutionBonus || module.PollutionBonus >= 0) &&
+													(recipe.AllowQualityBonus || module.QualityBonus <= 0);
+								if (validModule)
+								{
+									recipe.assemblerModules.Add(module);
+									module.recipes.Add(recipe);
+								}
+							}
+						}
+					}
 				}
 			}
 
@@ -979,7 +1022,7 @@ namespace Foreman
 			foreach (ModulePrototype module in modules.Values.Cast<ModulePrototype>()) //we will let the assembler sort out which module can be used with this recipe
 			{
 				module.recipes.Add(recipe);
-				recipe.modules.Add(module);
+				recipe.assemblerModules.Add(module);
 			}
 
 			recipe.SetIconAndColor(new IconColorPair(recipe.productList[0].Icon, recipe.productList[0].AverageColor));
@@ -1069,7 +1112,7 @@ namespace Foreman
 			assemblers.Add(playerAssember.Name, playerAssember);
 		}
 
-		private void ProcessEntity(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<RecipePrototype>> craftingCategories, Dictionary<string, List<RecipePrototype>> resourceCategories, Dictionary<string, List<ItemPrototype>> fuelCategories, List<Recipe> miningWithFluidRecipes)
+		private void ProcessEntity(JToken objJToken, Dictionary<string, IconColorPair> iconCache, Dictionary<string, List<RecipePrototype>> craftingCategories, Dictionary<string, List<RecipePrototype>> resourceCategories, Dictionary<string, List<ItemPrototype>> fuelCategories, List<Recipe> miningWithFluidRecipes, Dictionary<string, List<ModulePrototype>> moduleCategories)
 		{
 			string type = (string)objJToken["type"];
 			if (type == "character") //character is processed later
@@ -1141,7 +1184,7 @@ namespace Foreman
 			//modules
 			if (entity.EntityType == EntityType.Assembler || entity.EntityType == EntityType.Miner || entity.EntityType == EntityType.Rocket || entity.EntityType == EntityType.Beacon)
 			{
-				if (entity is AssemblerPrototype)
+                if (entity is AssemblerPrototype)
 				{
 					((AssemblerPrototype)entity).BaseConsumptionBonus = (double)objJToken["base_module_effects"]["consumption"];
 					((AssemblerPrototype)entity).BaseSpeedBonus = (double)objJToken["base_module_effects"]["speed"];
@@ -1152,31 +1195,58 @@ namespace Foreman
 					((AssemblerPrototype)entity).AllowBeacons = (bool)objJToken["uses_beacon_effects"];
 				}
 
-				foreach (ModulePrototype module in modules.Values.Cast<ModulePrototype>())
-				{
-					bool validModule = ((bool)objJToken["allowed_effects"]["consumption"] || module.ConsumptionBonus >= 0) &&
-										((bool)objJToken["allowed_effects"]["speed"] || module.SpeedBonus <= 0) &&
-										((bool)objJToken["allowed_effects"]["productivity"] || module.ProductivityBonus <= 0) &&
-										((bool)objJToken["allowed_effects"]["pollution"] || module.PollutionBonus >= 0) &&
-										((bool)objJToken["allowed_effects"]["quality"] || module.QualityBonus <= 0);
+                if (objJToken["allowed_effects"] != null)
+                {
+                    bool allow_consumption = (bool)objJToken["allowed_effects"]["consumption"];
+                    bool allow_speed = (bool)objJToken["allowed_effects"]["speed"];
+                    bool alllow_productivity = (bool)objJToken["allowed_effects"]["productivity"];
+                    bool allow_pollution = (bool)objJToken["allowed_effects"]["pollution"];
+                    bool allow_quality = (bool)objJToken["allowed_effects"]["quality"];
 
-					if (objJToken["allowed_module_categories"] != null)
-					{
-						foreach (var moduleCategoryJToken in objJToken["allowed_module_categories"].ToList())
-						{
-							validModule &= (module.Category == (string)moduleCategoryJToken);
-						}
-					}
-
-					if (validModule)
-					{
-						entity.modules.Add(module);
-						if (entity is AssemblerPrototype aEntity)
-							module.assemblers.Add(aEntity);
-						else if (entity is BeaconPrototype bEntity)
-							module.beacons.Add(bEntity);
-					}
-				}
+                    if (objJToken["allowed_module_categories"] == null || objJToken["allowed_module_categories"].Count() == 0)
+                    {
+                        foreach (ModulePrototype module in modules.Values.Cast<ModulePrototype>())
+                        {
+                            bool validModule = (allow_consumption || module.ConsumptionBonus >= 0) &&
+                                                (allow_speed || module.SpeedBonus <= 0) &&
+                                                (alllow_productivity || module.ProductivityBonus <= 0) &&
+                                                (allow_pollution || module.PollutionBonus >= 0) &&
+                                                (allow_quality || module.QualityBonus <= 0);
+                            if (validModule)
+                            {
+                                entity.modules.Add(module);
+                                if (entity is AssemblerPrototype aEntity)
+                                    module.assemblers.Add(aEntity);
+                                else if (entity is BeaconPrototype bEntity)
+                                    module.beacons.Add(bEntity);
+                            }
+                        }
+                    } else
+                    {
+                        foreach (string moduleCategory in objJToken["allowed_module_categories"].Select(a => ((JProperty)a).Name))
+                        {
+                            if (moduleCategories.ContainsKey(moduleCategory))
+                            {
+                                foreach (ModulePrototype module in moduleCategories[moduleCategory])
+                                {
+                                    bool validModule = (allow_consumption || module.ConsumptionBonus >= 0) &&
+                                                        (allow_speed || module.SpeedBonus <= 0) &&
+                                                        (alllow_productivity || module.ProductivityBonus <= 0) &&
+                                                        (allow_pollution || module.PollutionBonus >= 0) &&
+                                                        (allow_quality || module.QualityBonus <= 0);
+                                    if (validModule)
+                                    {
+                                        entity.modules.Add(module);
+                                        if (entity is AssemblerPrototype aEntity)
+                                            module.assemblers.Add(aEntity);
+                                        else if (entity is BeaconPrototype bEntity)
+                                            module.beacons.Add(bEntity);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 			}
 
 			//energy types
@@ -1481,7 +1551,7 @@ namespace Foreman
 				foreach (ModulePrototype module in modules.Values.Cast<ModulePrototype>()) //we will let the assembler sort out which module can be used with this recipe
 				{
 					module.recipes.Add(recipe);
-					recipe.modules.Add(module);
+					recipe.assemblerModules.Add(module);
 				}
 
 				recipes.Add(recipe.Name, recipe);
@@ -1538,7 +1608,7 @@ namespace Foreman
 				foreach (ModulePrototype module in modules.Values.Cast<ModulePrototype>()) //we will let the assembler sort out which module can be used with this recipe
 				{
 					module.recipes.Add(recipe);
-					recipe.modules.Add(module);
+					recipe.assemblerModules.Add(module);
 				}
 
 				recipes.Add(recipe.Name, recipe);

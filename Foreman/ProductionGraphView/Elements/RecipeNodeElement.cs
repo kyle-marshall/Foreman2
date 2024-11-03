@@ -177,8 +177,8 @@ namespace Foreman
 					bool canPasteExtraProductivityMiners = rNodes.Any(rn => rn.SelectedAssembler.Assembler.EntityType == EntityType.Miner);
 					bool canPasteExtraProductivityNonMiners = graphViewer.Graph.EnableExtraProductivityForNonMiners && rNodes.Any(rn => rn.SelectedAssembler.Assembler.EntityType != EntityType.Miner);
 					bool canPasteFuel = copiedOptions.Fuel != null && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Recipe.Assemblers.Any(a => a.Fuels.Contains(copiedOptions.Fuel))));
-					bool canPasteModules = copiedOptions.AssemblerModules.Count > 0 && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Recipe.Modules.Count > 0 && rn.SelectedAssembler.Assembler.Modules.Count > 0 && rn.SelectedAssembler.Assembler.ModuleSlots > 0));
-					bool canPasteBeacon = copiedOptions.Beacon.Beacon != null && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Recipe.Modules.Count > 0 && rn.SelectedAssembler.Assembler.Modules.Count > 0));
+					bool canPasteModules = copiedOptions.AssemblerModules.Count > 0 && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Recipe.AssemblerModules.Count > 0 && rn.SelectedAssembler.Assembler.Modules.Count > 0 && rn.SelectedAssembler.Assembler.ModuleSlots > 0));
+					bool canPasteBeacon = copiedOptions.Beacon.Beacon != null && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Recipe.AssemblerModules.Count > 0 && rn.SelectedAssembler.Assembler.Modules.Count > 0));
 
 					if (canPasteAssembler || canPasteFuel || canPasteModules || canPasteBeacon)
 					{
@@ -236,12 +236,12 @@ namespace Foreman
 
 									if (modulesCheck.Checked)
 									{
-										HashSet<Module> acceptableAssemblerModules = new HashSet<Module>(rNode.BaseRecipe.Recipe.Modules.Intersect(rNode.SelectedAssembler.Assembler.Modules));
+										HashSet<Module> acceptableAssemblerModules = new HashSet<Module>(rNode.BaseRecipe.Recipe.AssemblerModules.Intersect(rNode.SelectedAssembler.Assembler.Modules));
 										if (!copiedOptions.AssemblerModules.Any(module => !acceptableAssemblerModules.Contains(module.Module))) //all modules we copied can be added to the selected recipe/assembler
 											controller.SetAssemblerModules(copiedOptions.AssemblerModules, true);
 									}
 
-									if (beaconCheck.Checked && rNode.BaseRecipe.Recipe.Modules.Intersect(rNode.SelectedAssembler.Assembler.Modules).Count() > 0 && copiedOptions.Beacon.Beacon != null)
+									if (beaconCheck.Checked && rNode.BaseRecipe.Recipe.AssemblerModules.Intersect(rNode.SelectedAssembler.Assembler.Modules).Count() > 0 && copiedOptions.Beacon.Beacon != null)
 									{
 										controller.SetBeacon(copiedOptions.Beacon);
 										controller.SetBeaconCount(copiedOptions.BeaconCount);
@@ -251,7 +251,7 @@ namespace Foreman
 
 									if (beaconModuleCheck.Checked && rNode.SelectedBeacon.Beacon != null)
 									{
-										HashSet<Module> acceptableBeaconModules = new HashSet<Module>(rNode.BaseRecipe.Recipe.Modules.Intersect(rNode.SelectedAssembler.Assembler.Modules).Intersect(rNode.SelectedBeacon.Beacon.Modules));
+										HashSet<Module> acceptableBeaconModules = new HashSet<Module>(rNode.BaseRecipe.Recipe.AssemblerModules.Intersect(rNode.SelectedAssembler.Assembler.Modules).Intersect(rNode.SelectedBeacon.Beacon.Modules));
 										if (!copiedOptions.BeaconModules.Any(module => !acceptableBeaconModules.Contains(module.Module)))
 											controller.SetBeaconModules(copiedOptions.BeaconModules, true);
 									}

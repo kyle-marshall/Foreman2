@@ -393,7 +393,7 @@ local function ExportEntities()
 					tentity['base_module_effects']['productivity'] = 0
 					tentity['base_module_effects']['pollution'] = 0
 					tentity['base_module_effects']['quality'] = 0
-					tentity['use_module_effects'] = false
+					tentity['uses_module_effects'] = false
 					tentity['uses_beacon_effects'] = false
 					tentity['uses_surface_effects'] = false
 				end
