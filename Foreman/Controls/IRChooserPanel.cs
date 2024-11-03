@@ -884,7 +884,7 @@ namespace Foreman
 			new float[] { .2126f, .2126f, .2126f, 0, 0 },
 			new float[] { .7152f, .7152f, .7152f, 0, 0 },
 			new float[] { .0722f, .0722f, .0722f, 0, 0 },
-			new float[] { 0, 0, 0, 1, 0 },
+			new float[] { 0, 0, 0, 0.4f, 0 },
 			new float[] { 0, 0, 0, 0, 1 }
 		});
 		private Image bgImg;
