@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -120,9 +121,10 @@ namespace Foreman
 				button.FlatAppearance.BorderSize = 0;
 				button.TabStop = false;
 				button.Margin = new Padding(0);
-				button.Size = new Size(1, 1);
+				button.Size = new Size(1, 64);
 				button.Dock = DockStyle.Fill;
-				button.Image = new Bitmap(SortedGroups[i].Icon, (int)(GroupTable.Width / (GroupTable.ColumnCount * 1.1f)), (int)(GroupTable.Width / (GroupTable.ColumnCount * 1.1f)));
+				button.BackgroundImage = SortedGroups[i].Icon;
+				button.BackgroundImageLayout = ImageLayout.Center;
 				button.Tag = SortedGroups[i];
 
 				GroupButtonToolTip.SetToolTip(button, string.IsNullOrEmpty(SortedGroups[i].FriendlyName) ? "-" : SortedGroups[i].FriendlyName);
@@ -153,7 +155,7 @@ namespace Foreman
 					button.ForeColor = Color.Gray;
 					button.BackColor = Color.DimGray;
 					button.Margin = new Padding(1);
-					button.Size = new Size(1, 1);
+					button.Size = new Size(40, 40);
 					button.Dock = DockStyle.Fill;
 					button.BackgroundImage = null;
 					button.Tag = null;
@@ -877,8 +879,42 @@ namespace Foreman
 
 	public class NFButton : Button
 	{
+		private static ColorMatrix grayMatrix = new ColorMatrix(new float[][]
+		{
+			new float[] { .2126f, .2126f, .2126f, 0, 0 },
+			new float[] { .7152f, .7152f, .7152f, 0, 0 },
+			new float[] { .0722f, .0722f, .0722f, 0, 0 },
+			new float[] { 0, 0, 0, 1, 0 },
+			new float[] { 0, 0, 0, 0, 1 }
+		});
+		private Image bgImg;
+
 		public NFButton() : base() { this.SetStyle(ControlStyles.Selectable, false); }
 		protected override bool ShowFocusCues { get { return false; } }
+		protected override void OnBackgroundImageChanged(EventArgs e) {
+			base.OnBackgroundImageChanged(e);
+			if (Enabled)
+				bgImg = BackgroundImage;
+		}
+		protected override void OnEnabledChanged(EventArgs e)
+		{
+			base.OnEnabledChanged(e);
+			if (BackgroundImage == null)
+				return;
+			if (!Enabled) {
+				var gray = new Bitmap(BackgroundImage.Width, BackgroundImage.Height, BackgroundImage.PixelFormat);
+				gray.SetResolution(BackgroundImage.HorizontalResolution, BackgroundImage.VerticalResolution);
+				using (var g = Graphics.FromImage(gray)) {
+					using (var attrib = new ImageAttributes()) {
+						attrib.SetColorMatrix(grayMatrix);
+						g.DrawImage(BackgroundImage, new Rectangle(0, 0, BackgroundImage.Width, BackgroundImage.Height), 0, 0, BackgroundImage.Width, BackgroundImage.Height, GraphicsUnit.Pixel, attrib);
+						BackgroundImage = gray;
+					}
+				}
+			} else if (bgImg != null) {
+				BackgroundImage = bgImg;
+			}
+		}
 	}
 
 	public class RecipeRequestArgs : EventArgs
