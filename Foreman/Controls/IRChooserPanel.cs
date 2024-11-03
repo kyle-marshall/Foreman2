@@ -438,7 +438,7 @@ namespace Foreman
 		protected override void IRChooserPanel_Disposed(object sender, EventArgs e)
 		{
 			base.IRChooserPanel_Disposed(sender, e);
-			if (selectedItem.Item != null)
+			if (selectedItem)
 				ItemRequested?.Invoke(this, new ItemRequestArgs(selectedItem));
 		}
 
@@ -571,7 +571,7 @@ namespace Foreman
 			DCache = parent.DCache;
 			qualitySelectorIndexSet = new List<Quality>();
 
-            if (item.Quality == null)
+            if (!item)
             {
                 QualitySelectorTable.Visible = true;
 				foreach (Quality quality in parent.DCache.AvailableQualities.Where(q => q.Enabled))
@@ -613,15 +613,10 @@ namespace Foreman
 
 			KeyItem = item;
 			KeyItemTempRange = (nodeType == NewNodeType.Disconnected) ? new fRange(0, 0, true) : tempRange; //cant use temp range if its a disconnected node
-			isDefaultQuality = KeyItem.Quality == null || KeyItem.Quality == DCache.DefaultQuality;
+			isDefaultQuality = !KeyItem || KeyItem.Quality == DCache.DefaultQuality;
 
 			RecipeNameOnlyFilterCheckBox.Visible = true;
-			if (KeyItem.Item == null)
-			{
-				OtherNodeOptionsATable.Visible = false;
-				OtherNodeOptionsBTable.Visible = false;
-			}
-			else
+			if (KeyItem)
 			{
 				ItemIconPanel.Visible = true;
 				ItemIconPanel.BackgroundImage = KeyItem.Icon;
@@ -638,7 +633,7 @@ namespace Foreman
 				OtherNodeOptionsBTable.Visible = totalVisible > 0;
 
 				bool hasConsumptionRecipes = Properties.Settings.Default.ShowUnavailable? KeyItem.Item.ConsumptionRecipes.Count > 0 : KeyItem.Item.ConsumptionRecipes.Count(r => r.Available) > 0;
-				bool hasFuelConsumptionRecipes = isDefaultQuality && (KeyItem.Item.FuelsEntities.FirstOrDefault(a => (a is Assembler assembler) && assembler.Enabled && assembler.Recipes.FirstOrDefault(r => r.Enabled) != null) != null);
+				bool hasFuelConsumptionRecipes = isDefaultQuality && (KeyItem.Item.FuelsEntities.Any(a => (a is Assembler assembler) && assembler.Enabled && assembler.Recipes.Any(r => r.Enabled)));
 				bool hasProductionRecipes = Properties.Settings.Default.ShowUnavailable ? KeyItem.Item.ProductionRecipes.Count > 0 : KeyItem.Item.ProductionRecipes.Count(r => r.Available) > 0;
 				bool hasFuelProductionRecipes = isDefaultQuality && (KeyItem.Item.FuelOrigin != null && KeyItem.Item.FuelOrigin.FuelsEntities.Any(a => (a is Assembler assembler) && assembler.Enabled && assembler.Recipes.Any(r => r.Enabled)));
 
@@ -665,6 +660,11 @@ namespace Foreman
 					AsFuelCheckBox.Visible = (asIngredient && KeyItem.Item.FuelsEntities.Count > 0);
 				}
 			}
+			else
+			{
+                OtherNodeOptionsATable.Visible = false;
+                OtherNodeOptionsBTable.Visible = false;
+            }
 		}
 
 		protected override List<Group> GetSortedGroups()
@@ -692,7 +692,7 @@ namespace Foreman
 			bool includeSuppliers = AsProductCheckBox.Checked;
 			bool includeConsumers = AsIngredientCheckBox.Checked;
 			bool includeFuel = AsFuelCheckBox.Checked && isDefaultQuality;
-			bool ignoreItem = (KeyItem.Item == null);
+			bool ignoreItem = !KeyItem;
 
 			Dictionary<Group, List<List<KeyValuePair<DataObjectBase, Color>>>> filteredRecipes = new Dictionary<Group, List<List<KeyValuePair<DataObjectBase, Color>>>>();
 			Dictionary<Group, int> filteredRecipeCount = new Dictionary<Group, int>();
@@ -923,14 +923,14 @@ namespace Foreman
 		public NodeType NodeType;
 		public NodeDirection Direction;
 		public RecipeRequestArgs(RecipeQualityPair recipe) : this(NodeType.Recipe, recipe, NodeDirection.Down) { }
-        public RecipeRequestArgs(NodeType nodeType) : this(nodeType, new RecipeQualityPair(null,null), NodeDirection.Down)
+        public RecipeRequestArgs(NodeType nodeType) : this(nodeType, new RecipeQualityPair("non-recipe request args"), NodeDirection.Down)
 		{
 			if(nodeType == NodeType.Recipe)
 				Trace.Fail("RecipeRequestArgs need a recipe for a recipe node request!");
-            if (nodeType == NodeType.Spoil)
-                Trace.Fail("RecipeRequestArgs need a direction for a spoil node request!");
+            if (nodeType == NodeType.Spoil || nodeType == NodeType.Plant)
+                Trace.Fail("RecipeRequestArgs need a direction for a spoil / plant node request!");
         }
-		public RecipeRequestArgs(NodeType nodeType, NodeDirection direction) : this(nodeType, new RecipeQualityPair(null, null), direction)
+		public RecipeRequestArgs(NodeType nodeType, NodeDirection direction) : this(nodeType, new RecipeQualityPair("non-recipe request args"), direction)
 		{
             if (nodeType != NodeType.Spoil && nodeType != NodeType.Plant)
                 Trace.Fail("RecipeRequestArgs with direction only supported for spoil & plant requests!");

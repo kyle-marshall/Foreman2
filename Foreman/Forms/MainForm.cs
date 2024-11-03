@@ -530,7 +530,7 @@ namespace Foreman
 		private void AddRecipeButton_Click(object sender, EventArgs e)
 		{
 			Point location = GraphViewer.ScreenToGraph(new Point(GraphViewer.Width / 2, GraphViewer.Height / 2));
-			GraphViewer.AddNewNode(new Point(15, 15), new ItemQualityPair(null, null), location, NewNodeType.Disconnected);
+			GraphViewer.AddNewNode(new Point(15, 15), new ItemQualityPair("adding disconnected recipe node"), location, NewNodeType.Disconnected);
 		}
 
 		private void AddItemButton_Click(object sender, EventArgs e)

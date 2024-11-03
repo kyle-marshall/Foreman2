@@ -324,10 +324,10 @@ namespace Foreman
 
 			//modules panel
 			List<Module> moduleOptions = GetBeaconModuleOptions();
-            bool showModules = nodeData.SelectedBeacon.Beacon != null && nodeData.SelectedBeacon.Beacon.ModuleSlots > 0 && moduleOptions.Count > 0;
+            bool showModules = nodeData.SelectedBeacon && nodeData.SelectedBeacon.Beacon.ModuleSlots > 0 && moduleOptions.Count > 0;
 
-			BeaconValuesTable.Visible = nodeData.SelectedBeacon.Beacon != null;
-			BeaconInfoTable.Visible = nodeData.SelectedBeacon.Beacon != null;
+			BeaconValuesTable.Visible = nodeData.SelectedBeacon;
+			BeaconInfoTable.Visible = nodeData.SelectedBeacon;
 
 			BModulesLabel.Visible = showModules;
 			BModuleOptionsLabel.Visible = showModules;
@@ -336,14 +336,14 @@ namespace Foreman
 			SetupBeaconModuleOptions();
 
 			//beacon values
-			if (nodeData.SelectedBeacon.Beacon != null)
+			if (nodeData.SelectedBeacon)
 				SetBeaconValues(true);
 		}
 
 		private void SetupBeaconModuleOptions()
 		{
 			List<Module> moduleOptions = GetBeaconModuleOptions();
-			int moduleSlots = nodeData.SelectedBeacon.Beacon == null ? 0 : nodeData.SelectedBeacon.Beacon.ModuleSlots;
+			int moduleSlots = nodeData.SelectedBeacon ? nodeData.SelectedBeacon.Beacon.ModuleSlots : 0;
 
 			CleanTable(BModulesChoiceTable, moduleOptions.Count);
 			BModuleOptions.Clear();
@@ -368,7 +368,7 @@ namespace Foreman
 				mbutton.Enabled = nodeData.BeaconModules.Count < nodeData.SelectedBeacon.Beacon.ModuleSlots;
 
             List<Module> moduleOptions = GetBeaconModuleOptions();
-            int moduleSlots = nodeData.SelectedBeacon.Beacon == null ? 0 : nodeData.SelectedBeacon.Beacon.ModuleSlots;
+            int moduleSlots = nodeData.SelectedBeacon ? nodeData.SelectedBeacon.Beacon.ModuleSlots : 0;
 
 			CleanTable(SelectedBModulesTable, nodeData.BeaconModules.Count);
 
@@ -445,14 +445,14 @@ namespace Foreman
 
 		private void UpdateBeaconInfo()
 		{
-			BeaconTitle.Text = string.Format("Beacon: {0}", nodeData.SelectedBeacon.Beacon == null ? "-none-" : nodeData.SelectedBeacon.Beacon.FriendlyName);
+			BeaconTitle.Text = string.Format("Beacon: {0}", nodeData.SelectedBeacon ? nodeData.SelectedBeacon.Beacon.FriendlyName : "-none-");
 			SelectedBeaconIcon.Image = nodeData.SelectedBeacon.Icon;
 
-			BeaconEnergyLabel.Text = nodeData.SelectedBeacon.Beacon == null ? "0J" : GraphicsStuff.DoubleToEnergy(nodeData.GetBeaconEnergyConsumption(), "W");
-			BeaconModuleCountLabel.Text = nodeData.SelectedBeacon.Beacon == null ? "0" : nodeData.SelectedBeacon.Beacon.ModuleSlots.ToString();
-			BeaconEfficiencyLabel.Text = nodeData.SelectedBeacon.Beacon == null ? "0%" : nodeData.SelectedBeacon.Beacon.GetBeaconEffectivity(nodeData.SelectedBeacon.Quality, nodeData.BeaconCount).ToString("P0");
+			BeaconEnergyLabel.Text = nodeData.SelectedBeacon ? GraphicsStuff.DoubleToEnergy(nodeData.GetBeaconEnergyConsumption(), "W") : "0J";
+			BeaconModuleCountLabel.Text = nodeData.SelectedBeacon ? nodeData.SelectedBeacon.Beacon.ModuleSlots.ToString() : "0";
+			BeaconEfficiencyLabel.Text = nodeData.SelectedBeacon ? nodeData.SelectedBeacon.Beacon.GetBeaconEffectivity(nodeData.SelectedBeacon.Quality, nodeData.BeaconCount).ToString("P0") : "0%";
 			TotalBeaconsLabel.Text = nodeData.GetTotalBeacons().ToString();
-			TotalBeaconEnergyLabel.Text = nodeData.SelectedBeacon.Beacon == null ? "0J" : GraphicsStuff.DoubleToEnergy(nodeData.GetTotalBeaconElectricalConsumption(), "W");
+			TotalBeaconEnergyLabel.Text = nodeData.SelectedBeacon ? GraphicsStuff.DoubleToEnergy(nodeData.GetTotalBeaconElectricalConsumption(), "W") : "0J";
 		}
 
 		//------------------------------------------------------------------------------------------------------Helper functions
@@ -467,7 +467,7 @@ namespace Foreman
 
         private List<Module> GetBeaconModuleOptions()
         {
-            if (nodeData.SelectedAssembler.Assembler.AllowBeacons && nodeData.SelectedBeacon.Beacon != null)
+            if (nodeData.SelectedAssembler.Assembler.AllowBeacons && nodeData.SelectedBeacon)
                 return nodeData.BaseRecipe.Recipe.BeaconModules.Intersect(nodeData.SelectedBeacon.Beacon.Modules).Where(m => m.Enabled).OrderBy(m => m.LFriendlyName).ToList();
             else
                 return new List<Module>();

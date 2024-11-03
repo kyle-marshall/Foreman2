@@ -195,7 +195,7 @@ namespace Foreman
 				return;
 			}
 
-			if ((nNodeType != NewNodeType.Disconnected) && (originElement == null || baseItem.Item == null))
+			if ((nNodeType != NewNodeType.Disconnected) && (originElement == null || !baseItem))
 				Trace.Fail("Origin element or base item not provided for a new (linked) node");
 			
 			if (Grid.ShowGrid)
@@ -215,7 +215,7 @@ namespace Foreman
             } else
             {
                 fRange tempRange = new fRange(0, 0, true);
-                if (baseItem.Item != null && baseItem.Item is Fluid fluid && fluid.IsTemperatureDependent)
+                if (baseItem && baseItem.Item is Fluid fluid && fluid.IsTemperatureDependent)
                 {
                     if (nNodeType == NewNodeType.Consumer) //need to check all nodes down to recipes for range of temperatures being produced
                         tempRange = LinkChecker.GetTemperatureRange(fluid, originElement.DisplayedNode, LinkType.Output, true);
@@ -820,7 +820,7 @@ namespace Foreman
 						rightClickMenu.MenuItems.Add(new MenuItem("Add Recipe",
 							new EventHandler((o, ee) =>
 							{
-								AddNewNode(screenPoint, new ItemQualityPair(null,null), ScreenToGraph(e.Location), NewNodeType.Disconnected);
+								AddNewNode(screenPoint, new ItemQualityPair("adding disconnected recipe"), ScreenToGraph(e.Location), NewNodeType.Disconnected);
 							})));
 						rightClickMenu.Show(this, e.Location);
 					}

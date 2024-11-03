@@ -105,7 +105,7 @@ namespace Foreman
 				int textLength = GraphicsStuff.DrawText(graphics, TextBrush, textFormat, RecipeName, BaseFont, textSlot);
 
 				//assembler icon
-				graphics.DrawImage(DisplayedNode.SelectedAssembler.Assembler == null ? DataCache.UnknownIcon : DisplayedNode.SelectedAssembler.Icon, trans.X - Math.Min((Width / 2) - 10, (textLength / 2) + 32), trans.Y - 16, 32, 32);
+				graphics.DrawImage(DisplayedNode.SelectedAssembler ? DisplayedNode.SelectedAssembler.Icon : DataCache.UnknownIcon, trans.X - Math.Min((Width / 2) - 10, (textLength / 2) + 32), trans.Y - 16, 32, 32);
 
 				//productivity ticks
 				int pModules = DisplayedNode.AssemblerModules.Count(m => m.Module.GetProductivityBonus() > 0);
@@ -160,7 +160,7 @@ namespace Foreman
 							foreach (ReadOnlyRecipeNode rNode in rNodes)
 								((RecipeNodeController)graphViewer.Graph.RequestNodeController(rNode)).RemoveAssemblerModules();
 						})));
-				if (rNodes.Any(rn => rn.SelectedBeacon.Beacon != null))
+				if (rNodes.Any(rn => rn.SelectedBeacon))
 					RightClickMenu.Items.Add(new ToolStripMenuItem("Remove beacons", null,
 						new EventHandler((o, e) =>
 						{
@@ -178,7 +178,7 @@ namespace Foreman
 					bool canPasteExtraProductivityNonMiners = graphViewer.Graph.EnableExtraProductivityForNonMiners && rNodes.Any(rn => rn.SelectedAssembler.Assembler.EntityType != EntityType.Miner);
 					bool canPasteFuel = copiedOptions.Fuel != null && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Recipe.Assemblers.Any(a => a.Fuels.Contains(copiedOptions.Fuel))));
 					bool canPasteModules = copiedOptions.AssemblerModules.Count > 0 && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Recipe.AssemblerModules.Count > 0 && rn.SelectedAssembler.Assembler.Modules.Count > 0 && rn.SelectedAssembler.Assembler.ModuleSlots > 0));
-					bool canPasteBeacon = copiedOptions.Beacon.Beacon != null && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Recipe.AssemblerModules.Count > 0 && rn.SelectedAssembler.Assembler.Modules.Count > 0));
+					bool canPasteBeacon = copiedOptions.Beacon && (canPasteAssembler || rNodes.Any(rn => rn.BaseRecipe.Recipe.AssemblerModules.Count > 0 && rn.SelectedAssembler.Assembler.Modules.Count > 0));
 
 					if (canPasteAssembler || canPasteFuel || canPasteModules || canPasteBeacon)
 					{
@@ -241,7 +241,7 @@ namespace Foreman
 											controller.SetAssemblerModules(copiedOptions.AssemblerModules, true);
 									}
 
-									if (beaconCheck.Checked && rNode.BaseRecipe.Recipe.AssemblerModules.Intersect(rNode.SelectedAssembler.Assembler.Modules).Count() > 0 && copiedOptions.Beacon.Beacon != null)
+									if (beaconCheck.Checked && rNode.BaseRecipe.Recipe.AssemblerModules.Intersect(rNode.SelectedAssembler.Assembler.Modules).Count() > 0 && copiedOptions.Beacon)
 									{
 										controller.SetBeacon(copiedOptions.Beacon);
 										controller.SetBeaconCount(copiedOptions.BeaconCount);
@@ -249,7 +249,7 @@ namespace Foreman
 										controller.SetBeaconsPerAssembler(copiedOptions.BeaconsPerAssembler);
 									}
 
-									if (beaconModuleCheck.Checked && rNode.SelectedBeacon.Beacon != null)
+									if (beaconModuleCheck.Checked && rNode.SelectedBeacon)
 									{
 										HashSet<Module> acceptableBeaconModules = new HashSet<Module>(rNode.BaseRecipe.Recipe.AssemblerModules.Intersect(rNode.SelectedAssembler.Assembler.Modules).Intersect(rNode.SelectedBeacon.Beacon.Modules));
 										if (!copiedOptions.BeaconModules.Any(module => !acceptableBeaconModules.Contains(module.Module)))

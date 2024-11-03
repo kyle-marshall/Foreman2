@@ -46,7 +46,7 @@ namespace Foreman
 
 		protected override void Draw(Graphics graphics, NodeDrawingStyle style)
 		{
-			if (DisplayedNode.SelectedBeacon.Beacon == null || style == NodeDrawingStyle.IconsOnly || style == NodeDrawingStyle.Simple)
+			if (!DisplayedNode.SelectedBeacon || style == NodeDrawingStyle.IconsOnly || style == NodeDrawingStyle.Simple)
 				return;
 
 			Point trans = LocalToGraph(new Point(-Width / 2, -Height / 2));
@@ -95,7 +95,7 @@ namespace Foreman
 			}
 
 			//quantity
-			if (DisplayedNode.SelectedBeacon.Beacon != null) // && recipeNode.BeaconCount > 0)
+			if (DisplayedNode.SelectedBeacon) // && recipeNode.BeaconCount > 0)
 			{
 				Rectangle textbox = new Rectangle(trans.X + Width, trans.Y + 5, (myParent.Width / 2) - this.X - (this.Width / 2) - 6, 18);
 				//graphics.DrawRectangle(devPen, textbox);
@@ -112,7 +112,7 @@ namespace Foreman
 		{
 			if (!Visible)
 				return null;
-			if (DisplayedNode.SelectedBeacon.Beacon == null)
+			if (!DisplayedNode.SelectedBeacon)
 				return null;
 
 			List<TooltipInfo> tooltips = new List<TooltipInfo>();
