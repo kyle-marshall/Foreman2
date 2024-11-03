@@ -66,7 +66,8 @@ namespace Foreman
 		public bool LowPriority { get; set; }
 
 		public readonly RecipeQualityPair BaseRecipe;
-		public double NeighbourCount { get; set; }
+		private double neighbourCount;
+		public double NeighbourCount { get { return neighbourCount; } set { if (neighbourCount != value) { neighbourCount = value; ioUpdateRequired = true; UpdateState(); OnNodeValuesChanged(); } } }
 
 		private readonly DataCache RecipeOwner;
 
