@@ -314,7 +314,7 @@ namespace Foreman
 						newNode = rNode;
 						if ((nNodeType == NewNodeType.Consumer && !recipeRequestArgs.Recipe.Recipe.IngredientSet.ContainsKey(baseItem.Item)) || 
 							(nNodeType == NewNodeType.Supplier && !recipeRequestArgs.Recipe.Recipe.ProductSet.ContainsKey(baseItem.Item)) ||
-							(nNodeType == NewNodeType.Disconnected && !recipeRequestArgs.Recipe.Recipe.IngredientSet.ContainsKey(baseItem.Item) && !recipeRequestArgs.Recipe.Recipe.ProductSet.ContainsKey(baseItem.Item)))
+							(nNodeType == NewNodeType.Disconnected && baseItem && !recipeRequestArgs.Recipe.Recipe.IngredientSet.ContainsKey(baseItem.Item) && !recipeRequestArgs.Recipe.Recipe.ProductSet.ContainsKey(baseItem.Item)))
 						{
 							AssemblerSelector.Style style;
 							switch (Graph.AssemblerSelector.DefaultSelectionStyle)
