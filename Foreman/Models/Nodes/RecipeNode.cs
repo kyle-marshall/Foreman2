@@ -75,12 +75,12 @@ namespace Foreman
 		public AssemblerQualityPair SelectedAssembler
 		{
 			get { return assembler; }
-			set { if (value && assembler != value) { assembler = value; ioUpdateRequired = true; UpdateState(); OnNodeValuesChanged(); } }
+			set { if (value && assembler != value) { assembler = value; ioUpdateRequired = true; UpdateState(); OnNodeStateChanged(); } }
 		}
 		public Item Fuel
 		{
 			get { return fuel; }
-			set { if (fuel != value) { fuel = value; fuelRemainsOverride = null; ioUpdateRequired = true; UpdateState(); OnNodeValuesChanged(); } }
+			set { if (fuel != value) { fuel = value; fuelRemainsOverride = null; ioUpdateRequired = true; UpdateState(); OnNodeStateChanged(); } }
 		}
 		public Item FuelRemains
 		{
