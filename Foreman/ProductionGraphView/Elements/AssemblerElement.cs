@@ -101,12 +101,12 @@ namespace Foreman
 				if (DisplayedNode.GetQualityMultiplier() > 0)
 				{
 					graphics.DrawString("Speed:\nProd:\nPower:\nQuality:", infoFont, textBrush, trans.X + Width + 2, trans.Y);
-					graphics.DrawString(string.Format("{0:P0}\n{1:P0}\n{2:P0}\n{3:P0}", DisplayedNode.GetSpeedMultiplier(), DisplayedNode.GetProductivityMultiplier(), DisplayedNode.GetConsumptionMultiplier(), DisplayedNode.GetQualityMultiplier()), infoFont, textBrush, trans.X + Width + 26, trans.Y);
+					graphics.DrawString(string.Format("{0:+0%; -0%; 0%}\n{1:+0%; -0%; 0%}\n{2:+0%; -0%; 0%}\n{3:+0%; -0%; 0%}", (DisplayedNode.GetSpeedMultiplier() - 1), (DisplayedNode.GetProductivityMultiplier() - 1), (DisplayedNode.GetConsumptionMultiplier() - 1), DisplayedNode.GetQualityMultiplier()), infoFont, textBrush, trans.X + Width + 26, trans.Y);
 				}
 				else
 				{
 					graphics.DrawString("Speed:\nProd:\nPower:", infoFont, textBrush, trans.X + Width + 2, trans.Y);
-					graphics.DrawString(string.Format("{0:P0}\n{1:P0}\n{2:P0}", DisplayedNode.GetSpeedMultiplier(), DisplayedNode.GetProductivityMultiplier(), DisplayedNode.GetConsumptionMultiplier()), infoFont, textBrush, trans.X + Width + 26, trans.Y);
+					graphics.DrawString(string.Format("{0:+0%; -0%; 0%}\n{1:+0%; -0%; 0%}\n{2:+0%; -0%; 0%}", (DisplayedNode.GetSpeedMultiplier() - 1), (DisplayedNode.GetProductivityMultiplier() - 1), (DisplayedNode.GetConsumptionMultiplier() - 1)), infoFont, textBrush, trans.X + Width + 26, trans.Y);
 				}
 
 				textbox.Y = trans.Y + 28;

@@ -249,6 +249,7 @@ namespace Foreman
             this.AssemblerPollutionLabel.Size = new System.Drawing.Size(155, 13);
             this.AssemblerPollutionLabel.TabIndex = 12;
             this.AssemblerPollutionLabel.Text = "12/min";
+            this.AssemblerPollutionLabel.Visible = false;
             // 
             // AssemblerEnergyTitleLabel
             // 
