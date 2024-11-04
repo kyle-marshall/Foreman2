@@ -626,7 +626,7 @@ namespace Foreman
 
                 OtherNodeOptionsBTable.Visible = true;
 				AddSpoilButton.Visible = asIngredient && KeyItem.Item.SpoilResult != null;
-				AddUnspoilButton.Visible = asProduct && isDefaultQuality && KeyItem.Item.SpoilOrigins.Count > 0;
+				AddUnspoilButton.Visible = asProduct && KeyItem.Item.SpoilOrigins.Count > 0;
 				AddPlantButton.Visible = asIngredient && KeyItem.Item.PlantResult != null;
 				AddUnplantButton.Visible = asProduct && isDefaultQuality && KeyItem.Item.PlantOrigins.Count > 0;
 				int totalVisible = (AddSpoilButton.Visible ? 1 : 0) + (AddUnspoilButton.Visible ? 1 : 0) + (AddPlantButton.Visible ? 1 : 0) + (AddUnplantButton.Visible ? 1 : 0);

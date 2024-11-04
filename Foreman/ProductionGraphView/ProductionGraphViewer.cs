@@ -267,7 +267,7 @@ namespace Foreman
 						}
 						else if (baseItem.Item.SpoilOrigins.Count == 1)
 						{
-							newNode = Graph.CreateSpoilNode(new ItemQualityPair(baseItem.Item.SpoilOrigins.ElementAt(0), baseItem.Item.Owner.DefaultQuality), baseItem.Item, newLocation); //QUALITY UPDATE
+							newNode = Graph.CreateSpoilNode(new ItemQualityPair(baseItem.Item.SpoilOrigins.ElementAt(0), baseItem.Quality), baseItem.Item, newLocation); //QUALITY UPDATE
 							FinalizeNodePosition(newNode);
 						}
 						else
@@ -277,7 +277,7 @@ namespace Foreman
 							ItemChooserPanel itemChooser = new ItemChooserPanel(this, drawOrigin, baseItem.Item.SpoilOrigins);
 							itemChooser.ItemRequested += (oo, itemRequestArgs) =>
 							{
-								newNode = Graph.CreateSpoilNode(itemRequestArgs.Item, baseItem.Item, newLocation);
+								newNode = Graph.CreateSpoilNode(new ItemQualityPair(itemRequestArgs.Item.Item, baseItem.Quality), baseItem.Item, newLocation);
                                 FinalizeNodePosition(newNode);
                             };
 							itemChooser.PanelClosed += (oo, e) => { SubwindowOpen = false; };
