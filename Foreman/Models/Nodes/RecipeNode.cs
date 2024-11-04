@@ -1023,7 +1023,7 @@ namespace Foreman
 				//have to remove any links to the burner/burnt item (if they exist) unless the item is also part of the recipe
 				if (MyNode.Fuel != null && !MyNode.IsFuelPartOfRecipeInputs)
 				{
-					ItemQualityPair fuelIQP = new ItemQualityPair(fuel, MyNode.Fuel.Owner.DefaultQuality);
+					ItemQualityPair fuelIQP = new ItemQualityPair(MyNode.Fuel, MyNode.Fuel.Owner.DefaultQuality);
 					foreach (NodeLink link in MyNode.InputLinks.Where(link => link.Item == fuelIQP).ToList())
 						link.Controller.Delete();
 				}
