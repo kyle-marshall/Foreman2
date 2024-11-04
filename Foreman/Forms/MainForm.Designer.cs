@@ -552,7 +552,7 @@
             this.VersionLabel.Name = "VersionLabel";
             this.VersionLabel.Size = new System.Drawing.Size(53, 130);
             this.VersionLabel.TabIndex = 18;
-            this.VersionLabel.Text = "v2.2.16.0";
+            this.VersionLabel.Text = "v2.2.16.1";
             this.VersionLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // MainForm
