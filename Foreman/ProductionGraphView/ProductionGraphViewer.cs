@@ -312,7 +312,9 @@ namespace Foreman
 					case NodeType.Recipe:
 						ReadOnlyRecipeNode rNode = Graph.CreateRecipeNode(recipeRequestArgs.Recipe, newLocation);
 						newNode = rNode;
-						if ((nNodeType == NewNodeType.Consumer && !recipeRequestArgs.Recipe.Recipe.IngredientSet.ContainsKey(baseItem.Item)) || (nNodeType == NewNodeType.Supplier && !recipeRequestArgs.Recipe.Recipe.ProductSet.ContainsKey(baseItem.Item)))
+						if ((nNodeType == NewNodeType.Consumer && !recipeRequestArgs.Recipe.Recipe.IngredientSet.ContainsKey(baseItem.Item)) || 
+							(nNodeType == NewNodeType.Supplier && !recipeRequestArgs.Recipe.Recipe.ProductSet.ContainsKey(baseItem.Item)) ||
+							(nNodeType == NewNodeType.Disconnected && !recipeRequestArgs.Recipe.Recipe.IngredientSet.ContainsKey(baseItem.Item) && !recipeRequestArgs.Recipe.Recipe.ProductSet.ContainsKey(baseItem.Item)))
 						{
 							AssemblerSelector.Style style;
 							switch (Graph.AssemblerSelector.DefaultSelectionStyle)
@@ -332,12 +334,13 @@ namespace Foreman
 							List<Assembler> assemblerOptions = Graph.AssemblerSelector.GetOrderedAssemblerList(recipeRequestArgs.Recipe.Recipe, style);
 
 							RecipeNodeController controller = (RecipeNodeController)Graph.RequestNodeController(rNode);
-							if (nNodeType == NewNodeType.Consumer)
+							if ((nNodeType == NewNodeType.Consumer) || (nNodeType == NewNodeType.Disconnected && assemblerOptions.Any(a => a.Fuels.Contains(baseItem.Item))))
 							{
 								controller.SetAssembler(new AssemblerQualityPair(assemblerOptions.First(a => a.Fuels.Contains(baseItem.Item)), Graph.DefaultAssemblerQuality));
 								controller.SetFuel(baseItem.Item);
-							} else // if(nNodeType == NewNodeType.Supplier)
-							{
+							}
+							else if(nNodeType == NewNodeType.Supplier || (nNodeType == NewNodeType.Disconnected && assemblerOptions.Any(a => a.Fuels.Contains(baseItem.Item.FuelOrigin))))
+                            {
 								controller.SetAssembler(new AssemblerQualityPair(assemblerOptions.First(a => a.Fuels.Contains(baseItem.Item.FuelOrigin)), Graph.DefaultAssemblerQuality));
 								controller.SetFuel(baseItem.Item.FuelOrigin);
 							}
