@@ -69,7 +69,7 @@ namespace Foreman
 
 			Beacon beacon = (beacons && cache.Beacons.ContainsKey((string)json["Beacon"])) ? cache.Beacons[(string)json["Beacon"]] : null;
 			Quality beaconQuality = (beacons && cache.Qualities.ContainsKey((string)json["BeaconQuality"])) ? cache.Qualities[(string)json["BeaconQuality"]] : null;
-			BeaconQualityPair beaconQP = new BeaconQualityPair(beacon, beaconQuality ?? cache.DefaultQuality);
+			BeaconQualityPair beaconQP = beacon != null? new BeaconQualityPair(beacon, beaconQuality ?? cache.DefaultQuality) : new BeaconQualityPair("no beacon");
 
 			List<ModuleQualityPair> aModules = new List<ModuleQualityPair>();
 			foreach(JToken moduleToken in json["AModules"])
